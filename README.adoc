@@ -1,0 +1,9 @@
+= Daily Rust
+
+My journey to learn rust. 
+
+Resources: 
+* https://www.youtube.com/watch?v=2hXNd6x9sZs[How to learn Rust - No boilerplate] (Really good short videos)
+* https://doc.rust-lang.org/stable/book/[The Rust Programming Language] (Book)
+* https://doc.rust-lang.org/stable/rust-by-example/[Rust by Example]
+* https://github.com/rust-lang/rustlings[Rustlings] (Small exercises to learn rust)

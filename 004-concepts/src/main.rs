@@ -1,3 +1,4 @@
+use std::time::Instant;
 const PI: i8 = 3;
 
 fn main() {
@@ -10,13 +11,41 @@ fn main() {
     loop_label();
     whiles(76);
     fors();
-    fibonacci(0);
-    fibonacci(1);
-    fibonacci(2);
-    fibonacci(10);
-    fibonacci(19);
-    fibonacci(40);
-    fibonacci(94);
+    //fibonacci(0);
+    //fibonacci(1);
+    //fibonacci(2);
+    //fibonacci(10);
+    //fibonacci(19);
+    //fibonacci(40);
+    //fibonacci(94);
+
+    //let now = Instant::now();
+    //{
+    //    fibonacci(40);
+    //}
+    //println!("\tSumatory {:.2?}", now.elapsed());
+    println!("\nTesting fib as sum vs recursive: 45th number");
+
+    println!("n,rust_sum");
+    compute_fib_time(50, &fibonacci);
+    println!("n,rust_recursive");
+    compute_fib_time(50, &fibonacci_rec_v2);
+
+    let now = Instant::now();
+    {
+        fibonacci(40);
+    }
+    println!("\tSumatory {:.2?}", now.elapsed());
+    let now = Instant::now();
+    {
+        fibonacci_rec(40);
+    }
+    println!("\tRecursive {:.2?}", now.elapsed());
+    let now = Instant::now();
+    {
+        fibonacci_rec_v2(40);
+    }
+    println!("\tRecursiveV2 {:.2?}", now.elapsed());
 }
 
 fn num_types() {
@@ -133,6 +162,35 @@ fn fibonacci(number: u32) -> u128 {
         minus_two = minus_one;
         minus_one = current;
     }
-    println!("The {number} number in Fib's sequence is {current}");
+    //println!("The {number} number in Fib's sequence is {current}");
     current
+}
+
+fn fibonacci_rec(number: u32) -> u128 {
+    if number < 2 {
+        number as u128
+    } else {
+        fibonacci_rec(number-1) + fibonacci_rec(number-2)
+    }
+}
+
+fn fibonacci_rec_v2(number: u32) -> u128 {
+    match number {
+        1 | 0 => number as u128,
+        _ => fibonacci_rec_v2(number - 1) + fibonacci_rec_v2(number - 2),
+    }
+}
+
+
+fn compute_fib_time(max_num: u32, f: &dyn Fn(u32) -> u128) {
+    for n in 1..=max_num {
+
+        let now = Instant::now();
+        {
+            f(n);
+        }
+        //println!("{},{:.2?}", n, now.elapsed());
+        let elapsed = now.elapsed();
+        println!("{},{},{:.2?}", n, elapsed.as_nanos(), elapsed);
+    }
 }

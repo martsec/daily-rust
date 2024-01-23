@@ -34,7 +34,10 @@ impl <'a>Character<'a> {
 
     pub fn hit(&mut self, other: &mut Self) {
         let attack_roll = DiceType::D20.roll();
-        if attack_roll >= other.ac.into() {
+        if attack_roll == 20 {
+            println!("\t critical hit!!!");
+            other.take_damage(2 * self.weapon.damage_dice.roll())
+        } else if attack_roll >= other.ac.into() {
             other.take_damage(self.weapon.damage_dice.roll())
         } else {
             println!("Attack from {} missed.", self.name)

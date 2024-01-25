@@ -1,16 +1,16 @@
-use std::sync::Arc;
 use crate::dices::DiceType;
 use crate::weapons::handheld::Weapon;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Character<'a> {
     pub(crate) name: String,
     hp: u16,
     ac: u16,
-    weapon: Weapon<'a>
+    weapon: Weapon<'a>,
 }
 
-impl <'a>Default for Character<'a> {
+impl<'a> Default for Character<'a> {
     fn default() -> Self {
         let weapon = Weapon {
             name: Arc::new("Empty hand"),
@@ -25,10 +25,13 @@ impl <'a>Default for Character<'a> {
     }
 }
 
-impl <'a>Character<'a> {
+impl<'a> Character<'a> {
     pub fn new(name: String, hp: u16, ac: u16, weapon: Weapon<'a>) -> Self {
         Self {
-            name, hp, ac, weapon
+            name,
+            hp,
+            ac,
+            weapon,
         }
     }
 

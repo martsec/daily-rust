@@ -1,16 +1,13 @@
-use std::sync::Arc;
-use rand::prelude::*;
 use crate::character::Character;
-use crate::dices::DiceType;
 use crate::dices::do_roll;
+use crate::dices::DiceType;
 use crate::weapons::handheld::Weapon;
-
+use rand::prelude::*;
+use std::sync::Arc;
 
 mod character;
 mod dices;
 mod weapons;
-
-
 
 fn main() {
     use DiceType::*;
@@ -20,13 +17,19 @@ fn main() {
         String::from("Cornelius"),
         20,
         12,
-        Weapon { name: Arc::new ("Gladius"), damage_dice: D10}
+        Weapon {
+            name: Arc::new("Gladius"),
+            damage_dice: D10,
+        },
     );
     let mut barca = Character::new(
         String::from("Barca"),
         25,
         13,
-        Weapon { name: Arc::new ("ShortSword"), damage_dice: D8}
+        Weapon {
+            name: Arc::new("ShortSword"),
+            damage_dice: D8,
+        },
     );
 
     println!("{:?}", cornelius);
@@ -45,6 +48,23 @@ fn main() {
         //println!("{:?}", cornelius);
         //println!("{:?}", barca);
     }
-    let winner = if cornelius.is_alive() { cornelius } else { barca };
-    println!("\n\nAfter {} rounds the winner is {}!", num_rounds, winner.name)
+    let winner = if cornelius.is_alive() {
+        cornelius
+    } else {
+        barca
+    };
+    println!(
+        "\n\nAfter {} rounds the winner is {}!",
+        num_rounds, winner.name
+    );
+
+    let new_char = Character::new(
+        "myname".to_string(),
+        10,
+        15,
+        Weapon {
+            name: Arc::new("Fist"),
+            damage_dice: D20,
+        },
+    );
 }

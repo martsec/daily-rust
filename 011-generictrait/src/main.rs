@@ -5,7 +5,7 @@ use std::hash::Hash;
 
 fn median<T>(v: &[T]) -> T
 where
-    T: Float + Clone,
+    T: Float,
 {
     // Issue: we must return a decimal since if it has a pair number of elements
     // we'll need to divide them.
@@ -45,10 +45,63 @@ fn mode<T: Eq + Hash + Copy>(v: &[T]) -> T {
     mode
 }
 
+fn longest_str<'a>(x: &'a str, y: &'a str) -> &'a str {
+    // Compiler can't infer which str we will return, so we must say
+    // that both need to have the same lifetime (or validity)
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
 fn main() {
     let v = vec![100, 32, 57];
     println!("Mode: {}", mode(&v));
 
     let v = vec![100.3, 3.43, 32.4, 57.4];
-    println!("Median: {} ", median(&v))
+    println!("Median: {} ", median(&v));
+
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest_str(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+
+    let result: &str;
+    {
+        let string3 = String::from("mnijk");
+        result = longest_str(string1.as_str(), string3.as_str());
+        println!("The longest string is {}", result);
+    }
+    // This will fail
+    //println!("The longest string is {}", result);
+    let result: &str;
+    {
+        let string3 = String::from("mnijk");
+        //result = longest_str(string1.clone().as_str(), string3.as_str());
+        //println!("The longest string is {}", result);
+    }
+
+    let novel = String::from("Call me Atlantis. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+    println!("{}", i.announce_and_return_part("This is important"));
+}
+
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+impl<'a> ImportantExcerpt<'a> {
+    fn level(&self) -> i32 {
+        3
+    }
+}
+impl<'a> ImportantExcerpt<'a> {
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention please: {}", announcement);
+        self.part
+    }
 }

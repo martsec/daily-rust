@@ -1,4 +1,6 @@
 = Daily Rust
+:source-highlighter: highlight.js
+:highlightjs-languages: rust
 
 My journey to learn rust. 
 
@@ -7,3 +9,81 @@ Resources:
 * https://doc.rust-lang.org/stable/book/[The Rust Programming Language] (Book)
 * https://doc.rust-lang.org/stable/rust-by-example/[Rust by Example]
 * https://github.com/rust-lang/rustlings[Rustlings] (Small exercises to learn rust)
+
+
+
+== Match and structs
+
+From https://stackoverflow.com/questions/50775023/why-do-i-get-an-error-when-pattern-matching-a-struct-like-enum-variant-with-fiel[Why do I get an error when pattern matching a struct-like enum variant with fields?]
+
+
+[quote, Shepmaster]
+____
+Enum variants have three possible syntaxes:
+
+[,rust]
+.unit
+----
+enum A { One }
+----
+
+[,rust]
+.tuple
+----
+enum B { Two(u8, bool) }
+----
+
+[,rust]
+.struct
+----
+enum C { Three { a: f64, b: String } }
+----
+
+You have to use the same syntax when pattern matching as the syntax the variant was defined as:
+
+[,rust]
+.unit
+----
+match something {
+  A::One => { /* Do something */ }
+}
+----
+
+[,rust]
+.tuple
+----
+match something {
+  B::Two(x, y) => { /* Do something */ }
+}
+----
+
+[,rust]
+.struct
+----
+match something {
+  C::Three { a: another_name, b } => { /* Do something */ }
+}
+----
+
+Beyond that, you can use various patterns that allow ignoring a value, 
+such as `_` or `..` 
+In this case, you need curly braces and the `..` catch-all:
+
+[,rust]
+----
+OperationMode::CBC { .. } => { /* Do something */ }
+----
+
+See also:
+
+* https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#ignoring-values-in-a-pattern[Ignoring Values in a Pattern in The Rust Programming Language]
+* https://doc.rust-lang.org/book/appendix-02-operators.html[Appendix B: Operators and Symbols in The Rust Programming Language]
+* https://stackoverflow.com/questions/41390457/how-to-match-struct-fields-in-rust[How to match struct fields in Rust?]
+____
+
+
+== Great helper tools and libraries
+
+* https://github.com/Canop/bacon[Bacon]: autocompiler to leave in the side screen
+* Tokio for async
+* polars for data processing in local

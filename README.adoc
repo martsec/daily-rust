@@ -87,3 +87,4 @@ ____
 * https://github.com/Canop/bacon[Bacon]: autocompiler to leave in the side screen
 * Tokio for async
 * polars for data processing in local
+* `evcxr` is a REPL for rust. A bit slow if you are using polars for example

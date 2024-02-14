@@ -10,6 +10,17 @@ color-eyre = "0.6.2"
 rand = "0.8.5"
 rstest = "0.18.2"
 
+leptos = {  version = "0.6.5",features = ["csr"] }
+leptos_meta = { version = "0.6.5", features = ["csr"] }
+leptos_router = {  version = "0.6.5",features = ["csr"] }
+log = "0.4"
+gloo-net = { version = "0.2", features = ["http"] }
+
+# dependencies for client (enable when csr or hydrate set)
+wasm-bindgen = { version = "0.2" }
+console_log = { version = "1" }
+console_error_panic_hook = { version = "0.1" }
+
 # From https://github.com/0atman/noboilerplate/blob/main/scripts/37-functional-rust.md
 [lints.rust]
 unsafe_code = "forbid"

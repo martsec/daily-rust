@@ -1,0 +1,7 @@
+= PLAI cards
+
+
+== Startup
+
+Start the dev website using `trunk serve --port 3000`
+Developed using leptos

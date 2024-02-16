@@ -3,12 +3,29 @@
 @tailwind utilities;
 
 
+
+/*
+from PIL import Image
+i = Image.open("card_special.png")
+x, y = i.size
+crop = 30
+r = i.crop((crop, crop, x -crop, y-crop))
+i.save("card_special.png", "PNG")
+ */
+
 .card {
-	width: 300px;
-	height: 400px;
+	width: 298px;
+	height: 408px;
 	background-color: white;
 	border: 1px solid #ccc;
 	border-radius: 25px;
+	background-image: url("img/card_special.png");
+	background-size: contain;
+	transition: transform .2s; /* Animation */
+}
+
+.card:hover {
+	transform: scale(1.2) translateY(-20px);
 }
 
 .bottom-90 {

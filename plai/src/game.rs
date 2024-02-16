@@ -1,18 +1,39 @@
-use crate::cards::{Deck, Hand};
+use crate::cards::{Card, Deck, Hand};
 
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
-struct Game {
-    players: Vec<Player>,
+#[derive(Clone)]
+pub struct Game {
+    pub players: Vec<Player>,
     deck: Box<Deck>,
-    round: u32,
+    pub round: u32,
 }
 
 impl Game {
-    pub fn new() -> Self {
+    #[must_use]
+    pub fn new(player_names: &[String]) -> Self {
+        let cards = vec![
+            Card {
+                title: "Card1".into(),
+                effect: None,
+            },
+            Card {
+                title: "Card2".into(),
+                effect: None,
+            },
+            Card {
+                title: "Card3".into(),
+                effect: None,
+            },
+            Card {
+                title: "Card4".into(),
+                effect: None,
+            },
+        ];
+        let deck = Deck::new(cards);
         Self {
-            players: vec![Player::new("P1")],
-            deck: Box::new(Deck::new()),
+            players: player_names.iter().map(|n| Player::new(n)).collect(),
+            deck: Box::new(deck),
             round: 0,
         }
     }
@@ -47,8 +68,8 @@ impl Game {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
-enum PlayerState {
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum PlayerState {
     Startup,
     OpenSource,
     Eliminated,
@@ -60,7 +81,19 @@ impl Default for PlayerState {
     }
 }
 
-struct Player {
+impl std::fmt::Display for PlayerState {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let text = match self {
+            Self::Startup => "Startup",
+            Self::OpenSource => "Open Source",
+            Self::Eliminated => "Eliminated",
+        };
+        write!(f, "{text}")
+    }
+}
+
+#[derive(Clone)]
+pub struct Player {
     name: String,
     state: PlayerState,
     hand: Hand,
@@ -76,13 +109,20 @@ impl Player {
     }
 
     fn update_state(&mut self) {
-        use PlayerState::*;
+        use PlayerState::{Eliminated, OpenSource, Startup};
         if self.hand.is_empty() {
             match self.state {
                 Startup => self.state = OpenSource,
-                OpenSource => (),
-                Eliminated => (),
+                OpenSource | Eliminated => (),
             }
         }
+    }
+
+    pub fn state(&self) -> &PlayerState {
+        &self.state
+    }
+
+    pub fn name(&self) -> &String {
+        &self.name
     }
 }

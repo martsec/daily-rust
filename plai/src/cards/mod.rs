@@ -20,6 +20,6 @@ pub enum Effect {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Card {
-    title: String,
-    effect: Option<Effect>,
+    pub title: String,
+    pub effect: Option<Effect>,
 }

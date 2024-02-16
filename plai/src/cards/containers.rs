@@ -2,11 +2,13 @@ use rand::prelude::*;
 
 use crate::cards::{Card, Effect};
 
+#[derive(Clone)]
 pub struct Hand {
     cards: Vec<Card>,
 }
 
 impl Hand {
+    #[must_use]
     pub const fn new() -> Self {
         Self { cards: vec![] }
     }
@@ -35,43 +37,27 @@ impl Hand {
         returned
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.cards.len()
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.cards.is_empty()
     }
 }
 
+#[derive(Clone)]
 pub struct Deck {
     cards: Vec<Card>,
 }
 
 impl Deck {
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new(cards: Vec<Card>) -> Self {
         // TODO this init needs to change
-        let mut deck = Self {
-            cards: vec![
-                Card {
-                    title: "Card1".into(),
-                    effect: None,
-                },
-                Card {
-                    title: "Card2".into(),
-                    effect: None,
-                },
-                Card {
-                    title: "Card3".into(),
-                    effect: None,
-                },
-                Card {
-                    title: "Card4".into(),
-                    effect: None,
-                },
-            ],
-        };
+        let mut deck = Self { cards };
         deck.shuffle();
         deck
     }
@@ -93,19 +79,36 @@ impl Deck {
 
 #[cfg(test)]
 mod tests {
+    use rstest::{fixture, rstest};
+
     use super::*;
 
-    #[test]
-    fn new_deck_is_shufled() {
-        let deck = Deck::new();
-        let deck2 = Deck::new();
+    #[fixture]
+    fn cards() -> Vec<Card> {
+        let mut cards = vec![];
 
-        assert_ne!(deck.cards, deck2.cards);
+        for i in 1..=5 {
+            cards.push(Card {
+                title: format!("Card_{i}"),
+                effect: None,
+            });
+        }
+        cards
     }
 
-    #[test]
-    fn draw_decreases_remaining_cards() {
-        let mut deck = Deck::new();
+    #[rstest]
+    fn new_deck_is_shufled(cards: Vec<Card>) {
+        let deck = Deck::new(cards.clone());
+        let deck2 = Deck::new(cards.clone());
+
+        assert_ne!(deck.cards, deck2.cards);
+        assert_ne!(deck.cards, cards);
+        assert_ne!(deck2.cards, cards);
+    }
+
+    #[rstest]
+    fn draw_decreases_remaining_cards(cards: Vec<Card>) {
+        let mut deck = Deck::new(cards);
 
         let original_size = deck.len();
         deck.draw();
@@ -214,7 +217,7 @@ mod testhand {
                     first_last_matches += 1;
                 }
             }
-            assert!(first_last_matches < 80)
+            assert!(first_last_matches < 80);
         }
 
         #[test]

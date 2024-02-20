@@ -1,6 +1,6 @@
 mod containers;
 
-pub use containers::{Deck, Hand};
+pub use containers::{Deck, DeckEmptyError, Hand};
 
 /// This enum contains all possible effects in the game
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

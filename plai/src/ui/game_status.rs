@@ -1,7 +1,5 @@
 use crate::game::{Game, Player, PlayerState};
-use crate::ui::app::Button;
 use leptos::*;
-use leptos_router::Redirect;
 
 #[component]
 fn StartupIcon() -> impl IntoView {
@@ -141,7 +139,7 @@ pub fn GameStatusBar(game: RwSignal<Game>) -> impl IntoView {
                         d="M17.7 7.7A7.1 7.1 0 0 0 5 10.8M18 4v4h-4m-7.7 8.3A7.1 7.1 0 0 0 19 13.2M6 20v-4h4"
                     ></path>
                 </svg>
-                <span class="text-sm px-2">{game.get().round} " rounds"</span>
+                <span class="text-sm px-2">{game.get().round.number} " rounds"</span>
 
             </div>
             // Player status

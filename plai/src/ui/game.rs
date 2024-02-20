@@ -1,6 +1,6 @@
 //! Everything related to the game rendering engine
 
-use crate::game::{Game, Player, PlayerState};
+use crate::game::Game;
 use crate::ui::app::Button;
 use crate::ui::game_status::GameStatusBar;
 use leptos::*;
@@ -23,7 +23,7 @@ pub fn GameView(players: RwSignal<Vec<(i32, RwSignal<String>)>>) -> impl IntoVie
         </div>
 
         <div class="my-0 mx-auto max-w-3xl text-center">
-            <PlayerDrawer/>
+            <PlayerDrawer _game=game/>
         </div>
     }
     .into()
@@ -53,7 +53,9 @@ pub fn PlayerHand(cards: ReadSignal<Vec<String>>) -> impl IntoView {
 }
 
 #[component]
-pub fn PlayerDrawer() -> impl IntoView {
+pub fn PlayerDrawer(_game: RwSignal<Game>) -> impl IntoView {
+    //let cards = game.get().players.first().expect("No player");
+
     let plain_cards: Vec<String> = (0..5).map(|n| format!("Card {n}")).collect();
     let (cards, set_cards) = create_signal(plain_cards);
     // create event handlers for our buttons

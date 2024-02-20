@@ -1,8 +1,25 @@
+use std::fmt;
+
 use rand::prelude::*;
 
-use crate::cards::{Card, Effect};
+use crate::cards::Card;
 
-#[derive(Clone)]
+#[derive(PartialEq)]
+pub struct DeckEmptyError;
+
+impl fmt::Display for DeckEmptyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Deck is out of cards. You all lost!")
+    }
+}
+
+impl fmt::Debug for DeckEmptyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{{ file: {}, line: {} }}", file!(), line!()) // programmer-facing output
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Hand {
     cards: Vec<Card>,
 }
@@ -48,7 +65,7 @@ impl Hand {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Deck {
     cards: Vec<Card>,
 }
@@ -56,14 +73,19 @@ pub struct Deck {
 impl Deck {
     #[must_use]
     pub fn new(cards: Vec<Card>) -> Self {
-        // TODO this init needs to change
         let mut deck = Self { cards };
         deck.shuffle();
         deck
     }
 
-    fn draw(&mut self) -> Option<Card> {
-        self.cards.pop()
+    pub fn draw(&mut self, num: usize) -> Result<Vec<Card>, DeckEmptyError> {
+        let remaining = self.len();
+
+        if remaining <= num {
+            return Err(DeckEmptyError);
+        }
+
+        Ok(self.cards.drain((remaining - num)..remaining).collect())
     }
 
     fn shuffle(&mut self) {
@@ -111,14 +133,29 @@ mod tests {
         let mut deck = Deck::new(cards);
 
         let original_size = deck.len();
-        deck.draw();
+        let _ = deck.draw(1);
         let after_draw_size = deck.len();
         assert_ne!(original_size, after_draw_size);
         assert_eq!(original_size, after_draw_size + 1);
     }
 
-    #[test]
-    const fn draw_empty_deck_returns_none() {}
+    #[rstest]
+    fn draw_empty_deck_returns_err() {
+        let mut deck = Deck::new(vec![]);
+
+        let drawn = deck.draw(1);
+
+        assert_eq!(drawn, Err(DeckEmptyError));
+    }
+
+    #[rstest]
+    fn draw_more_or_equal_cards_than_available(cards: Vec<Card>) {
+        let num_cards = cards.len();
+        let mut deck = Deck::new(cards);
+
+        assert_eq!(deck.draw(num_cards), Err(DeckEmptyError));
+        assert_eq!(deck.draw(num_cards + 1), Err(DeckEmptyError));
+    }
 }
 
 #[cfg(test)]

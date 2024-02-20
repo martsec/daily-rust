@@ -80,20 +80,22 @@ impl Game {
         }
 
         match action {
-            TurnAction::Funding(f) => {
-                let deck = &mut self.deck;
-                match f {
-                    Funding::Family => {
-                        let cards = deck.draw(1)?;
-                        self.active_player_mut().hand.add_multiple(cards);
-                        Ok(())
-                    }
-                    Funding::Regional => todo!(),
-                    Funding::VC => todo!(),
-                }
-            }
+            TurnAction::Funding(f) => self.do_funding(f),
             TurnAction::HostileTakeover(target) => todo!(),
             TurnAction::SpecialCard(c) => todo!(),
+        }
+    }
+
+    fn do_funding(&mut self, f: Funding) -> Result<(), DeckEmptyError> {
+        let deck = &mut self.deck;
+        match f {
+            Funding::Family => {
+                let cards = deck.draw(1)?;
+                self.active_player_mut().hand.add_multiple(cards);
+                Ok(())
+            }
+            Funding::Regional => todo!(),
+            Funding::VC => todo!(),
         }
     }
 }

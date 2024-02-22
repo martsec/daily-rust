@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::cards::{BasicCard, Deck, DeckEmptyError, Hand};
+use crate::cards::{get_cards, Card, Deck, DeckEmptyError, Hand};
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
 #[derive(Clone)]
@@ -13,24 +13,7 @@ pub struct Game {
 impl Game {
     #[must_use]
     pub fn new(player_names: &[String]) -> Self {
-        let cards = vec![
-            BasicCard {
-                title: "Card1".into(),
-                effect: None,
-            },
-            BasicCard {
-                title: "Card2".into(),
-                effect: None,
-            },
-            BasicCard {
-                title: "Card3".into(),
-                effect: None,
-            },
-            BasicCard {
-                title: "Card4".into(),
-                effect: None,
-            },
-        ];
+        let cards = get_cards();
         let deck = Deck::new(cards);
         let players: Vec<Player> = player_names
             .iter()
@@ -49,7 +32,7 @@ impl Game {
 
 pub enum TurnAction<'a> {
     Funding(Funding),
-    SpecialCard(BasicCard),
+    SpecialCard(Card),
     HostileTakeover(&'a Player),
 }
 
@@ -58,7 +41,7 @@ impl Game {
     /// Ends the turn and computes logic for startup elimination
     /// and new round if needed
     pub fn end_turn(&mut self) {
-        let _ = self.round.next_player();
+        self.round.next_player();
     }
 
     pub fn active_player(&self) -> &Player {
@@ -392,11 +375,43 @@ impl Player {
         }
     }
 
+    fn possible_actions(&self) -> Vec<TurnAction> {
+        todo!()
+    }
+
     pub fn state(&self) -> &PlayerState {
         &self.state
     }
 
     pub fn name(&self) -> &String {
         &self.name
+    }
+}
+
+#[cfg(test)]
+mod test_player {
+    use super::*;
+    use rstest::{fixture, rstest};
+
+    #[fixture]
+    fn cards() -> Vec<Card> {
+        let mut cards = vec![];
+
+        for i in 1..=60 {
+            cards.push(Card::Adversary {
+                title: format!("Card_{i}"),
+                effect: None,
+                description: "".to_string(),
+                strenght: 0,
+            });
+        }
+        cards
+    }
+
+    #[rstest]
+    fn next_turn_changes_player(mut cards: Vec<Card>) {
+        let mut p = Player::new(0, "Test");
+
+        p.hand.add(cards.pop().expect(""))
     }
 }

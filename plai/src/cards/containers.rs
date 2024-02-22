@@ -2,7 +2,7 @@ use std::fmt;
 
 use rand::prelude::*;
 
-use crate::cards::BasicCard;
+use super::Card;
 
 #[derive(PartialEq)]
 pub struct DeckEmptyError;
@@ -21,7 +21,7 @@ impl fmt::Debug for DeckEmptyError {
 
 #[derive(Clone, Debug)]
 pub struct Hand {
-    cards: Vec<BasicCard>,
+    cards: Vec<Card>,
 }
 
 impl Hand {
@@ -31,16 +31,16 @@ impl Hand {
     }
 
     /// Add a card to the hand
-    pub fn add(&mut self, c: BasicCard) {
+    pub fn add(&mut self, c: Card) {
         self.cards.push(c);
     }
 
-    pub fn add_multiple(&mut self, cs: Vec<BasicCard>) {
+    pub fn add_multiple(&mut self, cs: Vec<Card>) {
         self.cards.extend(cs);
     }
 
-    pub fn take(&mut self, num: u32) -> Vec<BasicCard> {
-        let mut returned: Vec<BasicCard> = vec![];
+    pub fn take(&mut self, num: u32) -> Vec<Card> {
+        let mut returned: Vec<Card> = vec![];
         let mut rng = rand::thread_rng();
 
         for _ in 1..=num {
@@ -67,18 +67,18 @@ impl Hand {
 
 #[derive(Clone, Debug)]
 pub struct Deck {
-    cards: Vec<BasicCard>,
+    cards: Vec<Card>,
 }
 
 impl Deck {
     #[must_use]
-    pub fn new(cards: Vec<BasicCard>) -> Self {
+    pub fn new(cards: Vec<Card>) -> Self {
         let mut deck = Self { cards };
         deck.shuffle();
         deck
     }
 
-    pub fn draw(&mut self, num: usize) -> Result<Vec<BasicCard>, DeckEmptyError> {
+    pub fn draw(&mut self, num: usize) -> Result<Vec<Card>, DeckEmptyError> {
         let remaining = self.len();
 
         if remaining <= num {
@@ -106,20 +106,22 @@ mod tests {
     use super::*;
 
     #[fixture]
-    fn cards() -> Vec<BasicCard> {
+    fn cards() -> Vec<Card> {
         let mut cards = vec![];
 
         for i in 1..=5 {
-            cards.push(BasicCard {
+            cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
                 effect: None,
+                description: "".to_string(),
+                strenght: 0,
             });
         }
         cards
     }
 
     #[rstest]
-    fn new_deck_is_shufled(cards: Vec<BasicCard>) {
+    fn new_deck_is_shufled(cards: Vec<Card>) {
         let deck = Deck::new(cards.clone());
         let deck2 = Deck::new(cards.clone());
 
@@ -129,7 +131,7 @@ mod tests {
     }
 
     #[rstest]
-    fn draw_decreases_remaining_cards(cards: Vec<BasicCard>) {
+    fn draw_decreases_remaining_cards(cards: Vec<Card>) {
         let mut deck = Deck::new(cards);
 
         let original_size = deck.len();
@@ -149,7 +151,7 @@ mod tests {
     }
 
     #[rstest]
-    fn draw_more_or_equal_cards_than_available(cards: Vec<BasicCard>) {
+    fn draw_more_or_equal_cards_than_available(cards: Vec<Card>) {
         let num_cards = cards.len();
         let mut deck = Deck::new(cards);
 
@@ -161,23 +163,20 @@ mod tests {
 #[cfg(test)]
 mod testhand {
     #[allow(clippy::wildcard_imports)]
-    use rstest::*;
-
-    #[fixture]
-    fn setup() {
-        #[allow(clippy::unwrap_used)]
-        color_eyre::install().unwrap();
-    }
+    use rstest::{fixture, rstest};
 
     use super::*;
 
-    fn get_cards(num: u32) -> Vec<BasicCard> {
+    #[fixture]
+    fn cards() -> Vec<Card> {
         let mut cards = vec![];
 
-        for i in 1..=num {
-            cards.push(BasicCard {
+        for i in 1..=60 {
+            cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
                 effect: None,
+                description: "".to_string(),
+                strenght: 0,
             });
         }
         cards
@@ -190,44 +189,35 @@ mod testhand {
         assert!(h.is_empty());
     }
 
-    #[test]
-    fn can_add_cards() {
+    #[rstest]
+    fn can_add_cards(cards: Vec<Card>) {
         let mut h = Hand::new();
 
-        for i in 1..10 {
-            h.add(BasicCard {
-                title: "MyCard".into(),
-                effect: None,
-            });
+        for (i, card) in cards.into_iter().enumerate() {
+            h.add(card);
 
-            assert_eq!(h.len(), i);
+            assert_eq!(h.len(), i + 1);
         }
     }
 
-    #[test]
-    fn can_add_multiple_cards() {
+    #[rstest]
+    fn can_add_multiple_cards(cards: Vec<Card>) {
         let mut h = Hand::new();
-        let mut to_add = vec![];
+        let len_cards = cards.len();
 
-        for _ in 1..10 {
-            to_add.push(BasicCard {
-                title: "MyCard".into(),
-                effect: None,
-            });
-        }
         // When
-        h.add_multiple(to_add);
+        h.add_multiple(cards);
         // Then
-        assert_eq!(h.len(), (1..10).len());
+        assert_eq!(h.len(), len_cards);
     }
 
     mod take {
         use super::*;
 
-        #[test]
-        fn take_one_card() {
+        #[rstest]
+        fn take_one_card(cards: Vec<Card>) {
             let mut h = Hand::new();
-            let card = get_cards(1).first().expect("").clone();
+            let card = cards.first().expect("").clone();
             h.add(card.clone());
             // When
             let taken_cards = h.take(1);
@@ -236,9 +226,8 @@ mod testhand {
             assert_eq!(h.len(), 0);
         }
 
-        #[test]
-        fn takes_a_random_card() {
-            let cards = get_cards(20);
+        #[rstest]
+        fn takes_a_random_card(cards: Vec<Card>) {
             let first_card = cards.first();
             let last_card = cards.last();
 
@@ -257,10 +246,10 @@ mod testhand {
             assert!(first_last_matches < 80);
         }
 
-        #[test]
-        fn takes_multiple_cards() {
+        #[rstest]
+        fn takes_multiple_cards(cards: Vec<Card>) {
             let mut h = Hand::new();
-            let card = get_cards(1).first().expect("").clone();
+            let card = cards.first().expect("").clone();
             h.add(card.clone());
             h.add(card.clone());
             // When

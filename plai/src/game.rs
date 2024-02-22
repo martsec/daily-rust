@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::cards::{Card, Deck, DeckEmptyError, Hand};
+use crate::cards::{BasicCard, Deck, DeckEmptyError, Hand};
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
 #[derive(Clone)]
@@ -14,19 +14,19 @@ impl Game {
     #[must_use]
     pub fn new(player_names: &[String]) -> Self {
         let cards = vec![
-            Card {
+            BasicCard {
                 title: "Card1".into(),
                 effect: None,
             },
-            Card {
+            BasicCard {
                 title: "Card2".into(),
                 effect: None,
             },
-            Card {
+            BasicCard {
                 title: "Card3".into(),
                 effect: None,
             },
-            Card {
+            BasicCard {
                 title: "Card4".into(),
                 effect: None,
             },
@@ -49,12 +49,18 @@ impl Game {
 
 pub enum TurnAction<'a> {
     Funding(Funding),
-    SpecialCard(Card),
+    SpecialCard(BasicCard),
     HostileTakeover(&'a Player),
 }
 
 /// Player options
 impl Game {
+    /// Ends the turn and computes logic for startup elimination
+    /// and new round if needed
+    pub fn end_turn(&mut self) {
+        let _ = self.round.next_player();
+    }
+
     pub fn active_player(&self) -> &Player {
         let pid = self.round.active_player();
         self.players
@@ -112,6 +118,26 @@ mod test_game_actions {
     }
 
     #[rstest]
+    fn next_turn_changes_player(mut game: Game) {
+        let p1 = game.active_player().id;
+
+        game.end_turn();
+
+        assert_ne!(game.active_player().id, p1);
+    }
+
+    #[rstest]
+    fn next_turn_advances_round(mut game: Game) {
+        let p1 = game.active_player().id;
+        let round_num = game.round.number;
+        for _ in 0..game.players.len() {
+            game.end_turn();
+        }
+        assert_eq!(game.round.number, round_num + 1);
+        assert_eq!(game.active_player().id, p1);
+    }
+
+    #[rstest]
     fn family_funding(mut game: Game) {
         let original_deck_size = game.deck.len();
         let active_p = game.active_player();
@@ -137,6 +163,20 @@ mod test_game_actions {
 
     //     assert_eq!(game.active_player().hand.len(), original_card_num + 2);
     //     assert_eq!(game.deck.len(), original_deck_size - 2)
+    // }
+
+    // #[rstest]
+    // fn regional_funding_next_player_can_attak(mut game: Game) {
+    //     let original_deck_size = game.deck.len();
+    //     let active_p = game.active_player();
+    //     let original_card_num = active_p.hand.len();
+    //     let active_pid = active_p.id;
+
+    //     let action = TurnAction::Funding(Funding::Regional);
+    //     let _ = game.turn_action(active_pid, action);
+    //     let _ = game.end_turn();
+
+    //     todo!();
     // }
 
     // #[rstest]
@@ -226,23 +266,30 @@ impl Round {
         }
     }
 
-    fn next_round(self) -> Result<Self, RoundNotEnded> {
+    fn next_round(&mut self) -> () {
         match self.remaining_players.len() {
-            0 => Ok(Self::new(self.number + 1, self.players)),
-            _ => Err(RoundNotEnded),
+            0 => {
+                self.number += 1;
+                self.remaining_players = self.players.clone();
+                self.remaining_players.reverse();
+            }
+            _ => {}
         }
     }
 
-    fn active_player(&self) -> &usize {
+    pub fn active_player(&self) -> &usize {
         self.remaining_players
             .last()
             .expect("A round should have no empty player list")
     }
 
-    fn next_player(&mut self) -> Result<usize, RoundEnded> {
-        match self.remaining_players.pop() {
-            Some(p) => Ok(p),
-            None => Err(RoundEnded),
+    pub fn next_player(&mut self) {
+        let _ = match self.remaining_players.pop() {
+            Some(p) => p,
+            None => 0,
+        };
+        if self.remaining_players.is_empty() {
+            self.next_round();
         }
     }
 }
@@ -265,45 +312,25 @@ mod test_round {
         let ids = vec![0, 1, 2, 3];
         let mut r = Round::new(0, ids);
 
-        let previous_player = r.next_player();
+        let previous_player = *r.active_player();
+        r.next_player();
 
-        assert_eq!(previous_player, Ok(0));
+        assert_eq!(previous_player, 0);
         assert_eq!(r.remaining_players.len(), 3);
     }
 
     #[test]
-    fn error_when_no_new_player() {
-        let ids = vec![0];
+    fn when_ending_round_starts_a_new() {
+        let ids = vec![0, 1];
         let mut r = Round::new(0, ids);
 
-        let previous_player = r.next_player();
+        let round_num = r.number;
+        let first = *r.active_player();
+        r.next_player();
+        r.next_player();
 
-        assert_eq!(previous_player, Ok(0));
-
-        let err = r.next_player();
-        assert_eq!(err, Err(RoundEnded));
-    }
-
-    #[test]
-    fn cannot_end_round_if_players_remaining() {
-        let ids = vec![0, 1, 2, 3];
-        let r = Round::new(1, ids);
-
-        assert_eq!(r.next_round(), Err(RoundNotEnded));
-    }
-
-    #[test]
-    fn new_round() {
-        let ids = vec![0, 1, 2, 3];
-        let mut r = Round::new(1, ids);
-        let _: Result<Vec<usize>, RoundEnded> = (0..4).map(|_| r.next_player()).collect();
-
-        assert_eq!(r.remaining_players.len(), 0);
-
-        let next_round = r.next_round().expect("Error in round");
-
-        assert_eq!(next_round.number, 2);
-        assert_eq!(next_round.remaining_players.len(), 4);
+        assert_eq!(*r.active_player(), first, "Should return first player");
+        assert_eq!(r.number, round_num + 1);
     }
 }
 

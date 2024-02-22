@@ -2,7 +2,7 @@ use std::fmt;
 
 use rand::prelude::*;
 
-use crate::cards::Card;
+use crate::cards::BasicCard;
 
 #[derive(PartialEq)]
 pub struct DeckEmptyError;
@@ -21,7 +21,7 @@ impl fmt::Debug for DeckEmptyError {
 
 #[derive(Clone, Debug)]
 pub struct Hand {
-    cards: Vec<Card>,
+    cards: Vec<BasicCard>,
 }
 
 impl Hand {
@@ -31,16 +31,16 @@ impl Hand {
     }
 
     /// Add a card to the hand
-    pub fn add(&mut self, c: Card) {
+    pub fn add(&mut self, c: BasicCard) {
         self.cards.push(c);
     }
 
-    pub fn add_multiple(&mut self, cs: Vec<Card>) {
+    pub fn add_multiple(&mut self, cs: Vec<BasicCard>) {
         self.cards.extend(cs);
     }
 
-    pub fn take(&mut self, num: u32) -> Vec<Card> {
-        let mut returned: Vec<Card> = vec![];
+    pub fn take(&mut self, num: u32) -> Vec<BasicCard> {
+        let mut returned: Vec<BasicCard> = vec![];
         let mut rng = rand::thread_rng();
 
         for _ in 1..=num {
@@ -67,18 +67,18 @@ impl Hand {
 
 #[derive(Clone, Debug)]
 pub struct Deck {
-    cards: Vec<Card>,
+    cards: Vec<BasicCard>,
 }
 
 impl Deck {
     #[must_use]
-    pub fn new(cards: Vec<Card>) -> Self {
+    pub fn new(cards: Vec<BasicCard>) -> Self {
         let mut deck = Self { cards };
         deck.shuffle();
         deck
     }
 
-    pub fn draw(&mut self, num: usize) -> Result<Vec<Card>, DeckEmptyError> {
+    pub fn draw(&mut self, num: usize) -> Result<Vec<BasicCard>, DeckEmptyError> {
         let remaining = self.len();
 
         if remaining <= num {
@@ -106,11 +106,11 @@ mod tests {
     use super::*;
 
     #[fixture]
-    fn cards() -> Vec<Card> {
+    fn cards() -> Vec<BasicCard> {
         let mut cards = vec![];
 
         for i in 1..=5 {
-            cards.push(Card {
+            cards.push(BasicCard {
                 title: format!("Card_{i}"),
                 effect: None,
             });
@@ -119,7 +119,7 @@ mod tests {
     }
 
     #[rstest]
-    fn new_deck_is_shufled(cards: Vec<Card>) {
+    fn new_deck_is_shufled(cards: Vec<BasicCard>) {
         let deck = Deck::new(cards.clone());
         let deck2 = Deck::new(cards.clone());
 
@@ -129,7 +129,7 @@ mod tests {
     }
 
     #[rstest]
-    fn draw_decreases_remaining_cards(cards: Vec<Card>) {
+    fn draw_decreases_remaining_cards(cards: Vec<BasicCard>) {
         let mut deck = Deck::new(cards);
 
         let original_size = deck.len();
@@ -149,7 +149,7 @@ mod tests {
     }
 
     #[rstest]
-    fn draw_more_or_equal_cards_than_available(cards: Vec<Card>) {
+    fn draw_more_or_equal_cards_than_available(cards: Vec<BasicCard>) {
         let num_cards = cards.len();
         let mut deck = Deck::new(cards);
 
@@ -171,11 +171,11 @@ mod testhand {
 
     use super::*;
 
-    fn get_cards(num: u32) -> Vec<Card> {
+    fn get_cards(num: u32) -> Vec<BasicCard> {
         let mut cards = vec![];
 
         for i in 1..=num {
-            cards.push(Card {
+            cards.push(BasicCard {
                 title: format!("Card_{i}"),
                 effect: None,
             });
@@ -195,7 +195,7 @@ mod testhand {
         let mut h = Hand::new();
 
         for i in 1..10 {
-            h.add(Card {
+            h.add(BasicCard {
                 title: "MyCard".into(),
                 effect: None,
             });
@@ -210,7 +210,7 @@ mod testhand {
         let mut to_add = vec![];
 
         for _ in 1..10 {
-            to_add.push(Card {
+            to_add.push(BasicCard {
                 title: "MyCard".into(),
                 effect: None,
             });

@@ -19,7 +19,7 @@ impl fmt::Debug for DeckEmptyError {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Hand {
     cards: Vec<Card>,
 }

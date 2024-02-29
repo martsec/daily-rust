@@ -2,7 +2,7 @@ mod containers;
 
 pub use containers::{Deck, DeckEmptyError, Hand};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Card {
     Adversary {
         title: String,
@@ -56,8 +56,9 @@ pub struct BasicCard {
     pub effect: Option<CardEffect>,
 }
 
-pub fn get_cards() -> Vec<Card> {
-    use Card::*;
+#[must_use]
+pub fn get_cards_available() -> Vec<Card> {
+    use Card::Adversary;
     vec![
         Adversary {
             title: "nyob (NGO)".to_string(),
@@ -66,8 +67,8 @@ pub fn get_cards() -> Vec<Card> {
             effect: None,
         },
         Adversary {
-            title: "".to_string(),
-            description: "".to_string(),
+            title: "C1".to_string(),
+            description: "D1".to_string(),
             strenght: 0,
             effect: None,
         },

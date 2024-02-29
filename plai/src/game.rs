@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::cards::{get_cards, Card, Deck, DeckEmptyError, Hand};
+use crate::cards::{get_cards_available, Card, Deck, DeckEmptyError, Hand};
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
 #[derive(Clone)]
@@ -13,7 +13,7 @@ pub struct Game {
 impl Game {
     #[must_use]
     pub fn new(player_names: &[String]) -> Self {
-        let cards = get_cards();
+        let cards = get_cards_available();
         let deck = Deck::new(cards);
         let players: Vec<Player> = player_names
             .iter()
@@ -30,7 +30,7 @@ impl Game {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum TurnAction<'a> {
     Funding(Funding),
     SpecialCard(&'a Card),
@@ -45,6 +45,9 @@ impl Game {
         self.round.next_player();
     }
 
+    /// # Panics
+    /// If user id does not exist
+    #[must_use]
     pub fn active_player(&self) -> &Player {
         let pid = self.round.active_player();
         self.players
@@ -52,6 +55,9 @@ impl Game {
             .expect("INNER ERROR: Player not found.")
     }
 
+    /// # Panics
+    /// If user id does not exist
+    #[must_use]
     fn active_player_mut(&mut self) -> &mut Player {
         let pid = self.round.active_player();
         self.players
@@ -59,6 +65,10 @@ impl Game {
             .expect("INNER ERROR: Player not found.")
     }
 
+    /// Execute an action for a given player
+    ///
+    /// # Errors
+    /// If deck is empty, returns an error
     pub fn turn_action(
         &mut self,
         player_id: usize,
@@ -132,7 +142,7 @@ mod test_game_actions {
         let _ = game.turn_action(active_pid, action);
 
         assert_eq!(game.active_player().hand.len(), original_card_num + 1);
-        assert_eq!(game.deck.len(), original_deck_size - 1)
+        assert_eq!(game.deck.len(), original_deck_size - 1);
     }
 
     // #[rstest]
@@ -232,7 +242,7 @@ impl fmt::Display for RoundNotEnded {
 ///
 /// * Round number
 /// * Player order
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Round {
     pub number: u32,
     players: Vec<usize>,
@@ -240,6 +250,7 @@ pub struct Round {
 }
 
 impl Round {
+    #[must_use]
     fn new(number: u32, players: Vec<usize>) -> Self {
         let mut player_order = players.clone();
         player_order.reverse();
@@ -251,27 +262,29 @@ impl Round {
     }
 
     fn next_round(&mut self) -> () {
-        match self.remaining_players.len() {
-            0 => {
-                self.number += 1;
-                self.remaining_players = self.players.clone();
-                self.remaining_players.reverse();
-            }
-            _ => {}
+        if self.remaining_players.len() == 0 {
+            self.number += 1;
+            self.remaining_players = self.players.clone();
+            self.remaining_players.reverse();
         }
     }
 
+    /// # Panics
+    /// If there are no remaining players. This is something that should
+    /// not happen.
+    ///
+    /// TODO see if there is a way to avoid representing the empty group
+    /// at compile time
+    #[must_use]
     pub fn active_player(&self) -> &usize {
         self.remaining_players
             .last()
-            .expect("A round should have no empty player list")
+            .expect("INTERNAL ERROR: A round should have no empty player list")
     }
 
+    #[must_use]
     pub fn next_player(&mut self) {
-        let _ = match self.remaining_players.pop() {
-            Some(p) => p,
-            None => 0,
-        };
+        let _ = self.remaining_players.pop().map_or(0, |p| p);
         if self.remaining_players.is_empty() {
             self.next_round();
         }
@@ -318,7 +331,7 @@ mod test_round {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone, Eq)]
 pub enum Funding {
     Family,
     Regional,
@@ -351,9 +364,9 @@ impl std::fmt::Display for PlayerState {
 
 /// Represnts a player and its elements:
 ///
-/// * [PlayerState]
-/// * [Hand] representing the cards the player has
-#[derive(Debug, Clone, PartialEq)]
+/// * [`PlayerState`]
+/// * [`Hand`] representing the cards the player has
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Player {
     id: usize,
     name: String,
@@ -362,6 +375,7 @@ pub struct Player {
 }
 
 impl Player {
+    #[must_use]
     pub fn new(id: usize, name: &str) -> Self {
         Self {
             id,
@@ -381,8 +395,9 @@ impl Player {
         }
     }
 
+    #[must_use]
     fn possible_actions(&self) -> Vec<TurnAction> {
-        use Funding::*;
+        use Funding::{Family, Regional, VC};
         let mut actions = vec![
             TurnAction::Funding(Family),
             TurnAction::Funding(Regional),
@@ -399,11 +414,13 @@ impl Player {
         actions
     }
 
-    pub fn state(&self) -> &PlayerState {
+    #[must_use]
+    pub const fn state(&self) -> &PlayerState {
         &self.state
     }
 
-    pub fn name(&self) -> &String {
+    #[must_use]
+    pub const fn name(&self) -> &String {
         &self.name
     }
 }
@@ -434,14 +451,13 @@ mod test_player {
     fn next_turn_changes_player(mut cards: Vec<Card>) {
         let mut p = Player::new(0, "Test");
 
-        p.hand.add(cards.pop().expect(""))
+        p.hand.add(cards.pop().expect(""));
     }
 
     #[rstest]
     fn possible_actions_startup_funding() {
-        let p = Player::new(0, "Test");
-
         use Funding::{Family, Regional, VC};
+        let p = Player::new(0, "Test");
 
         for f_type in [Family, Regional, VC] {
             assert!(p.possible_actions().contains(&TurnAction::Funding(f_type)));
@@ -452,8 +468,8 @@ mod test_player {
     fn possible_actions_special_card() {
         let mut p = Player::new(0, "Test");
         let c = Card::Special {
-            title: "".into(),
-            description: "".into(),
+            title: "c".into(),
+            description: "c".into(),
             effect: CardEffect::FourCardVC,
         };
         p.hand.add(c.clone());
@@ -474,7 +490,7 @@ mod test_player {
                     _ => true,
                 },
                 "Found SpecialCard action when there are no special cards in the hand"
-            )
+            );
         }
     }
 }

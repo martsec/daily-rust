@@ -42,7 +42,6 @@ impl Round {
             .expect("INTERNAL ERROR: A round should have no empty player list")
     }
 
-    #[must_use]
     pub fn next_player(&mut self) {
         let _ = self.remaining_players.pop().map_or(0, |p| p);
         if self.remaining_players.is_empty() {

@@ -133,7 +133,7 @@ mod test_player {
         let c = Card::Special {
             title: "c".into(),
             description: "c".into(),
-            effect: CardEffect::FourCardVC,
+            effect: CardEffect::DrawTwo,
         };
         p.hand.add(c.clone());
 

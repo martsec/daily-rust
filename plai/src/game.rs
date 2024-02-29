@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::cards::{Card, Deck, DeckEmptyError, get_cards_available};
+use crate::cards::{get_cards_available, Card, Deck, DeckEmptyError};
 use crate::player::{Player, PlayerState};
 use crate::round::Round;
 
@@ -78,7 +78,7 @@ impl Game {
         match action {
             TurnAction::Funding(f) => self.do_funding(f),
             TurnAction::HostileTakeover(target) => todo!(),
-            TurnAction::SpecialCard(c) => todo!(),
+            TurnAction::SpecialCard(c) => self.do_special(c),
         }
     }
 
@@ -94,10 +94,32 @@ impl Game {
             Funding::VC => todo!(),
         }
     }
+
+    fn do_special(&mut self, c: &Card) -> Result<(), DeckEmptyError> {
+        use crate::cards::CardEffect::*;
+        self.active_player_mut().hand.use_card(&c);
+        let deck = &mut self.deck;
+        if let Card::Special { effect, .. } = c {
+            match effect {
+                DrawTwo => {
+                    let cards = deck.draw(2)?;
+                    self.active_player_mut().hand.add_multiple(cards);
+                }
+                DrawThree => {
+                    let cards = deck.draw(3)?;
+                    self.active_player_mut().hand.add_multiple(cards);
+                }
+            }
+        };
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod test_game_actions {
+    use crate::cards::{Card::Special, CardEffect};
+
     use super::*;
     use rstest::*;
 
@@ -182,6 +204,49 @@ mod test_game_actions {
     //     assert_eq!(game.active_player().hand.len(), original_card_num + 3);
     //     assert_eq!(game.deck.len(), original_deck_size - 3)
     // }
+
+    fn special_card(effect: CardEffect) -> Card {
+        Special {
+            title: String::new(),
+            description: String::new(),
+            effect,
+        }
+    }
+
+    #[rstest]
+    fn special_removes_from_player_hand(mut game: Game) {
+        let active_p = game.active_player_mut();
+        let card = special_card(CardEffect::DrawTwo);
+        active_p.hand.add_multiple(vec![card.clone()]);
+        let active_pid = active_p.id;
+
+        dbg!(game.active_player());
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(active_pid, action);
+
+        dbg!(game.active_player());
+        assert!(
+            !game.active_player().hand.contains(&card),
+            "Card used must be removed from hand"
+        );
+    }
+
+    #[rstest]
+    fn special_draw_three(mut game: Game) {
+        let original_deck_size = game.deck.len();
+        let active_p = game.active_player_mut();
+        let card = special_card(CardEffect::DrawThree);
+        active_p.hand.add_multiple(vec![card.clone()]);
+        // We are using one card, so the hand will have one less
+        let original_card_num = active_p.hand.len() - 1;
+        let active_pid = active_p.id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(active_pid, action);
+
+        assert_eq!(game.deck.len(), original_deck_size - 3);
+        assert_eq!(game.active_player().hand.len(), original_card_num + 3);
+    }
 }
 
 /// End conditions
@@ -240,7 +305,6 @@ pub enum Funding {
     Regional,
     VC,
 }
-
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TurnAction<'a> {

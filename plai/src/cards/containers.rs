@@ -67,6 +67,19 @@ impl Hand {
     pub fn card_iter(&self) -> impl Iterator<Item = &Card> {
         self.cards.iter()
     }
+
+    pub fn contains(&self, c: &Card) -> bool {
+        self.cards.contains(c)
+    }
+
+    pub fn use_card(&mut self, c: &Card) {
+        let pos = self
+            .cards
+            .iter()
+            .position(|hc| hc == c)
+            .expect("INTERNAL ERR: Card used should be in hand");
+        self.cards.remove(pos);
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -217,6 +230,33 @@ mod testhand {
         h.add_multiple(cards);
         // Then
         assert_eq!(h.len(), len_cards);
+    }
+
+    #[rstest]
+    fn use_a_card(cards: Vec<Card>) {
+        let mut h = Hand::new();
+        let card = cards.first().expect("").clone();
+        h.add_multiple(cards.clone());
+
+        h.use_card(&card);
+
+        assert_eq!(h.len(), cards.len() - 1);
+    }
+
+    #[rstest]
+    fn use_a_card_should_remove_one_copy(cards: Vec<Card>) {
+        let mut h = Hand::new();
+        let card = cards.first().expect("").clone();
+        h.add_multiple(cards.clone());
+        h.add(card.clone());
+
+        h.use_card(&card);
+
+        assert_eq!(
+            h.len(),
+            cards.len() + 1 - 1,
+            "more than one copy of the card was removed. Should not happen"
+        );
     }
 
     mod take {

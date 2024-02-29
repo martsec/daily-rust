@@ -1,5 +1,6 @@
-use crate::game::{Game, Player, PlayerState};
+use crate::game::Game;
 use leptos::*;
+use crate::player::{Player, PlayerState};
 
 #[component]
 fn StartupIcon() -> impl IntoView {

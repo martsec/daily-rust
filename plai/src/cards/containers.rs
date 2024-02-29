@@ -4,7 +4,7 @@ use rand::prelude::*;
 
 use super::Card;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct DeckEmptyError;
 
 impl fmt::Display for DeckEmptyError {
@@ -15,11 +15,11 @@ impl fmt::Display for DeckEmptyError {
 
 impl fmt::Debug for DeckEmptyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{ file: {}, line: {} }}", file!(), line!()) // programmer-facing output
+        write!(f, "{{ file: {}, line: {} }}", file!(), line!())
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Hand {
     cards: Vec<Card>,
 }
@@ -63,6 +63,10 @@ impl Hand {
     pub fn is_empty(&self) -> bool {
         self.cards.is_empty()
     }
+
+    pub fn card_iter(&self) -> impl Iterator<Item = &Card> {
+        self.cards.iter()
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -78,6 +82,10 @@ impl Deck {
         deck
     }
 
+    /// Draw a card from the deck
+    ///
+    /// # Errors
+    /// If there are no more cards in the deck, returns a [`DeckEmptyError`]
     pub fn draw(&mut self, num: usize) -> Result<Vec<Card>, DeckEmptyError> {
         let remaining = self.len();
 

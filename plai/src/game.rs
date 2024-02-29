@@ -30,9 +30,10 @@ impl Game {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum TurnAction<'a> {
     Funding(Funding),
-    SpecialCard(Card),
+    SpecialCard(&'a Card),
     HostileTakeover(&'a Player),
 }
 
@@ -317,6 +318,7 @@ mod test_round {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Funding {
     Family,
     Regional,
@@ -347,7 +349,11 @@ impl std::fmt::Display for PlayerState {
     }
 }
 
-#[derive(Debug, Clone)]
+/// Represnts a player and its elements:
+///
+/// * [PlayerState]
+/// * [Hand] representing the cards the player has
+#[derive(Debug, Clone, PartialEq)]
 pub struct Player {
     id: usize,
     name: String,
@@ -376,7 +382,21 @@ impl Player {
     }
 
     fn possible_actions(&self) -> Vec<TurnAction> {
-        todo!()
+        use Funding::*;
+        let mut actions = vec![
+            TurnAction::Funding(Family),
+            TurnAction::Funding(Regional),
+            TurnAction::Funding(VC),
+        ];
+
+        for c in self.hand.card_iter() {
+            match c {
+                Card::Special { .. } => actions.push(TurnAction::SpecialCard(c)),
+                _ => (),
+            }
+        }
+
+        actions
     }
 
     pub fn state(&self) -> &PlayerState {
@@ -390,6 +410,8 @@ impl Player {
 
 #[cfg(test)]
 mod test_player {
+    use crate::cards::CardEffect;
+
     use super::*;
     use rstest::{fixture, rstest};
 
@@ -413,5 +435,46 @@ mod test_player {
         let mut p = Player::new(0, "Test");
 
         p.hand.add(cards.pop().expect(""))
+    }
+
+    #[rstest]
+    fn possible_actions_startup_funding() {
+        let p = Player::new(0, "Test");
+
+        use Funding::{Family, Regional, VC};
+
+        for f_type in [Family, Regional, VC] {
+            assert!(p.possible_actions().contains(&TurnAction::Funding(f_type)));
+        }
+    }
+
+    #[rstest]
+    fn possible_actions_special_card() {
+        let mut p = Player::new(0, "Test");
+        let c = Card::Special {
+            title: "".into(),
+            description: "".into(),
+            effect: CardEffect::FourCardVC,
+        };
+        p.hand.add(c.clone());
+
+        dbg!(p.possible_actions());
+        assert!(p.possible_actions().contains(&TurnAction::SpecialCard(&c)));
+    }
+
+    #[rstest]
+    fn possible_actions_no_special_card() {
+        let p = Player::new(0, "Test");
+
+        dbg!(p.possible_actions());
+        for a in p.possible_actions() {
+            assert!(
+                match a {
+                    TurnAction::SpecialCard(_) => false,
+                    _ => true,
+                },
+                "Found SpecialCard action when there are no special cards in the hand"
+            )
+        }
     }
 }

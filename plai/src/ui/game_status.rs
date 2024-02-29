@@ -1,7 +1,4 @@
-use crate::{
-    cards::Card,
-    game::{Game, Player, PlayerState},
-};
+use crate::game::{Game, Player, PlayerState};
 use leptos::*;
 
 #[component]

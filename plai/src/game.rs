@@ -43,6 +43,15 @@ impl Game {
 
     /// # Panics
     /// If user id does not exist
+    pub fn get_player(&self, id: usize) -> &Player {
+        self.players
+            .iter()
+            .find(|p| p.id == id)
+            .expect("INNER ERROR: Player not found.")
+    }
+
+    /// # Panics
+    /// If user id does not exist
     #[must_use]
     pub fn active_player(&self) -> &Player {
         let pid = self.round.active_player();
@@ -61,7 +70,7 @@ impl Game {
             .expect("INNER ERROR: Player not found.")
     }
 
-    /// Execute an action for a given player
+    /// Execute an action for a given player and ends the turn
     ///
     /// # Errors
     /// If deck is empty, returns an error
@@ -79,7 +88,11 @@ impl Game {
             TurnAction::Funding(f) => self.do_funding(f),
             TurnAction::HostileTakeover(target) => todo!(),
             TurnAction::SpecialCard(c) => self.do_special(c),
-        }
+        }?;
+
+        // TODO implement battle logic when needed
+        self.end_turn();
+        Ok(())
     }
 
     fn do_funding(&mut self, f: Funding) -> Result<(), DeckEmptyError> {
@@ -150,6 +163,20 @@ mod test_game_actions {
     }
 
     #[rstest]
+    fn after_an_action_turn_is_ended(mut game: Game) {
+        let first_player = game.active_player().id;
+
+        let action = TurnAction::Funding(Funding::Family);
+        let _ = game.turn_action(first_player, action);
+
+        assert_ne!(
+            game.active_player().id,
+            first_player,
+            "After taking an action (and thus the turn), active player should be different."
+        );
+    }
+
+    #[rstest]
     fn family_funding(mut game: Game) {
         let original_deck_size = game.deck.len();
         let active_p = game.active_player();
@@ -159,7 +186,10 @@ mod test_game_actions {
         let action = TurnAction::Funding(Funding::Family);
         let _ = game.turn_action(active_pid, action);
 
-        assert_eq!(game.active_player().hand.len(), original_card_num + 1);
+        assert_eq!(
+            game.get_player(active_pid).hand.len(),
+            original_card_num + 1
+        );
         assert_eq!(game.deck.len(), original_deck_size - 1);
     }
 
@@ -245,7 +275,10 @@ mod test_game_actions {
         let _ = game.turn_action(active_pid, action);
 
         assert_eq!(game.deck.len(), original_deck_size - 3);
-        assert_eq!(game.active_player().hand.len(), original_card_num + 3);
+        assert_eq!(
+            game.get_player(active_pid).hand.len(),
+            original_card_num + 3
+        );
     }
 }
 

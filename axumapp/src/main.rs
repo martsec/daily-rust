@@ -1,23 +1,36 @@
 #![allow(unused)]
 use std::net::SocketAddr;
 
-use axum;
-use axum::response::IntoResponse;
+use axum::response::{IntoResponse, Response};
 use axum::routing::get_service;
+use axum::{self, middleware};
 use axum::{response::Html, Router};
 use serde::Deserialize;
 use tokio;
+use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
 
 mod error;
+mod model;
 mod web;
 
 pub use crate::error::{Error, Result};
 
+use crate::model::ModelController;
+
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+    // Initialize ModelController
+    let mc = ModelController::new().await?;
+
     let routes_hello = Router::new()
         .merge(web::hello_routes())
+        .merge(web::routes_login::routes())
+        // Nice usage for prefixes
+        .nest("/api", web::routes_tickets::routes(mc.clone()))
+        //IMPORTANT Layers get executed from bottom to top
+        .layer(middleware::map_response(main_response_mapper))
+        .layer(CookieManagerLayer::new())
         // Because we would have a conflict
         .fallback_service(routes_static());
 
@@ -27,6 +40,16 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
 
     axum::serve(listener, routes_hello).await.unwrap();
+
+    Ok(())
+}
+
+// First layer (middleware)
+async fn main_response_mapper(res: Response) -> Response {
+    println!("--> {:<12} - main_response_mapper", "RES_MAPPER");
+
+    println!();
+    res
 }
 
 fn routes_static() -> Router {

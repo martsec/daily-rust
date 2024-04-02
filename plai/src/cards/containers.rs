@@ -68,10 +68,13 @@ impl Hand {
         self.cards.iter()
     }
 
+    #[must_use]
     pub fn contains(&self, c: &Card) -> bool {
         self.cards.contains(c)
     }
 
+    /// # Panics
+    /// If card is not found
     pub fn use_card(&mut self, c: &Card) {
         let pos = self
             .cards

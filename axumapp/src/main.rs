@@ -10,6 +10,7 @@ use tokio;
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
 
+mod ctx;
 mod error;
 mod model;
 mod web;
@@ -34,6 +35,10 @@ async fn main() -> Result<()> {
         .nest("/api", routes_apis)
         //IMPORTANT Layers get executed from bottom to top
         .layer(middleware::map_response(main_response_mapper))
+        .layer(middleware::from_fn_with_state(
+            mc.clone(),
+            web::mw_auth::mw_ctx_resolver,
+        ))
         .layer(CookieManagerLayer::new())
         // Because we would have a conflict
         .fallback_service(routes_static());

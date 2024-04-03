@@ -75,6 +75,8 @@ pub async fn mw_ctx_resolver(
 
 // Ctx extractor
 // requires an async trait that is not supported by default
+//
+// https://docs.rs/axum/latest/axum/extract/index.html
 #[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for Ctx {
     type Rejection = Error;

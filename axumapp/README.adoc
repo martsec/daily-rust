@@ -1,0 +1,20 @@
+= Rust axum backend
+
+Followin this course https://www.youtube.com/watch?v=XZtlD_m59sM
+
+Also see https://rust10x.com/web-app
+
+To execute it in dev, use:
+
+[,bash]
+----
+cargo watch -q -c -w src/ -x run
+----
+
+
+For continuous "dev/test", execute in another shell
+
+[,bash]
+----
+cargo watch -q -c -x "test -q quick_dev -- --nocapture"
+----

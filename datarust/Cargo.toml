@@ -1,0 +1,17 @@
+[package]
+name = "datarust"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.76.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+arrow-json = "51.0.0"
+datafusion = "37.0.0"
+duckdb = { version = "0.10.1", features = ["bundled"] }
+flate2 = "1.0.28"
+polars = { version = "0.38.3", features = ["lazy", "json", "parquet", "describe", "sql", "decompress"] }
+polars-core = "0.38.3"
+rayon = "1.10.0"
+tokio = { version = "1.37.0", features = ["rt", "rt-multi-thread"] }

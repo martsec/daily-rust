@@ -1,0 +1,32 @@
+= Data Tools in Rust
+
+Quick comparison of the main data tools in rust. 
+
+
+== UseCase
+
+Aircrafts historical data from adsb_exchange. 
+
+* Extract from raw files and store as table format (parquet and native if supported)
+* Analyze the parquet files to obtain aircraft statistics
+* [Real time] Time individual aircraft statistics retrieval
+
+It provides a couple challenges that can help us analyze real use cases:  
+
+. Explode 1000s of nested JSONs 
+. Several GB of data
+. Compaction to a more manageable number of files
+
+
+This will affect memory usage, since some tools have issues concatenating files.
+
+
+== Libaries compared 
+
+* duckDB
+* polars 
+* Data Fusion (Arrow)
+
+== Enhancements
+
+* Analyze iceberg support 

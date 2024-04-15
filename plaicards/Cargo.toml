@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-axum = { version = "0.7", optional = true }
+axum = { version = "0.7", optional = true, features = ["macros", "ws"] }
 console_error_panic_hook = "0.1"
 leptos = { version = "0.6", features = ["nightly"] }
 leptos_axum = { version = "0.6", optional = true }
@@ -20,6 +20,15 @@ wasm-bindgen = "=0.2.92"
 thiserror = "1"
 tracing = { version = "0.1", optional = true }
 http = "1"
+rand = "0.8.5"
+rstest = "0.19.0"
+uuid = { version = "1.8.0", features = ["serde", "v4", "v7"] }
+cfg-if = "1.0.0"
+serde = "1.0.197"
+headers = "0.4.0"
+leptos-use = "0.10"
+serde_json = "1.0.115"
+data-encoding = "2.5.0"
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -32,8 +41,20 @@ ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
+    "leptos-use/ssr",
     "dep:tracing",
 ]
+
+# From https://github.com/0atman/noboilerplate/blob/main/scripts/37-functional-rust.md
+[lints.rust]
+unsafe_code = "forbid"
+
+
+[lints.clippy]
+enum_glob_use = "deny"
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+unwrap_used = "deny"
 
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]

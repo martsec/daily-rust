@@ -1,5 +1,6 @@
+#![allow(clippy::wildcard_imports)]
 mod game;
-mod web;
+pub mod web;
 
 pub mod app;
 pub mod error_template;

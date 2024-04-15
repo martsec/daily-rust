@@ -1,0 +1,43 @@
+= Decision Records
+
+
+[quote, https://medium.com/olzzio/y-statements-10eb07b5a177]
+----
+[%hardbreaks]
+_In the context of the Web shop service,_
+_facing the need to keep user session data consistent and current across shop instances,_
+
+[%hardbreaks]
+_we decided for the Database Session State pattern_
+_and against Client Session State or Server Session State_
+
+[%hardbreaks]
+_to achieve data consistency and cloud elasticity,_
+_accepting that a session database needs to be designed and implemented._
+
+Each template element appears on one line in the above example:
+
+1. context: functional requirement (story, use case) or arch. component,
+2. facing: non-functional requirement, for instance a desired quality,
+3. we decided: decision outcome (arguably the most important part),
+4. and neglected alternatives not chosen (not to be forgotten!),
+5. to achieve: benefits, the full or partial satisfaction of requirement(s),
+6. accepting that: drawbacks and other consequences, for instance impact on other properties/context and effort/cost (both short term and long term).
+
+----
+
+
+
+== ADR-1
+[%hardbreaks]
+In the context of the plai game website,
+facing the need of uniquelly identify lobbies and players, 
+
+[%hardbreaks]
+we decided for the uuid::v7 
+and against numerical and uuid::v4 ids
+
+[%hardbreaks]
+to achieve uniqueness in a distributed environment and database optimization,
+accepting that might not be the most space-efficient identifier nor the most 
+random.

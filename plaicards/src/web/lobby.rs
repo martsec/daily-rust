@@ -9,8 +9,14 @@ use leptos_use::{
     use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebsocketReturn,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::sync::Arc;
 use std::sync::Mutex;
+use tracing::event;
+use tracing::instrument;
+use tracing::trace;
+use tracing::Level;
+use tracing::{debug, info};
 use uuid::Uuid;
 
 use super::Ctx;
@@ -23,19 +29,15 @@ fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> (String, Uuid) 
 
     let uuid = from_url_uuid(&raw);
     let url = to_url_uuid(uuid.clone());
-    println!(">> {:<18}, {param_name:<9} {url:?} {uuid:?}", "In frontend");
     (url, uuid)
 }
 
 pub fn from_url_uuid(url_id: &str) -> Uuid {
-    println!(">> {:<18}", "STARTING DECODING FROM URL");
-    println!(">> {:<18}, {url_id}", "original");
     let res = Uuid::try_from(
         BASE64URL_NOPAD
             .decode(url_id.as_bytes())
             .unwrap_or_default(),
     );
-    println!(">> {:<18}, {res:?}", "decoded");
     res.unwrap_or_else(|_| Uuid::new_v4())
 }
 
@@ -55,130 +57,93 @@ pub fn Lobby() -> impl IntoView {
     let id = move || from_param_uuid(params, "id");
     let player_id = move || from_param_uuid(params, "player_id");
 
-    let add_p = create_server_action::<AddPlayer>();
-
-    // List of players loaded from the server
-    let ps = create_resource(move || add_p.version().get(), move |_| get_players(id().0));
+    let (players, set_players) = create_signal(vec![]);
 
     // Websocket
     //
     // FIXME this causes issues if we change the lobby_id after init
     let ws_url = format!("/lobby/{}/ws", id().1);
-    let UseWebsocketReturn { message, send, .. } = use_websocket(&ws_url);
 
-    let send_refresh = move |_| {
-        send.clone()("REFRESH_PLAIERS");
+    // Update signals when new data arrives from the webhook
+    let update_signals = move |m: String| {
+        info!("received message {}", m);
+        if m.starts_with("PLAYERS") {
+            let slice = &m[7..];
+            let ps: Vec<Player> = serde_json::from_str(slice).unwrap_or_default();
+            set_players.set(ps);
+        }
     };
+    let UseWebsocketReturn { message, send, .. } = use_websocket_with_options(
+        &ws_url,
+        UseWebSocketOptions::default().on_message(update_signals.clone()),
+    );
 
+    let (name, set_name) = create_signal("MetaTrust".to_string());
+
+    let new_player = move |_| {
+        let p = Player {
+            id: player_id().1,
+            name: name(),
+        };
+        let json = serde_json::to_string(&p).unwrap();
+        let m = format!("REFRESH_PLAIERS{}", json);
+        send.clone()(&m);
+    };
     view! {
-            <div class="my-0 mx-auto max-w-3xl text-center">
+        <div class="my-10 mx-auto flex justify-center">
+          <img src="/img/portada.png" alt="portada" class="w-[20rem] max-w-none rounded-xl sm:w-[57rem] md:-ml-4 lg:-ml-0" width="2432" height="1442" />
+        </div>
+        <div class="my-0 mx-auto max-w-3xl text-center">
 
-                <h2 class="p-6 text-4xl">"Welcome to PLAI"</h2>
-                <p class="px-10 pb-10">
-                    "✨Become the artificial intelligence monopoly you deserve✨"
-                </p>
-
-                <ActionForm action=add_p>
-                <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Name</label>
-                    <input type="hidden" name="lobby_id" prop:value=move || id().0/>
-                    <input type="hidden" name="player_id" prop:value=move || player_id().0/>
-                    <input type="text" name="name" class=" rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Choose your name" required/>
-                    <Button title="plai!".into() on:click=send_refresh/>
-                </ActionForm>
-
-
-                <p>You are in lobby {move || id().0} and are player id {move || player_id().0}</p>
-
-
-                <div>
-                    <Transition fallback=move || view! { <p>"Waiting for pl<b>ai</b>ers..."</p> }>
-                    {move || {
-
-
-    let p = move || {
-        ps.get()
-            .map(move |ps| match ps {
-                Err(_) => None,
-                Ok(ps) => Some(ps),
-            })
-            .flatten()
-            .unwrap_or_default()
-    };
-
-    let player_list = move || {
-        p().into_iter()
-            .map(move |p| {
-                view! {
-                    <li class="py-2">
-                     {p.name}
-                    </li>
-                }
-            })
-            .collect_view()
-    };
-
-
-    let game_uri = format!("/plai/{}/{}/", id().0, player_id().0);
-
-    view!{<ul class="my-4 list-disc">{player_list}</ul>
-
-                <div>
-
-                    <div class="my-4">
-                        <Show
-                            when=move || { 2 <= p().len() && p().len() <= 6 }
-                            fallback=|| view! { "Choose between 1 to 6 players." }
-                        >
-                            <ButtonLink title="👩🏾‍💼 Start Game 👨🏾‍💼".to_string() href=game_uri.clone()/>
-                        </Show>
+            //<h2 class="p-6 text-4xl">"Welcome to PLAI"</h2>
+            //<p class="px-10 pb-10">
+            //    "✨Become the artificial intelligence monopoly you deserve✨"
+            //</p>
+            <div class="flex grid grid-cols-2 items-center justify-around">
+                <div class="my-2 px-6 lg:px-8">
+                    <div class="flex py-2 flex-col justify-center">
+                    <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Your Startup Name</label>
+                    <input type="text" id="name" name="name" class="rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Try something edgy like MetaTrust" on:input=move |ev| { set_name(event_target_value(&ev));} required/>
+                    </div>
+                    <div class="my-2">
+                    <button type="submit" class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" on:click=new_player>
+                        "Create my startup"
+                    </button>
                     </div>
                 </div>
-    }
 
-                    }
-                    }
-
-                    </Transition>
-                </div>
-
-
-                <div>
-    <h4> Web socket updates </h4>
-
-                    <div>
-
-        {move ||
-            match message.get() {
-                None => view!{"It's just you"}.into_view(),
-                Some(m) => into_player_view(&m),
-            }
-        }
-
-
-    </div>
-
-
+            <div class="my-2 px-6 lg:px-8">
+                <PlayerList ps=players />
+                <div class="my-2">
+                    <Show
+                        when=move || { 2 <= players().len() && players().len() <= 6 }
+                        fallback=|| view! { "Choose between 1 to 5 players." }
+                    >
+                        <ButtonLink title="👩🏾‍💼 PLAI 👨🏾‍💼".to_string() href={format!("/plai/{}/{}/", id().0, player_id().0)}/>
+                    </Show>
                 </div>
             </div>
-        }
+            </div>
+        </div>
+    }
 }
 
-/// Convert a JSON with the list of players to the view to render
-fn into_player_view(s: &str) -> View {
-    let ps: Vec<Player> = serde_json::from_str(s).unwrap_or_default();
-
-    let player_list = ps
-        .into_iter()
-        .map(move |p| {
-            view! {
-                <li class="py-2">
-                 {p.name}
-                </li>
-            }
-        })
-        .collect_view();
-
-    view! {<ul class="my-4 list-disc">{player_list}</ul>}.into_view()
+#[component]
+fn PlayerList(ps: ReadSignal<Vec<Player>>) -> impl IntoView {
+    view! {
+        <div class="py-2">
+            <h4 class="p-4 text-xl">Current players</h4>
+            <ul role="list" class="divide-y divide-gray-100">
+                <For
+                    each=move || ps.get().into_iter()
+                    key=|p| p.name.clone()
+                    let:p
+                >
+                    <li class="py-2"><p class="text-m leading-6 text-gray-900">{p.name}</p></li>
+                </For>
+        </ul>
+        </div>
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -194,37 +159,6 @@ impl Player {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Lobby {
-    id: Uuid,
-    pub players: Arc<Mutex<Vec<Player>>>,
-}
-
-impl Lobby {
-    pub fn new() -> Self {
-        Self::from_id(Uuid::new_v4())
-    }
-
-    pub fn from_id(id: Uuid) -> Self {
-        Self {
-            id,
-            players: Arc::default(),
-        }
-    }
-}
-
-impl Lobby {
-    pub fn update_player(&self, player: Player) -> Res<Player> {
-        let mut store = self.players.lock().unwrap();
-        match store.iter_mut().find(|p| player.id == p.id) {
-            Some(p) => p.name = player.name.clone(),
-            None => store.push(player.clone()),
-        };
-
-        Ok(player)
-    }
-}
-
 #[cfg(feature = "ssr")]
 pub mod ssr {
     use axum::extract::FromRef;
@@ -232,14 +166,50 @@ pub mod ssr {
     use leptos::ServerFnError;
     use std::sync::Arc;
     use std::sync::Mutex;
+    use tokio::sync::broadcast;
     use uuid::Uuid;
 
-    use super::Lobby;
+    use super::Player;
     use super::Res;
 
     pub fn lobbys() -> Result<LobbyController, ServerFnError> {
         use_context::<LobbyController>()
             .ok_or_else(|| ServerFnError::ServerError("Database missing".into()))
+    }
+
+    #[derive(Clone, Debug)]
+    pub struct Lobby {
+        pub id: Uuid,
+        pub players: Arc<Mutex<Vec<Player>>>,
+        // Channel to send messages to all connected clients
+        pub tx: broadcast::Sender<String>,
+    }
+
+    impl Lobby {
+        pub fn new() -> Self {
+            Self::from_id(Uuid::new_v4())
+        }
+
+        pub fn from_id(id: Uuid) -> Self {
+            let (tx, _rx) = broadcast::channel(10);
+            Self {
+                id,
+                players: Arc::default(),
+                tx,
+            }
+        }
+    }
+
+    impl Lobby {
+        pub fn update_player(&self, player: Player) -> Res<Player> {
+            let mut store = self.players.lock().unwrap();
+            match store.iter_mut().find(|p| player.id == p.id) {
+                Some(p) => p.name = player.name.clone(),
+                None => store.push(player.clone()),
+            };
+
+            Ok(player)
+        }
     }
 
     #[derive(FromRef, Clone, Debug)]
@@ -284,13 +254,13 @@ pub mod ssr {
     }
 }
 
+#[instrument]
 #[server(AddPlayer, "/api/lobby")]
 pub async fn add_player(
     lobby_id: String,
     player_id: String,
     name: String,
 ) -> Result<(), ServerFnError> {
-    println!(">> Adding new player");
     use self::ssr::*;
     let lobbys = lobbys()?;
     let lobby_uuid = from_url_uuid(&lobby_id);
@@ -300,7 +270,6 @@ pub async fn add_player(
         Ok(l) => l,
         Err(_) => lobbys.create().await?,
     };
-    dbg!(&lobby);
 
     let p = lobby.update_player(Player {
         id: player_uuid,
@@ -308,10 +277,8 @@ pub async fn add_player(
     })?;
 
     //Redirect to correct URI
-    dbg!(&lobby_id);
-    dbg!(&lobby_uuid);
-    dbg!(to_url_uuid(lobby.id));
     let redirect = format!("/lobby/{}/{}", to_url_uuid(lobby.id), to_url_uuid(p.id));
+    info!("Redirecting to {}", &redirect);
     leptos_axum::redirect(&redirect);
 
     // TODO How to update the other clients?
@@ -321,7 +288,7 @@ pub async fn add_player(
 
 #[server(GetPlayers, "/api/lobby")]
 pub async fn get_players(lobby_id: String) -> Result<Vec<Player>, ServerFnError> {
-    println!("Get players of lobby {lobby_id}");
+    debug!("Get players of lobby {lobby_id}");
     use self::ssr::*;
     let lobbys = lobbys()?;
     let lobby_uuid = from_url_uuid(&lobby_id);

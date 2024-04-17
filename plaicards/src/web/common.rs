@@ -4,7 +4,8 @@ use leptos_meta::*;
 #[component]
 pub fn Button(title: String) -> impl IntoView {
     view! {
-        <button class="bg-amber-600 hover:bg-amber-800 mx-3 px-5 py-3 text-white rounded-lg">
+
+        <button class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             {title}
         </button>
     }
@@ -13,7 +14,7 @@ pub fn Button(title: String) -> impl IntoView {
 #[component]
 pub fn ButtonLink(title: String, href: String) -> impl IntoView {
     view! {
-        <a href={href} class="bg-amber-600 hover:bg-amber-800 mx-3 px-5 py-3 text-white rounded-lg">
+        <a href={href} class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             {title}
         </a>
     }

@@ -29,6 +29,10 @@ headers = "0.4.0"
 leptos-use = "0.10"
 serde_json = "1.0.115"
 data-encoding = "2.5.0"
+tracing-subscriber = {version="0.3.18", optional = true}
+axum-insights = { version="0.3", optional=true}
+opentelemetry = {version = "0.22.0", optional = true}
+futures = "0.3.30"
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -43,11 +47,18 @@ ssr = [
     "leptos_router/ssr",
     "leptos-use/ssr",
     "dep:tracing",
+    "dep:tracing-subscriber",
+    "dep:opentelemetry",
+    "dep:axum-insights",
 ]
 
 # From https://github.com/0atman/noboilerplate/blob/main/scripts/37-functional-rust.md
 [lints.rust]
 unsafe_code = "forbid"
+
+unused_variables = "allow"
+unused_imports = "allow"
+dead_code = "allow"
 
 
 [lints.clippy]

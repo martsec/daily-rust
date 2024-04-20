@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.card {
+  width: 5rem; /* Card width */
+  height: 7rem; /* Card height */
+  background: gray;
+  border-radius: 0.5rem;
+  border-color: black;
+  border-width: 0.1rem;
+  transition: transform 0.3s;
+}
+.card-container {
+  display: flex;
+  height: 8rem;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: margin 0.3s;
+}
+.card:hover {
+  transform: scale(1.1); /* Enlarge on hover */
+  z-index: 10; /* Ensure it rises above other elements */
+}
+.card:not(:first-child) {
+  margin-left: -2rem; /* Overlap cards */
+}
+
+.card-vertical {
+  width: 5rem; /* Card width */
+  height: 7rem; /* Card height */
+  background: gray;
+  border-radius: 0.5rem;
+  border-radius: 0.5rem;
+  border-color: black;
+  border-width: 0.1rem;
+  transition: transform 0.3s;
+  /*position: relative; /* Position relative for z-index control on hover */
+  z-index: 1; /* Default z-index */
+}
+.card-vertical:hover {
+  transform: scale(1.1); /* Enlarge on hover */
+  z-index: 10; /* Ensure hovered card is above others */
+}
+.card-vertical:not(:first-child) {
+  margin-top: -5rem; /* Overlap cards */
+}
+.drawer-container {
+  /*position: relative; /* Container relative for card alignment */
+  height: 100%; /* Adjust if necessary */
+  padding-top: 0.5rem; /* Space for title */
+  overflow: visible; /* Allow parts of cards to be visible outside container */
+}
+

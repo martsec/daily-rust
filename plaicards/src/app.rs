@@ -32,7 +32,7 @@ pub fn App() -> impl IntoView {
         }>
             <main>
                 <Routes>
-                    <Route path="" view=HomePage/>
+                    <Route path="/" view=HomePage/>
                     <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
                 </Routes>
             </main>

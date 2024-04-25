@@ -12,6 +12,7 @@ use leptos_use::{
 #[component]
 pub fn Board() -> impl IntoView {
     view! {
+    <div class="h-screen bg-gray-200">
     <Nav />
 
 
@@ -26,7 +27,7 @@ pub fn Board() -> impl IntoView {
     <MiddleBoard />
 
     <PlayerDrawer />
-
+    </div>
     }
 }
 
@@ -47,11 +48,11 @@ fn Nav() -> impl IntoView {
 
            //<!-- Players' Icons -->
            <div class="justify-self-end flex">
-             <div class="mx-1 h-6 w-6 rounded-full bg-blue-500"></div>
-             <div class="mx-1 h-6 w-6 rounded-full bg-green-500"></div>
-             <div class="mx-1 h-6 w-6 rounded-full bg-red-500"></div>
-             <div class="mx-1 h-6 w-6 rounded-full bg-yellow-500"></div>
-             <div class="mx-1 h-6 w-6 rounded-full bg-purple-500"></div>
+             <div class="mx-1 h-6 w-6 rounded-full bg-blue"></div>
+             <div class="mx-1 h-6 w-6 rounded-full bg-green"></div>
+             <div class="mx-1 h-6 w-6 rounded-full bg-orange"></div>
+             <div class="mx-1 h-6 w-6 rounded-full bg-yellow"></div>
+             <div class="mx-1 h-6 w-6 rounded-full bg-gray-illustration"></div>
            </div>
          </div>
        </div>
@@ -62,7 +63,7 @@ fn Nav() -> impl IntoView {
 #[component]
 fn MiddleBoard() -> impl IntoView {
     view! {
-    <!-- Middle Area for Decks -->
+    //<!-- Middle Area for Decks -->
     <div class="my-8 flex justify-center space-x-4">
       <div class="h-32 w-24 bg-gray-700"></div>
       <div class="h-32 w-24 bg-gray-500"></div>
@@ -77,11 +78,11 @@ fn HandVertical(left: bool) -> impl IntoView {
       <div class="rounded bg-white p-3">
         <h2>Player 1</h2>
         <div class="drawer-container">
-          <div class="card-vertical"></div>
-          <div class="card-vertical"></div>
-          <div class="card-vertical"></div>
-          <div class="card-vertical"></div>
-          <div class="card-vertical"></div>
+          <div class="card-vertical will-change-transform"></div>
+          <div class="card-vertical will-change-transform"></div>
+          <div class="card-vertical will-change-transform"></div>
+          <div class="card-vertical will-change-transform"></div>
+          <div class="card-vertical will-change-transform"></div>
         </div>
       </div>
     </div>
@@ -93,9 +94,9 @@ fn HandHorizontal() -> impl IntoView {
     view! {
     <div class="rounded bg-white p-2">
       <div class="card-container p-2">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
       </div>
       <h2>Player 3</h2>
     </div>
@@ -105,34 +106,33 @@ fn HandHorizontal() -> impl IntoView {
 #[component]
 fn PlayerDrawer() -> impl IntoView {
     view! {
-      //<!-- Bottom Drawer for Player's Cards -->
-      <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md">
+    //<!-- Bottom Drawer for Player's Cards -->
+    <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md">
 
-        <div class="grid grid-cols-3 justify-items-center">
-          <div class="justify-self-start">
-          <button onclick="toggleDrawer()" class="focus:shadow-outline rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none">Hide</button>
-          </div>
-          <div>
-            <h2>Your Cards</h2>
-          </div>
-          <div>
-          </div>
+      <div class="grid grid-cols-3 justify-items-center">
+        <div class="justify-self-start">
+        <button onclick="toggleDrawer()" class="focus:shadow-outline rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none">Hide</button>
         </div>
-
-        <div class="grid justify-center">
-        <div class="card-container pt-4">
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
+        <div>
+          <h2>Your Cards</h2>
+        </div>
+        <div>
         </div>
       </div>
+
+      <div class="grid justify-center">
+      <div class="card-container pt-4">
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
+        <div class="card will-change-transform"></div>
       </div>
     </div>
-      }
+    </div>
+    }
 }

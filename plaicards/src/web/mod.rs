@@ -1,4 +1,4 @@
-mod board;
+pub mod board;
 mod common;
 mod errors;
 mod home;

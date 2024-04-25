@@ -1,4 +1,5 @@
 use crate::error_template::{AppError, ErrorTemplate};
+use crate::web::board::Board;
 use crate::web::lobby::Lobby;
 use crate::web::HomePage;
 use leptos::*;
@@ -29,11 +30,14 @@ pub fn App() -> impl IntoView {
                 <ErrorTemplate outside_errors/>
             }
             .into_view()
-        }>
+        }
+            trailing_slash={TrailingSlash::Redirect}
+        >
             <main>
                 <Routes>
                     <Route path="/" view=HomePage/>
                     <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
+                    <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
                 </Routes>
             </main>
         </Router>

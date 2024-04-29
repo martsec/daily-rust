@@ -1,11 +1,13 @@
-use datafusion::config::JsonOptions;
 use datafusion::datasource::file_format::file_compression_type::FileCompressionType;
 use datafusion::datasource::file_format::json::JsonFormat;
 use datafusion::datasource::listing::ListingOptions;
+use datafusion::datasource::listing::ListingTable;
+use datafusion::datasource::listing::ListingTableConfig;
 use datafusion::datasource::listing::ListingTableUrl;
 use datafusion::prelude::*;
 use std::fs;
 use std::sync::Arc;
+use std::time::Instant;
 
 use crate::JSON_FILE;
 use crate::PREP_DIR;
@@ -27,7 +29,12 @@ fn read_raw_files() -> Vec<String> {
 }
 
 pub async fn main_df() -> datafusion::error::Result<()> {
-    raw_processing().await
+    let start = Instant::now();
+    let res = raw_processing().await;
+    let duration = start.elapsed();
+    println!("Time elapsed for DuckDB: {:?}", duration);
+
+    res
 }
 
 /// Read files using the default [read_json] method.
@@ -54,7 +61,9 @@ async fn raw_processing() -> datafusion::error::Result<()> {
     // Parse the path
     let table_path = ListingTableUrl::parse(&RAW_DIRECTORY)?;
 
-    let file_format = JsonFormat::default().with_file_compression_type(FileCompressionType::GZIP);
+    let file_format = JsonFormat::default()
+        .with_file_compression_type(FileCompressionType::GZIP)
+        .with_schema_infer_max_rec(5);
     let listing_options =
         ListingOptions::new(Arc::new(file_format)).with_file_extension(".json.gz");
 
@@ -64,7 +73,23 @@ async fn raw_processing() -> datafusion::error::Result<()> {
         .infer_schema(&session_state, &table_path)
         .await?;
 
-    dbg!(resolved_schema);
+    dbg!(&resolved_schema);
+
+    let config = ListingTableConfig::new(table_path)
+        .with_listing_options(listing_options)
+        .with_schema(resolved_schema);
+
+    // Create a new TableProvider
+    let provider = Arc::new(ListingTable::try_new(config)?);
+
+    // This provider can now be read as a dataframe:
+
+    ctx.register_table("aircraft", provider)?;
+
+    let sql = format!("COPY aircraft to '{PREP_DIR}/datafusion' OPTIONS (format parquet);");
+    let results = ctx.sql(&sql).await?.collect().await?;
+
+    println!("{:?}", &results);
 
     Ok(())
 }

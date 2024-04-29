@@ -30,7 +30,7 @@ pub struct GameRoom {
 }
 
 impl GameRoom {
-    pub fn new(id: Uuid, players: &[String]) -> Self {
+    pub fn new(id: Uuid, players: &[(Uuid, String)]) -> Self {
         let (tx, _rx) = broadcast::channel(5);
 
         let game = Game::new(players);
@@ -57,7 +57,13 @@ impl GameController {
         // FIXME just for dev purposes
         let gr = GameRoom::new(
             Uuid::from_str(&"9cb14765-bbfd-447a-b29e-bb203801acb6").unwrap(),
-            &["p1".to_string(), "p2".to_string(), "p3".to_string()],
+            &[
+                (Uuid::new_v4(), "p1".to_string()),
+                (Uuid::new_v4(), "p2".to_string()),
+                (Uuid::new_v4(), "p3".to_string()),
+                (Uuid::new_v4(), "p4".to_string()),
+                (Uuid::new_v4(), "p5".to_string()),
+            ],
         );
         gc.put(gr).await.unwrap();
 
@@ -95,18 +101,18 @@ mod test {
     #[fixture]
     fn game_room() -> GameRoom {
         let ps = vec![
-            "P1".to_owned(),
-            "P2".to_owned(),
-            "p3".to_owned(),
-            "p4".to_owned(),
-            "p5".to_owned(),
+            (Uuid::new_v4(), "p1".to_string()),
+            (Uuid::new_v4(), "p2".to_string()),
+            (Uuid::new_v4(), "p3".to_string()),
+            (Uuid::new_v4(), "p4".to_string()),
+            (Uuid::new_v4(), "p5".to_string()),
         ];
         GameRoom::new(Uuid::new_v4(), &ps)
     }
 
     #[rstest]
     async fn controller_multiple_reads(game_room: GameRoom) {
-        let mut gc = GameController::new();
+        let mut gc = GameController::new().await;
         let _ = gc.put(game_room.clone()).await;
 
         {

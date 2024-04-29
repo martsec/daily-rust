@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::game::cards::{Card, Hand};
 use crate::game::Funding::{Family, Regional, VC};
 use crate::game::TurnAction;
@@ -32,7 +34,7 @@ impl std::fmt::Display for PlayerState {
 /// * [`Hand`] representing the cards the player has
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Player {
-    pub id: usize,
+    pub id: Uuid,
     name: String,
     state: PlayerState,
     pub hand: Hand,
@@ -40,7 +42,7 @@ pub struct Player {
 
 impl Player {
     #[must_use]
-    pub fn new(id: usize, name: &str) -> Self {
+    pub fn new(id: Uuid, name: &str) -> Self {
         Self {
             id,
             name: name.into(),
@@ -91,6 +93,7 @@ impl Player {
 #[cfg(test)]
 mod test_player {
     use crate::game::cards::CardEffect;
+    use uuid::Uuid;
 
     use super::*;
     use rstest::{fixture, rstest};
@@ -110,43 +113,46 @@ mod test_player {
         cards
     }
 
-    #[rstest]
-    fn next_turn_changes_player(mut cards: Vec<Card>) {
-        let mut p = Player::new(0, "Test");
-
-        p.hand.add(cards.pop().expect(""));
+    #[fixture]
+    fn player() -> Player {
+        Player::new(Uuid::new_v4(), "Test")
     }
 
     #[rstest]
-    fn possible_actions_startup_funding() {
+    fn next_turn_changes_player(mut cards: Vec<Card>, mut player: Player) {
+        player.hand.add(cards.pop().expect(""));
+    }
+
+    #[rstest]
+    fn possible_actions_startup_funding(player: Player) {
         use crate::game::Funding::{Family, Regional, VC};
-        let p = Player::new(0, "Test");
 
         for f_type in [Family, Regional, VC] {
-            assert!(p.possible_actions().contains(&TurnAction::Funding(f_type)));
+            assert!(player
+                .possible_actions()
+                .contains(&TurnAction::Funding(f_type)));
         }
     }
 
     #[rstest]
-    fn possible_actions_special_card() {
-        let mut p = Player::new(0, "Test");
+    fn possible_actions_special_card(mut player: Player) {
         let c = Card::Special {
             title: "c".into(),
             description: "c".into(),
             effect: CardEffect::DrawTwo,
         };
-        p.hand.add(c.clone());
+        player.hand.add(c.clone());
 
-        dbg!(p.possible_actions());
-        assert!(p.possible_actions().contains(&TurnAction::SpecialCard(&c)));
+        dbg!(player.possible_actions());
+        assert!(player
+            .possible_actions()
+            .contains(&TurnAction::SpecialCard(&c)));
     }
 
     #[rstest]
-    fn possible_actions_no_special_card() {
-        let p = Player::new(0, "Test");
-
-        dbg!(p.possible_actions());
-        for a in p.possible_actions() {
+    fn possible_actions_no_special_card(player: Player) {
+        dbg!(player.possible_actions());
+        for a in player.possible_actions() {
             assert!(
                 match a {
                     TurnAction::SpecialCard(_) => false,

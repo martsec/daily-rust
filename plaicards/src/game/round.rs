@@ -2,16 +2,19 @@
 ///
 /// * Round number
 /// * Player order
+///
+use uuid::Uuid;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Round {
     pub number: u32,
-    players: Vec<usize>,
-    remaining_players: Vec<usize>,
+    players: Vec<Uuid>,
+    remaining_players: Vec<Uuid>,
 }
 
 impl Round {
     #[must_use]
-    pub fn new(number: u32, players: Vec<usize>) -> Self {
+    pub fn new(number: u32, players: Vec<Uuid>) -> Self {
         let mut player_order = players.clone();
         player_order.reverse();
         Self {
@@ -36,14 +39,14 @@ impl Round {
     /// TODO see if there is a way to avoid representing the empty group
     /// at compile time
     #[must_use]
-    pub fn active_player(&self) -> &usize {
+    pub fn active_player(&self) -> &Uuid {
         self.remaining_players
             .last()
             .expect("INTERNAL ERROR: A round should have no empty player list")
     }
 
     pub fn next_player(&mut self) {
-        let _ = self.remaining_players.pop().map_or(0, |p| p);
+        let _ = self.remaining_players.pop().map_or(Uuid::default(), |p| p);
         if self.remaining_players.is_empty() {
             self.next_round();
         }
@@ -52,33 +55,45 @@ impl Round {
 
 #[cfg(test)]
 mod test_round {
+    use uuid::Uuid;
+
     use crate::game::round::Round;
 
     #[test]
     fn creation() {
-        let ids = vec![0, 1, 2, 3];
-        let r = Round::new(0, ids);
+        let ids = vec![
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+        ];
+        let r = Round::new(0, ids.clone());
 
         assert_eq!(r.number, 0);
-        assert_eq!(r.players, vec![0, 1, 2, 3]);
+        assert_eq!(r.players, ids);
     }
 
     #[test]
     fn next_player() {
-        let ids = vec![0, 1, 2, 3];
-        let mut r = Round::new(0, ids);
+        let ids = vec![
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+        ];
+        let mut r = Round::new(0, ids.clone());
 
         let previous_player = *r.active_player();
         r.next_player();
 
-        assert_eq!(previous_player, 0);
+        assert_eq!(&previous_player, ids.get(0).unwrap());
         assert_eq!(r.remaining_players.len(), 3);
     }
 
     #[test]
     fn when_ending_round_starts_a_new() {
-        let ids = vec![0, 1];
-        let mut r = Round::new(0, ids);
+        let ids = vec![Uuid::new_v4(), Uuid::new_v4()];
+        let mut r = Round::new(0, ids.clone());
 
         let round_num = r.number;
         let first = *r.active_player();

@@ -1,4 +1,5 @@
 use std::fmt;
+use uuid::Uuid;
 
 mod cards;
 mod player;
@@ -19,15 +20,11 @@ pub struct Game {
 
 impl Game {
     #[must_use]
-    pub fn new(player_names: &[String]) -> Self {
+    pub fn new(players: &[(Uuid, String)]) -> Self {
         let cards = get_cards_available();
         let deck = Deck::new(cards);
-        let players: Vec<Player> = player_names
-            .iter()
-            .enumerate()
-            .map(|(id, n)| Player::new(id, n))
-            .collect();
-        let players_id: Vec<usize> = players.iter().map(|p| p.id).collect();
+        let players: Vec<Player> = players.iter().map(|(id, n)| Player::new(*id, n)).collect();
+        let players_id: Vec<Uuid> = players.iter().map(|p| p.id).collect();
 
         Self {
             players,
@@ -47,7 +44,7 @@ impl Game {
 
     /// # Panics
     /// If user id does not exist
-    pub fn get_player(&self, id: usize) -> &Player {
+    pub fn get_player(&self, id: Uuid) -> &Player {
         self.players
             .iter()
             .find(|p| p.id == id)
@@ -60,7 +57,8 @@ impl Game {
     pub fn active_player(&self) -> &Player {
         let pid = self.round.active_player();
         self.players
-            .get(*pid)
+            .iter()
+            .find(|p| p.id == *pid)
             .expect("INNER ERROR: Player not found.")
     }
 
@@ -70,7 +68,8 @@ impl Game {
     fn active_player_mut(&mut self) -> &mut Player {
         let pid = self.round.active_player();
         self.players
-            .get_mut(*pid)
+            .iter_mut()
+            .find(|p| p.id == *pid)
             .expect("INNER ERROR: Player not found.")
     }
 
@@ -80,7 +79,7 @@ impl Game {
     /// If deck is empty, returns an error
     pub fn turn_action(
         &mut self,
-        player_id: usize,
+        player_id: Uuid,
         action: TurnAction,
     ) -> Result<(), DeckEmptyError> {
         let player = self.active_player();
@@ -142,7 +141,11 @@ mod test_game_actions {
 
     #[fixture]
     fn game() -> Game {
-        let players = ["P1".to_string(), "P2".to_string(), "P3".to_string()];
+        let players = [
+            (Uuid::new_v4(), "P1".to_string()),
+            (Uuid::new_v4(), "P2".to_string()),
+            (Uuid::new_v4(), "P3".to_string()),
+        ];
         Game::new(&players)
     }
 

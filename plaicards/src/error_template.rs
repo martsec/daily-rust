@@ -9,9 +9,9 @@ pub enum AppError {
 }
 
 impl AppError {
-    pub fn status_code(&self) -> StatusCode {
+    #[must_use] pub fn status_code(&self) -> StatusCode {
         match self {
-            AppError::NotFound => StatusCode::NOT_FOUND,
+            Self::NotFound => StatusCode::NOT_FOUND,
         }
     }
 }
@@ -19,7 +19,7 @@ impl AppError {
 // A basic function to display errors served by the error boundaries.
 // Feel free to do more complicated things here than just displaying the error.
 #[component]
-pub fn ErrorTemplate(
+#[must_use] pub fn ErrorTemplate(
     #[prop(optional)] outside_errors: Option<Errors>,
     #[prop(optional)] errors: Option<RwSignal<Errors>>,
 ) -> impl IntoView {

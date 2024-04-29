@@ -24,6 +24,12 @@ pub struct Hand {
     cards: Vec<Card>,
 }
 
+impl Default for Hand {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Hand {
     #[must_use]
     pub const fn new() -> Self {
@@ -137,7 +143,7 @@ mod tests {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
                 effect: None,
-                description: "".to_string(),
+                description: String::new(),
                 strenght: 0,
             });
         }
@@ -199,7 +205,7 @@ mod testhand {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
                 effect: None,
-                description: "".to_string(),
+                description: String::new(),
                 strenght: 0,
             });
         }

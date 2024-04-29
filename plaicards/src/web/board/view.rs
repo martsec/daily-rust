@@ -20,11 +20,11 @@ use super::msg::{ClientMsg, ServerMsg, WsSerDe};
 
 fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> Uuid {
     let raw = params
-        .with(|ps| ps.get(param_name).map(|s| s.to_owned()).unwrap_or_default())
-        .to_owned();
+        .with(|ps| ps.get(param_name).map(std::borrow::ToOwned::to_owned).unwrap_or_default())
+        ;
 
     let uuid = from_url_uuid(&raw);
-    let url = to_url_uuid(uuid.clone());
+    let url = to_url_uuid(uuid);
     uuid
 }
 
@@ -54,7 +54,7 @@ impl WsContext {
     // create a method to avoid having to use parantheses around the field
     #[inline(always)]
     pub fn send(&self, message: &str) {
-        (self.send)(message)
+        (self.send)(message);
     }
 }
 
@@ -64,8 +64,8 @@ type History = RwSignal<Vec<String>>;
 ///
 /// * History of messages
 /// * Contract enforcement
-///   * Serializer from [ClientMsg]
-///   * Deserializer from [ServerMsg]
+///   * Serializer from [`ClientMsg`]
+///   * Deserializer from [`ServerMsg`]
 #[derive(Clone)]
 struct Ws {
     history: History,
@@ -79,8 +79,8 @@ impl Ws {
         let UseWebsocketReturn { message, send, .. } = use_websocket_with_options(
             "/game/ws",
             UseWebSocketOptions::default()
-                .on_open(Ws::callback_open(history.clone()))
-                .on_message(Ws::callback_message(history.clone())),
+                .on_open(Self::callback_open(history))
+                .on_message(Self::callback_message(history)),
         );
 
         provide_context(WsContext::new(message, Rc::new(send.clone())));
@@ -91,12 +91,12 @@ impl Ws {
 
     fn callback_open(history: RwSignal<Vec<String>>) -> impl Fn(Event) {
         move |e: Event| {
-            history.update(|h| h.push(format! {"[onopen]: event {:?}", e.type_()}));
+            history.update(|h| h.push(format!("[onopen]: event {:?}", e.type_())));
         }
     }
     fn callback_message(history: RwSignal<Vec<String>>) -> impl Fn(String) {
         move |m: String| {
-            history.update(|h| h.push(format! {"[onmessage]: event {}", m}));
+            history.update(|h| h.push(format!("[onmessage]: event {m}")));
         }
     }
 }
@@ -105,16 +105,16 @@ impl Ws {
     pub fn send(&self, msg: ClientMsg) {
         let msg = msg.to_str();
         self.ctx.send(&msg);
-        let _ = self
+        let () = self
             .history
-            .update(|history: &mut Vec<_>| history.push(format!("[send] {}", msg)));
+            .update(|history: &mut Vec<_>| history.push(format!("[send] {msg}")));
     }
 
     #[inline(always)]
     pub fn message(&self) -> Memo<Option<ServerMsg>> {
         let s = self.ctx.message.get().map(|m| ServerMsg::from_str(&m));
 
-        let msg = self.ctx.message.clone();
+        let msg = self.ctx.message;
         create_memo(move |_| msg.with(|m| m.clone().map(|m| ServerMsg::from_str(&m))))
     }
 }
@@ -131,7 +131,7 @@ pub fn Board() -> impl IntoView {
     // Respond to events
     let websocket = ws.clone();
     create_effect(move |_| {
-        if let Some(ServerMsg::Hello) = websocket.message()() {
+        if websocket.message()() == Some(ServerMsg::Hello) {
             logging::log!("I'm sending the connect message");
             let conn_msg = msg::ClientMsg::Connect {
                 game_id: id(),
@@ -169,7 +169,7 @@ pub fn Board() -> impl IntoView {
 
     <MiddleBoard />
 
-    <PlayerDrawer ws=ws.clone()/>
+    <PlayerDrawer ws=ws/>
     </div>
     }
 }

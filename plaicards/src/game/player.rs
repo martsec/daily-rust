@@ -106,7 +106,7 @@ mod test_player {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
                 effect: None,
-                description: "".to_string(),
+                description: String::new(),
                 strenght: 0,
             });
         }

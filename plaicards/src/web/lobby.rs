@@ -24,15 +24,15 @@ use super::Result as Res;
 
 fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> (String, Uuid) {
     let raw = params
-        .with(|ps| ps.get(param_name).map(|s| s.to_owned()).unwrap_or_default())
-        .to_owned();
+        .with(|ps| ps.get(param_name).map(std::borrow::ToOwned::to_owned).unwrap_or_default())
+        ;
 
     let uuid = from_url_uuid(&raw);
-    let url = to_url_uuid(uuid.clone());
+    let url = to_url_uuid(uuid);
     (url, uuid)
 }
 
-pub fn from_url_uuid(url_id: &str) -> Uuid {
+#[must_use] pub fn from_url_uuid(url_id: &str) -> Uuid {
     let res = Uuid::try_from(
         BASE64URL_NOPAD
             .decode(url_id.as_bytes())
@@ -46,7 +46,7 @@ fn to_url_uuid(id: Uuid) -> String {
 }
 
 #[component]
-pub fn Lobby() -> impl IntoView {
+#[must_use] pub fn Lobby() -> impl IntoView {
     let params = use_params_map();
 
     // FIXME Every time we use this, we call this function
@@ -75,7 +75,7 @@ pub fn Lobby() -> impl IntoView {
     };
     let UseWebsocketReturn { message, send, .. } = use_websocket_with_options(
         &ws_url,
-        UseWebSocketOptions::default().on_message(update_signals.clone()),
+        UseWebSocketOptions::default().on_message(update_signals),
     );
 
     let (name, set_name) = create_signal("MetaTrust".to_string());
@@ -86,7 +86,7 @@ pub fn Lobby() -> impl IntoView {
             name: name(),
         };
         let json = serde_json::to_string(&p).unwrap();
-        let m = format!("REFRESH_PLAIERS{}", json);
+        let m = format!("REFRESH_PLAIERS{json}");
         send.clone()(&m);
     };
     view! {
@@ -185,12 +185,18 @@ pub mod ssr {
         pub tx: broadcast::Sender<String>,
     }
 
+    impl Default for Lobby {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl Lobby {
-        pub fn new() -> Self {
+        #[must_use] pub fn new() -> Self {
             Self::from_id(Uuid::new_v4())
         }
 
-        pub fn from_id(id: Uuid) -> Self {
+        #[must_use] pub fn from_id(id: Uuid) -> Self {
             let (tx, _rx) = broadcast::channel(10);
             Self {
                 id,

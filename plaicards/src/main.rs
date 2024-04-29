@@ -10,7 +10,7 @@ use axum::{
     routing::get,
     Router,
 };
-use leptos::*;
+use leptos::{Props, get_configuration, provide_context, tracing};
 use leptos_axum::{
     generate_route_list, handle_server_fns_with_context, render_app_to_stream_with_context,
     LeptosRoutes,
@@ -24,7 +24,7 @@ use tracing_subscriber::FmtSubscriber;
 
 use plaicards::web::board::{board_handler, GameController};
 use plaicards::web::{lobby::Player, ssr::AppState, Result as Res};
-use plaicards::{app::*, web::lobby::ssr::LobbyController};
+use plaicards::{app::App, web::lobby::ssr::LobbyController};
 use plaicards::{fileserv::file_and_error_handler, web::lobby::ssr::Lobby};
 
 async fn server_fn_handler(
@@ -141,7 +141,7 @@ async fn handle_socket(socket: WebSocket, lobby_id: Uuid, lc: LobbyController) {
     let (mut sender, mut receiver) = socket.split();
     // TODO get path params for lobby_id
     //
-    let lobby = lc.get_lobby(lobby_id.clone()).await.unwrap();
+    let lobby = lc.get_lobby(lobby_id).await.unwrap();
 
     let mut rx = lobby.tx.subscribe();
 
@@ -167,7 +167,7 @@ async fn handle_socket(socket: WebSocket, lobby_id: Uuid, lc: LobbyController) {
             if msg.starts_with("REFRESH_PLAIERS") {
                 let slice = &msg[15..];
                 let p: Player = serde_json::from_str(slice).expect("malformed player");
-                let _ = add_player(&lb, p).await.expect("Failed with p");
+                let () = add_player(&lb, p).await.expect("Failed with p");
                 // Refresh player list to all
                 let updated_players = get_players(&lb).await;
                 let _ = tx.send(updated_players);
@@ -184,7 +184,7 @@ async fn handle_socket(socket: WebSocket, lobby_id: Uuid, lc: LobbyController) {
     };
 
     // Send "user left" message (similar to "joined" above).
-    let msg = format!("Player left.");
+    let msg = "Player left.".to_string();
     tracing::debug!("{msg}");
     let _ = lobby.tx.send(msg);
 }
@@ -194,7 +194,7 @@ async fn get_players(lobby: &Lobby) -> String {
     let players = lobby.players.lock().unwrap().clone();
     let json = serde_json::to_string(&players).unwrap();
     info!("{}", &json);
-    format!("PLAYERS{}", json)
+    format!("PLAYERS{json}")
 }
 
 #[instrument]

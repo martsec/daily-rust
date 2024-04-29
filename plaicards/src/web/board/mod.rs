@@ -30,11 +30,11 @@ pub mod msg {
             serde_json::to_string(&self).unwrap()
         }
 
-        fn from_str(msg: &'a str) -> Self {
-            serde_json::from_str(&msg).expect("Malformed Message")
+        #[must_use] fn from_str(msg: &'a str) -> Self {
+            serde_json::from_str(msg).expect("Malformed Message")
         }
     }
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     pub struct Player {
         pub id: Uuid,
         pub name: String,
@@ -51,7 +51,7 @@ pub mod msg {
     }
 
     /// Encapsulates all messages the server will send
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     #[serde(tag = "t", content = "c")]
     pub enum ServerMsg {
         Hello,
@@ -62,7 +62,7 @@ pub mod msg {
     }
     impl<'a> WsSerDe<'a> for ServerMsg {}
 
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     pub struct Card {
         #[serde(rename = "t")]
         pub title: String,
@@ -73,7 +73,7 @@ pub mod msg {
     }
 
     /// Encapsulates all messages the client will send
-    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+    #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     #[serde(tag = "t", content = "c")]
     pub enum ClientMsg {
         Connect { game_id: Uuid, player_id: Uuid },

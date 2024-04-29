@@ -56,7 +56,7 @@ impl GameController {
 
         // FIXME just for dev purposes
         let gr = GameRoom::new(
-            Uuid::from_str(&"9cb14765-bbfd-447a-b29e-bb203801acb6").unwrap(),
+            Uuid::from_str("9cb14765-bbfd-447a-b29e-bb203801acb6").unwrap(),
             &[
                 (Uuid::new_v4(), "p1".to_string()),
                 (Uuid::new_v4(), "p2".to_string()),
@@ -74,11 +74,11 @@ impl GameController {
 impl GameController {
     pub async fn put(&mut self, gr: GameRoom) -> Res<()> {
         let mut store = self.store.write().await;
-        if store.contains_key(&gr.id) {
-            Err(Error::Duplicated)
-        } else {
-            store.insert(gr.id.clone(), gr);
+        if let std::collections::hash_map::Entry::Vacant(e) = store.entry(gr.id) {
+            e.insert(gr);
             Ok(())
+        } else {
+            Err(Error::Duplicated)
         }
     }
 

@@ -7,7 +7,7 @@ use leptos::ServerFnError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
     NotFound,
     Duplicated,
@@ -39,6 +39,6 @@ impl Display for Error {
 
 impl StdError for Error {
     fn description(&self) -> &str {
-        "Internal error".into()
+        "Internal error"
     }
 }

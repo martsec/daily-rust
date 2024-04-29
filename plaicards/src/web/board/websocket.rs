@@ -80,7 +80,7 @@ async fn handle_socket(mut socket: WebSocket, gc: GameController) {
 
         send(
             &mut socket,
-            ServerMsg::Players(ps.iter().map(|p| msg::Player::from(p)).collect()),
+            ServerMsg::Players(ps.iter().map(msg::Player::from).collect()),
         )
         .await;
 
@@ -128,7 +128,7 @@ async fn handle_socket(mut socket: WebSocket, gc: GameController) {
     }
 
     // Send "user left" message (similar to "joined" above).
-    let msg = format!("Player left.");
+    let msg = "Player left.".to_string();
     tracing::debug!("{msg}");
     let _ = room.tx.send(msg);
 }

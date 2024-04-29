@@ -24,8 +24,8 @@ impl Round {
         }
     }
 
-    fn next_round(&mut self) -> () {
-        if self.remaining_players.len() == 0 {
+    fn next_round(&mut self) {
+        if self.remaining_players.is_empty() {
             self.number += 1;
             self.remaining_players = self.players.clone();
             self.remaining_players.reverse();
@@ -86,14 +86,14 @@ mod test_round {
         let previous_player = *r.active_player();
         r.next_player();
 
-        assert_eq!(&previous_player, ids.get(0).unwrap());
+        assert_eq!(&previous_player, ids.first().unwrap());
         assert_eq!(r.remaining_players.len(), 3);
     }
 
     #[test]
     fn when_ending_round_starts_a_new() {
         let ids = vec![Uuid::new_v4(), Uuid::new_v4()];
-        let mut r = Round::new(0, ids.clone());
+        let mut r = Round::new(0, ids);
 
         let round_num = r.number;
         let first = *r.active_player();

@@ -112,8 +112,8 @@ impl Game {
     }
 
     fn do_special(&mut self, c: &Card) -> Result<(), DeckEmptyError> {
-        use crate::game::cards::CardEffect::*;
-        self.active_player_mut().hand.use_card(&c);
+        use crate::game::cards::CardEffect::{DrawThree, DrawTwo};
+        self.active_player_mut().hand.use_card(c);
         let deck = &mut self.deck;
         if let Card::Special { effect, .. } = c {
             match effect {

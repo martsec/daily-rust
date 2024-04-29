@@ -7,9 +7,10 @@ use leptos::ServerFnError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Error {
     NotFound,
+    Duplicated,
     LoginFail,
     ServerError { e: ServerFnError },
 

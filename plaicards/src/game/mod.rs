@@ -3,14 +3,14 @@ use std::fmt;
 mod cards;
 mod player;
 mod round;
-
 use crate::game::cards::{get_cards_available, Card, Deck, DeckEmptyError};
-use crate::game::player::{Player, PlayerState};
+pub use crate::game::player::Player;
+use crate::game::player::PlayerState;
 use crate::game::round::Round;
 
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Game {
     pub players: Vec<Player>,
     deck: Box<Deck>,

@@ -22,6 +22,7 @@ use tracing::{event, info, instrument, span, Level};
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::FmtSubscriber;
 
+use plaicards::web::board::{board_handler, GameController};
 use plaicards::web::{lobby::Player, ssr::AppState, Result as Res};
 use plaicards::{app::*, web::lobby::ssr::LobbyController};
 use plaicards::{fileserv::file_and_error_handler, web::lobby::ssr::Lobby};
@@ -59,7 +60,11 @@ async fn leptos_routes_handler(
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Tracing
     // See https://github.com/tokio-rs/tracing?tab=readme-ov-file
-    tracing::subscriber::set_global_default(FmtSubscriber::default())?;
+    let subscriber = tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .compact()
+        .finish();
+    tracing::subscriber::set_global_default(subscriber)?;
     // TODO add axum insight
     // https://crates.io/crates/axum-insights
 
@@ -77,8 +82,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let lobby_controller = LobbyController::new().await;
 
+    let game_controller = GameController::new().await;
+
     let app_state = AppState {
         leptos_options,
+        gc: game_controller,
         lobby: lobby_controller,
         routes: routes.clone(),
     };
@@ -90,6 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             get(server_fn_handler).post(server_fn_handler),
         )
         .route("/lobby/:id/ws", get(handler))
+        .route("/game/ws", get(board_handler))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
         .with_state(app_state);

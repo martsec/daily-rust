@@ -1,8 +1,11 @@
 #![allow(clippy::wildcard_imports)]
+
+#[cfg(feature = "ssr")]
 mod game;
-pub mod web;
 
 pub mod app;
+pub mod web;
+
 pub mod error_template;
 #[cfg(feature = "ssr")]
 pub mod fileserv;

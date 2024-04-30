@@ -34,6 +34,18 @@ pub enum Card {
     },
 }
 
+impl Card {
+    pub fn title(&self) -> &str {
+        match self {
+            Card::Adversary { title, .. } => &title,
+            Card::Buzzword { title, .. } => &title,
+            Card::UseCase { title, .. } => &title,
+            Card::Special { title, .. } => &title,
+            Card::MarketEvent { title, .. } => &title,
+        }
+    }
+}
+
 /// This enum contains all possible effects in the game
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum CardEffect {

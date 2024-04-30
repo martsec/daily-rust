@@ -68,6 +68,19 @@ impl GameController {
                 (Uuid::new_v4(), "p5".to_string()),
             ],
         );
+
+        {
+            let mut g = gr.game.write().await;
+            // Simulate a first round
+            let pid = g.active_player().id;
+            trace!("Doing action for player {}", pid);
+
+            let _ = g.turn_action(
+                pid,
+                crate::game::TurnAction::Funding(crate::game::Funding::Family),
+            );
+        }
+
         gc.put(gr).await.unwrap();
 
         gc

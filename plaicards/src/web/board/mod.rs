@@ -19,7 +19,7 @@ cfg_if! {
 pub mod msg {
 
     #[cfg(feature = "ssr")]
-    use crate::game::Player as GPlayer;
+    use crate::game::{Card as GCard, Player as GPlayer};
 
     use serde::{Deserialize, Serialize};
     use serde_json::Result;
@@ -71,6 +71,17 @@ pub mod msg {
         pub effect: String,
         #[serde(rename = "d")]
         pub description: String,
+    }
+
+    #[cfg(feature = "ssr")]
+    impl From<&GCard> for Card {
+        fn from(c: &GCard) -> Self {
+            Self {
+                title: c.title().into(),
+                effect: "EFFECT".into(),
+                description: "Description".into(),
+            }
+        }
     }
 
     /// Encapsulates all messages the client will send

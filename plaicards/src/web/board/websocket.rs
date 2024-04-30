@@ -86,11 +86,18 @@ async fn handle_socket(mut socket: WebSocket, gc: GameController) {
 
         for p in ps {
             // TODO compare with player_id to send different info
-            let hand = ServerMsg::RivalHand {
-                id: p.id,
-                num_cards: p.hand.len(),
-            };
-            send(&mut socket, hand).await;
+            if p.id == player_id {
+                for card in p.hand.card_iter() {
+                    let c = msg::Card::from(card);
+                    send(&mut socket, ServerMsg::AddCard(c)).await;
+                }
+            } else {
+                let hand = ServerMsg::RivalHand {
+                    id: p.id,
+                    num_cards: p.hand.len(),
+                };
+                send(&mut socket, hand).await;
+            }
         }
     }
 

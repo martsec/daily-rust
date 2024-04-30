@@ -303,6 +303,16 @@ fn MiddleBoard() -> impl IntoView {
 #[component]
 fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
     let ws = expect_context::<Ws>();
+    let cards_memory = create_rw_signal(0);
+    let cards = move || {
+        if let Some(ServerMsg::RivalHand { id, num_cards }) = ws.message()() {
+            if id == player.id {
+                cards_memory.set(num_cards);
+            }
+        }
+        cards_memory()
+    };
+
     view! {
     <div class="absolute top-1/4"
         class=("left-5",  move || left)
@@ -311,11 +321,11 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
       <div class="rounded bg-white p-3">
         <h2>{player.name}</h2>
         <div class="drawer-container">
-          <div class="card-vertical will-change-transform"></div>
-          <div class="card-vertical will-change-transform"></div>
-          <div class="card-vertical will-change-transform"></div>
-          <div class="card-vertical will-change-transform"></div>
-          <div class="card-vertical will-change-transform"></div>
+      {move || vec![0; cards()]
+            .into_iter()
+            .map(|_| view!{<div class="card-vertical will-change-transform"></div>})
+            .collect_view()
+      }
         </div>
       </div>
     </div>
@@ -325,12 +335,25 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
 #[component]
 fn HandHorizontal(player: msg::Player) -> impl IntoView {
     let ws = expect_context::<Ws>();
+
+    let cards_memory = create_rw_signal(0);
+    let cards = move || {
+        if let Some(ServerMsg::RivalHand { id, num_cards }) = ws.message()() {
+            if id == player.id {
+                cards_memory.set(num_cards);
+            }
+        }
+        cards_memory()
+    };
+
     view! {
     <div class="rounded bg-white p-2">
       <div class="card-container p-2">
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
+      {move || vec![0; cards()]
+            .into_iter()
+            .map(|_| view!{<div class="card will-change-transform"></div>})
+            .collect_view()
+        }
       </div>
       <h2>{player.name}</h2>
     </div>
@@ -340,6 +363,16 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
 #[component]
 fn PlayerDrawer(player: msg::Player) -> impl IntoView {
     let ws = expect_context::<Ws>();
+
+    let cards: RwSignal<Vec<msg::Card>> = create_rw_signal(vec![]);
+
+    let updated_hand = move || {
+        if let Some(ServerMsg::AddCard(c)) = ws.message()() {
+            cards.update(|cs| cs.push(c));
+        }
+        cards()
+    };
+
     view! {
     //<!-- Bottom Drawer for Player's Cards -->
     <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md">
@@ -357,15 +390,13 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
 
       <div class="grid justify-center">
       <div class="card-container pt-4">
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
-        <div class="card will-change-transform"></div>
+      <For
+            each=move || updated_hand().into_iter().enumerate()
+            key=|(_, c)| c.title.clone()
+            children=move |(i, p)| view! {
+            <div class="card will-change-transform"></div>
+        }
+    />
       </div>
     </div>
     </div>

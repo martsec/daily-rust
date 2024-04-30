@@ -60,7 +60,10 @@ impl GameController {
             &[
                 (Uuid::new_v4(), "p1".to_string()),
                 (Uuid::new_v4(), "p2".to_string()),
-                (Uuid::new_v4(), "p3".to_string()),
+                (
+                    Uuid::from_str("59f99963-fddf-49b2-9a4c-8381b7668ec3").unwrap(),
+                    "p3".to_string(),
+                ),
                 (Uuid::new_v4(), "p4".to_string()),
                 (Uuid::new_v4(), "p5".to_string()),
             ],

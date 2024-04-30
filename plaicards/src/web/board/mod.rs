@@ -27,10 +27,11 @@ pub mod msg {
 
     pub trait WsSerDe<'a>: Serialize + Deserialize<'a> {
         fn to_str(&self) -> String {
-            serde_json::to_string(&self).unwrap()
+            serde_json::to_string(&self).expect("Malformed struct. Cannot serialize to String")
         }
 
-        #[must_use] fn from_str(msg: &'a str) -> Self {
+        #[must_use]
+        fn from_str(msg: &'a str) -> Self {
             serde_json::from_str(msg).expect("Malformed Message")
         }
     }
@@ -44,7 +45,7 @@ pub mod msg {
     impl From<&GPlayer> for Player {
         fn from(p: &GPlayer) -> Self {
             Self {
-                id: Uuid::new_v4(),
+                id: p.id.clone(),
                 name: p.name().clone(),
             }
         }

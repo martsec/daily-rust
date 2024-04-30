@@ -19,9 +19,11 @@ use super::msg;
 use super::msg::{ClientMsg, ServerMsg, WsSerDe};
 
 fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> Uuid {
-    let raw = params
-        .with(|ps| ps.get(param_name).map(std::borrow::ToOwned::to_owned).unwrap_or_default())
-        ;
+    let raw = params.with_untracked(|ps| {
+        ps.get(param_name)
+            .map(std::borrow::ToOwned::to_owned)
+            .unwrap_or_default()
+    });
 
     let uuid = from_url_uuid(&raw);
     let url = to_url_uuid(uuid);
@@ -52,7 +54,6 @@ impl WsContext {
     }
 
     // create a method to avoid having to use parantheses around the field
-    #[inline(always)]
     pub fn send(&self, message: &str) {
         (self.send)(message);
     }
@@ -66,6 +67,16 @@ type History = RwSignal<Vec<String>>;
 /// * Contract enforcement
 ///   * Serializer from [`ClientMsg`]
 ///   * Deserializer from [`ServerMsg`]
+///
+///   In order to pass it to Children (sub components), use the `provide_context`
+///   in the parent and `expect_context` functions from leptos.
+///
+///   ```
+///   provide_context(ws);
+///
+///   // And inside any child component
+///   let ws = expect_context::<Ws>();
+///   ```
 #[derive(Clone)]
 struct Ws {
     history: History,
@@ -82,10 +93,7 @@ impl Ws {
                 .on_open(Self::callback_open(history))
                 .on_message(Self::callback_message(history)),
         );
-
-        provide_context(WsContext::new(message, Rc::new(send.clone())));
-        let ctx = expect_context::<WsContext>();
-
+        let ctx = WsContext::new(message, Rc::new(send.clone()));
         Self { history, ctx }
     }
 
@@ -110,7 +118,6 @@ impl Ws {
             .update(|history: &mut Vec<_>| history.push(format!("[send] {msg}")));
     }
 
-    #[inline(always)]
     pub fn message(&self) -> Memo<Option<ServerMsg>> {
         let s = self.ctx.message.get().map(|m| ServerMsg::from_str(&m));
 
@@ -127,6 +134,7 @@ pub fn Board() -> impl IntoView {
     let player_id = move || from_param_uuid(params, "player_id");
 
     let ws = Ws::new("/game/ws");
+    provide_context(ws.clone());
 
     // Respond to events
     let websocket = ws.clone();
@@ -144,10 +152,12 @@ pub fn Board() -> impl IntoView {
 
     view! {
     <div class="h-screen bg-gray-200">
-    <Nav ws=ws.clone()/>
+    <Nav/>
 
 
-    //<!-- Player Drawers -->
+    <PlayersHands current_player=player_id() />
+
+    <MiddleBoard />
     <div class="mt-0.5 flex justify-around">
               <div class="py-20">
                                         <ul>
@@ -160,23 +170,15 @@ pub fn Board() -> impl IntoView {
                         </For>
                     </ul>
             </div>
-
-        <HandHorizontal />
-        <HandHorizontal />
     </div>
-    <HandVertical left=false />
-    <HandVertical left=true />
-
-    <MiddleBoard />
-
-    <PlayerDrawer ws=ws/>
     </div>
     }
 }
 
 #[component]
-fn Nav(ws: Ws) -> impl IntoView {
+fn Nav() -> impl IntoView {
     let players: RwSignal<Vec<msg::Player>> = create_rw_signal(vec![]);
+    let ws = expect_context::<Ws>();
 
     let updated_players = move || {
         if let Some(ServerMsg::Players(ps)) = ws.message()() {
@@ -184,6 +186,10 @@ fn Nav(ws: Ws) -> impl IntoView {
         }
         players.get()
     };
+
+    create_effect(move |_| {
+        logging::log!("Value of players updated in NAV {:?}", players());
+    });
 
     view! {
      <nav class="flex justify-center">
@@ -207,27 +213,80 @@ fn Nav(ws: Ws) -> impl IntoView {
               >
               <div class="group flex relative">
                   <span class="mx-1 h-6 w-6 rounded-full"
-                    class:bg-blue=move || ip.0 == 0
-                    class:bg-green=move || ip.0 == 1
-                    class:bg-orange=move || ip.0 == 2
-                    class:bg-yellow=move || ip.0 == 3
-                    class:bg-gray-illustration=move || ip.0 == 4
-
-                  ></span>
+                    class=("bg-blue", move || ip.0 == 0)
+                    class=("bg-green", move || ip.0 == 1)
+                    class=("bg-orange", move || ip.0 == 2)
+                    class=("bg-yellow", move || ip.0 == 3)
+                    class=("bg-gray-illustration", move || ip.0 == 4)
+                  />
     <span class="group-hover:opacity-100 transition-opacity bg-gray-800 px-1 text-sm text-gray-100 rounded-md absolute left-1/2
     -translate-x-1/2 translate-y-full opacity-0 m-4 p-1 mx-auto">{ip.1.name}</span>
               </div>
               </For>
-             //<div class="mx-1 h-6 w-6 rounded-full bg-blue"></div>
-             //<div class="mx-1 h-6 w-6 rounded-full bg-green"></div>
-             //<div class="mx-1 h-6 w-6 rounded-full bg-orange"></div>
-             //<div class="mx-1 h-6 w-6 rounded-full bg-yellow"></div>
-             //<div class="mx-1 h-6 w-6 rounded-full bg-gray-illustration"></div>
            </div>
          </div>
        </div>
     </nav>
        }
+}
+
+#[component]
+fn PlayersHands(current_player: Uuid) -> impl IntoView {
+    let ws = expect_context::<Ws>();
+    let players: RwSignal<Vec<msg::Player>> = create_rw_signal(vec![]);
+
+    let updated_players = move || {
+        if let Some(ServerMsg::Players(ps)) = ws.message()() {
+            // Order list starting by current player
+            let idx = ps
+                .iter()
+                .position(|p| p.id == current_player)
+                .unwrap_or_else(|| {
+                    panic!("Current player ID  {current_player} not available in the player list")
+                });
+
+            let mut sorted_ps = ps[idx..].to_vec();
+            sorted_ps.extend(ps[..idx].to_vec());
+
+            players.set(sorted_ps);
+        }
+        players.get()
+    };
+
+    view! {
+    <Show
+        when=move || !updated_players().is_empty()
+        fallback=|| view!{}
+    >
+
+
+        <PlayerDrawer player=players.get()[0].clone()/>
+        <Show
+            when=move || {players().len() > 2}
+                fallback=move || view!{<HandHorizontal player=players.get()[1].clone() />}
+        >
+            <HandVertical player=players.get()[1].clone() left=true/>
+        <div class="mt-0.5 flex justify-around">
+            <HandHorizontal player=players.get()[2].clone() />
+            <Show
+                when=move || players().len() == 5
+                fallback = || view!{}
+            >
+                <HandHorizontal player=players.get()[3].clone() />
+            </Show>
+        </div>
+            <Show
+                when=move || players().len() == 5
+                fallback = move || view!{<HandVertical player=players.get()[3].clone() left=false />}
+            >
+                <HandVertical player=players.get()[4].clone() left=false />
+            </Show>
+
+        </Show>
+    </Show>
+
+
+    }
 }
 
 #[component]
@@ -242,11 +301,15 @@ fn MiddleBoard() -> impl IntoView {
 }
 
 #[component]
-fn HandVertical(left: bool) -> impl IntoView {
+fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
+    let ws = expect_context::<Ws>();
     view! {
-    <div class="absolute left-5 top-1/4">
+    <div class="absolute top-1/4"
+        class=("left-5",  move || left)
+        class=("right-5", move || !left)
+        >
       <div class="rounded bg-white p-3">
-        <h2>Player 1</h2>
+        <h2>{player.name}</h2>
         <div class="drawer-container">
           <div class="card-vertical will-change-transform"></div>
           <div class="card-vertical will-change-transform"></div>
@@ -260,7 +323,8 @@ fn HandVertical(left: bool) -> impl IntoView {
 }
 
 #[component]
-fn HandHorizontal() -> impl IntoView {
+fn HandHorizontal(player: msg::Player) -> impl IntoView {
+    let ws = expect_context::<Ws>();
     view! {
     <div class="rounded bg-white p-2">
       <div class="card-container p-2">
@@ -268,13 +332,14 @@ fn HandHorizontal() -> impl IntoView {
         <div class="card will-change-transform"></div>
         <div class="card will-change-transform"></div>
       </div>
-      <h2>Player 3</h2>
+      <h2>{player.name}</h2>
     </div>
     }
 }
 
 #[component]
-fn PlayerDrawer(ws: Ws) -> impl IntoView {
+fn PlayerDrawer(player: msg::Player) -> impl IntoView {
+    let ws = expect_context::<Ws>();
     view! {
     //<!-- Bottom Drawer for Player's Cards -->
     <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md">
@@ -284,7 +349,7 @@ fn PlayerDrawer(ws: Ws) -> impl IntoView {
         <button onclick="toggleDrawer()" class="focus:shadow-outline rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none">Hide</button>
         </div>
         <div>
-          <h2>Your Cards</h2>
+          <h2>Your Cards {player.name}</h2>
         </div>
         <div>
         </div>

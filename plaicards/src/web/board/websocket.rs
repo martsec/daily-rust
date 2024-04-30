@@ -87,7 +87,7 @@ async fn handle_socket(mut socket: WebSocket, gc: GameController) {
         for p in ps {
             // TODO compare with player_id to send different info
             let hand = ServerMsg::RivalHand {
-                id: Uuid::new_v4(),
+                id: p.id,
                 num_cards: p.hand.len(),
             };
             send(&mut socket, hand).await;

@@ -126,6 +126,7 @@ impl Game {
                     let cards = deck.draw(3)?;
                     self.active_player_mut().hand.add_multiple(cards);
                 }
+                _ => todo!(),
             }
         };
 

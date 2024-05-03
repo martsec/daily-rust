@@ -3,18 +3,32 @@
 @tailwind utilities;
 
 
+.drawer-container {
+  /*position: relative; /* Container relative for card alignment */
+  height: 100%; /* Adjust if necessary */
+  padding-top: 0.5rem; /* Space for title */
+  overflow: visible; /* Allow parts of cards to be visible outside container */
+}
 .card {
-  width: 5rem; /* Card width */
-  height: 7rem; /* Card height */
-  background: gray;
+  width: 7rem; /* Card width */
+  height: 10rem; /* Card height */
   border-radius: 0.5rem;
   border-color: black;
   border-width: 0.1rem;
   transition: transform 0.3s;
 }
+
+.card-faceup {
+  padding-left: 1.3rem; 
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  width: 14rem; /* Card width */
+  height: 19rem; /* Card height */
+}
+
 .card-container {
   display: flex;
-  height: 8rem;
+  /*height: 11rem;*/
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -25,13 +39,12 @@
   z-index: 10; /* Ensure it rises above other elements */
 }
 .card:not(:first-child) {
-  margin-left: -2rem; /* Overlap cards */
+  margin-left: -4rem; /* Overlap cards */
 }
 
 .card-vertical {
-  width: 5rem; /* Card width */
-  height: 7rem; /* Card height */
-  background: gray;
+  width: 7rem; /* Card width */
+  height: 10rem; /* Card height */
   border-radius: 0.5rem;
   border-radius: 0.5rem;
   border-color: black;
@@ -45,12 +58,6 @@
   z-index: 10; /* Ensure hovered card is above others */
 }
 .card-vertical:not(:first-child) {
-  margin-top: -5rem; /* Overlap cards */
-}
-.drawer-container {
-  /*position: relative; /* Container relative for card alignment */
-  height: 100%; /* Adjust if necessary */
-  padding-top: 0.5rem; /* Space for title */
-  overflow: visible; /* Allow parts of cards to be visible outside container */
+  margin-top: -7rem; /* Overlap cards */
 }
 

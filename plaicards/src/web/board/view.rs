@@ -1,7 +1,9 @@
+use std::collections::hash_map::HashMap;
 use std::rc::Rc;
 
+use crate::game::Funding;
 use crate::web::common::Button;
-use crate::web::common::ButtonLink;
+use crate::web::common::ButtonDisablable;
 use data_encoding::BASE64URL_NOPAD;
 use leptos::ev::Event;
 use leptos::logging::log;
@@ -119,10 +121,11 @@ impl Ws {
     }
 
     pub fn message(&self) -> Memo<Option<ServerMsg>> {
-        let s = self.ctx.message.get().map(|m| ServerMsg::from_str(&m));
-
-        let msg = self.ctx.message;
-        create_memo(move |_| msg.with(|m| m.clone().map(|m| ServerMsg::from_str(&m))))
+        let ctx = self.ctx.clone();
+        create_memo(move |_| {
+            ctx.message
+                .with(|m| m.clone().map(|m| ServerMsg::from_str(&m)))
+        })
     }
 }
 
@@ -263,7 +266,10 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
         <PlayerDrawer player=players.get()[0].clone()/>
         <Show
             when=move || {players().len() > 2}
-                fallback=move || view!{<HandHorizontal player=players.get()[1].clone() />}
+                fallback=move || view!{
+                    <div class="mt-0.5 flex justify-around">
+                        <HandHorizontal player=players.get()[1].clone() />
+                    </div>}
         >
             <HandVertical player=players.get()[1].clone() left=true/>
         <div class="mt-0.5 flex justify-around">
@@ -323,7 +329,7 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
         <div class="drawer-container">
       {move || vec![0; cards()]
             .into_iter()
-            .map(|_| view!{<div class="card-vertical will-change-transform"></div>})
+            .map(|_| view!{<div class="card-vertical bg-card-back bg-cover will-change-transform"></div>})
             .collect_view()
       }
         </div>
@@ -351,7 +357,7 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
       <div class="card-container p-2">
       {move || vec![0; cards()]
             .into_iter()
-            .map(|_| view!{<div class="card will-change-transform"></div>})
+            .map(|_| view!{<div class="card bg-card-back bg-cover will-change-transform"></div>})
             .collect_view()
         }
       </div>
@@ -363,28 +369,51 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
 #[component]
 fn PlayerDrawer(player: msg::Player) -> impl IntoView {
     let ws = expect_context::<Ws>();
+    let ws_message = ws.message();
 
     let cards: RwSignal<Vec<msg::Card>> = create_rw_signal(vec![]);
-
     let updated_hand = move || {
-        if let Some(ServerMsg::AddCard(c)) = ws.message()() {
+        if let Some(ServerMsg::AddCard(c)) = ws_message() {
             cards.update(|cs| cs.push(c));
         }
         cards()
     };
 
+    let is_players_turn = create_rw_signal(false);
+    let check_player_turn = move || {
+        if let Some(ServerMsg::NextPlayer(pid)) = ws_message() {
+            is_players_turn.set(pid == player.id);
+        }
+        is_players_turn.get()
+    };
+    provide_context(is_players_turn);
+    create_effect(move |_| {
+        if is_players_turn() {
+            logging::log!("It's now your turn");
+        }
+    });
+
+    let type_to_color = HashMap::from([
+        ("Adversary".to_string(), "text-orange"),
+        ("UseCase".to_string(), "text-green"),
+        ("Buzzword".to_string(), "text-yellow"),
+        ("MarketEvent".to_string(), "text-blue"),
+        ("Special".to_string(), "text-gray"),
+    ]);
+
     view! {
     //<!-- Bottom Drawer for Player's Cards -->
-    <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md">
+    <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md hover:z-20">
 
       <div class="grid grid-cols-3 justify-items-center">
         <div class="justify-self-start">
-        <button onclick="toggleDrawer()" class="focus:shadow-outline rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none">Hide</button>
+            <PlayerActions player=player.clone() />
         </div>
         <div>
           <h2>Your Cards {player.name}</h2>
         </div>
-        <div>
+        <div class="justify-self-end">
+            <p>{move || if check_player_turn() {"Your turn"} else {""} }</p>
         </div>
       </div>
 
@@ -393,12 +422,62 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
       <For
             each=move || updated_hand().into_iter().enumerate()
             key=|(_, c)| c.title.clone()
-            children=move |(i, p)| view! {
-            <div class="card will-change-transform"></div>
+            children=move |(i, c)| view! {
+            <div class={&format!("card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}", c.ctype.to_lowercase())}
+                class=("bg-card-adversary", || false)
+                 class=("bg-card-usecase",  || false)
+                 class=("bg-card-buzzword", || false)
+                 class=("bg-card-special", || false)
+                 class=("bg-card-marketevent", ||false)
+            >
+                <p class={format!("select-none uppercase text-gray-illustration font-extrabold mt-10 {}", type_to_color.get(&c.ctype).unwrap_or(&"text-gray-illustration"))}>{c.title}</p>
+                <p class="select-none uppercase text-black font-bold mt-2">{c.effect}</p>
+                <p class="select-none text-dove-gray italic mt-2">{c.description}</p>
+            </div>
         }
     />
       </div>
     </div>
     </div>
+    }
+}
+
+#[component]
+fn PlayerActions(player: msg::Player) -> impl IntoView {
+    let ws = expect_context::<Ws>();
+    let is_players_turn =
+        use_context::<RwSignal<bool>>().expect("to have found the players turn signal");
+
+    let is_not_turn = Signal::derive(move || !is_players_turn());
+    let funding_button = create_rw_signal(None);
+    create_effect(move |_| match funding_button() {
+        None => {}
+        Some(f) => {
+            ws.send(ClientMsg::DoFunding(f));
+        }
+    });
+
+    view! {
+        <ButtonDisablable
+            title="Family Funding".into()
+            disabled=is_not_turn
+            on:click= move |_| {
+                funding_button.set(Some(Funding::Family));
+            }
+        />
+        <ButtonDisablable
+            title="Regional Funding".into()
+            disabled=is_not_turn
+            on:click= move |_| {
+                funding_button.set(Some(Funding::Regional));
+            }
+        />
+        <ButtonDisablable
+            title="VC Funding".into()
+            disabled=is_not_turn
+            on:click= move |_| {
+                funding_button.set(Some(Funding::VC));
+            }
+        />
     }
 }

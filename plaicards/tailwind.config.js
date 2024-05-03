@@ -4,6 +4,14 @@ module.exports = {
   content: ["*.html", "./src/**/*.rs",],
   theme: {
     extend: {
+      backgroundImage: {
+        'card-back': "url('../img/card_back.png')",
+        'card-special': "url('../img/card_special.png')",
+        'card-usecase': "url('../img/card_useCase.png')",
+        'card-marketevent': "url('../img/card_marketEvent.png')",
+        'card-buzzword': "url('../img/card_buzzword.png')",
+        'card-adversary': "url('../img/card_adversary.png')",
+      },
       colors: {
         green: {
           DEFAULT: '#287d3b',

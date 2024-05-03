@@ -2,6 +2,8 @@ use std::fmt;
 
 use rand::prelude::*;
 
+use crate::game::{Error, Result};
+
 use super::Card;
 
 #[derive(PartialEq, Eq)]
@@ -108,11 +110,11 @@ impl Deck {
     ///
     /// # Errors
     /// If there are no more cards in the deck, returns a [`DeckEmptyError`]
-    pub fn draw(&mut self, num: usize) -> Result<Vec<Card>, DeckEmptyError> {
+    pub fn draw(&mut self, num: usize) -> Result<Vec<Card>> {
         let remaining = self.len();
 
         if remaining <= num {
-            return Err(DeckEmptyError);
+            return Err(Error::EmptyDeck);
         }
 
         Ok(self.cards.drain((remaining - num)..remaining).collect())
@@ -142,9 +144,9 @@ mod tests {
         for i in 1..=5 {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
-                effect: None,
+                effect: crate::game::cards::CardEffect::NoEffect,
                 description: String::new(),
-                strenght: 0,
+                strength: 0,
             });
         }
         cards
@@ -177,7 +179,7 @@ mod tests {
 
         let drawn = deck.draw(1);
 
-        assert_eq!(drawn, Err(DeckEmptyError));
+        assert_eq!(drawn, Err(Error::EmptyDeck));
     }
 
     #[rstest]
@@ -185,8 +187,8 @@ mod tests {
         let num_cards = cards.len();
         let mut deck = Deck::new(cards);
 
-        assert_eq!(deck.draw(num_cards), Err(DeckEmptyError));
-        assert_eq!(deck.draw(num_cards + 1), Err(DeckEmptyError));
+        assert_eq!(deck.draw(num_cards), Err(Error::EmptyDeck));
+        assert_eq!(deck.draw(num_cards + 1), Err(Error::EmptyDeck));
     }
 }
 
@@ -204,9 +206,9 @@ mod testhand {
         for i in 1..=60 {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
-                effect: None,
+                effect: crate::game::cards::CardEffect::NoEffect,
                 description: String::new(),
-                strenght: 0,
+                strength: 0,
             });
         }
         cards

@@ -1,9 +1,11 @@
+//! Returns and errors of the website part
+
 use std::error::Error as StdError;
 use std::{fmt::Display, str::FromStr};
 
 use leptos::ServerFnError;
 
-/// Utilities for returns and errors
+use crate::game::Error as GameError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -13,14 +15,13 @@ pub enum Error {
     Duplicated,
     LoginFail,
     ServerError { e: ServerFnError },
+    WebsocketError,
+    GameError(GameError),
 
     // Auth Errors
     AuthFailNoAuthTokenCookie,
     AuthFailTokenWrongFormat,
     AuthFailCtxNotInRequuestExt,
-
-    // -- Model Errors
-    TicketDeleteFailIdNotFound { id: u64 },
 }
 
 impl FromStr for Error {
@@ -40,5 +41,11 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         "Internal error"
+    }
+}
+
+impl From<GameError> for Error {
+    fn from(value: GameError) -> Self {
+        Self::GameError(value)
     }
 }

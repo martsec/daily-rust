@@ -1,6 +1,6 @@
 #![allow(clippy::wildcard_imports)]
 
-#[cfg(feature = "ssr")]
+//#[cfg(feature = "ssr")]
 mod game;
 
 pub mod app;

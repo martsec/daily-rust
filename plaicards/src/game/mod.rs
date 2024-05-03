@@ -1,7 +1,10 @@
+use leptos::math::Mo;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use uuid::Uuid;
 
 mod cards;
+mod errors;
 mod player;
 mod round;
 pub use crate::game::cards::Card;
@@ -9,6 +12,8 @@ use crate::game::cards::{get_cards_available, Deck, DeckEmptyError};
 pub use crate::game::player::Player;
 use crate::game::player::PlayerState;
 use crate::game::round::Round;
+
+pub use crate::game::errors::{Error, Result};
 
 ///Represents a game of PLAI, containing all the items and logic
 ///to play the game until the end.
@@ -19,7 +24,10 @@ pub struct Game {
     pub round: Round,
 }
 
+// Setup
 impl Game {
+    const INITIAL_CARDS: u8 = 6;
+
     #[must_use]
     pub fn new(players: &[(Uuid, String)]) -> Self {
         let cards = get_cards_available();
@@ -27,11 +35,25 @@ impl Game {
         let players: Vec<Player> = players.iter().map(|(id, n)| Player::new(*id, n)).collect();
         let players_id: Vec<Uuid> = players.iter().map(|p| p.id).collect();
 
-        Self {
+        let mut game = Self {
             players,
             deck: Box::new(deck),
             round: Round::new(0, players_id),
-        }
+        };
+
+        game.initial_deal();
+
+        game
+    }
+
+    fn initial_deal(&mut self) {
+        self.players.iter_mut().for_each(|p| {
+            p.hand.add_multiple(
+                self.deck
+                    .draw(Self::INITIAL_CARDS.into())
+                    .expect("INTERNAL ERROR dealing cards"),
+            )
+        });
     }
 }
 
@@ -74,19 +96,26 @@ impl Game {
             .expect("INNER ERROR: Player not found.")
     }
 
-    /// Execute an action for a given player and ends the turn
-    ///
-    /// # Errors
-    /// If deck is empty, returns an error
-    pub fn turn_action(
-        &mut self,
-        player_id: Uuid,
-        action: TurnAction,
-    ) -> Result<(), DeckEmptyError> {
+    fn ensure_player_can_act(&self, player_id: Uuid) -> Result<()> {
+        if self.has_ended() {
+            return Err(Error::GameEnded);
+        }
         let player = self.active_player();
         if player.id != player_id {
-            todo!();
+            return Err(Error::NotYourTurn);
         }
+        Ok(())
+    }
+
+    /// Execute an action for a given player and ends the turn
+    ///
+    /// ### Errors
+    ///
+    /// * ``EmptyDeck``
+    /// * ``GameEnded``
+    /// * ``NotYourTurn``
+    pub fn turn_action(&mut self, player_id: Uuid, action: TurnAction) -> Result<()> {
+        self.ensure_player_can_act(player_id)?;
 
         match action {
             TurnAction::Funding(f) => self.do_funding(f),
@@ -99,7 +128,7 @@ impl Game {
         Ok(())
     }
 
-    fn do_funding(&mut self, f: Funding) -> Result<(), DeckEmptyError> {
+    fn do_funding(&mut self, f: Funding) -> Result<()> {
         let deck = &mut self.deck;
         match f {
             Funding::Family => {
@@ -112,7 +141,7 @@ impl Game {
         }
     }
 
-    fn do_special(&mut self, c: &Card) -> Result<(), DeckEmptyError> {
+    fn do_special(&mut self, c: &Card) -> Result<()> {
         use crate::game::cards::CardEffect::{DrawThree, DrawTwo};
         self.active_player_mut().hand.use_card(c);
         let deck = &mut self.deck;
@@ -341,14 +370,14 @@ impl fmt::Display for RoundNotEnded {
     }
 }
 
-#[derive(Debug, PartialEq, Copy, Clone, Eq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Funding {
     Family,
     Regional,
     VC,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TurnAction<'a> {
     Funding(Funding),
     SpecialCard(&'a Card),

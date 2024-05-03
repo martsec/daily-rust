@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 mod containers;
 
 pub use containers::{Deck, DeckEmptyError, Hand};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Card {
     Adversary {
         title: String,
@@ -35,19 +37,52 @@ pub enum Card {
 }
 
 impl Card {
-    pub fn title(&self) -> &str {
+    pub fn title(&self) -> String {
         match self {
-            Card::Adversary { title, .. } => &title,
-            Card::Buzzword { title, .. } => &title,
-            Card::UseCase { title, .. } => &title,
-            Card::Special { title, .. } => &title,
-            Card::MarketEvent { title, .. } => &title,
+            Card::Adversary { title, .. } => title,
+            Card::Buzzword { title, .. } => title,
+            Card::UseCase { title, .. } => title,
+            Card::Special { title, .. } => title,
+            Card::MarketEvent { title, .. } => title,
         }
+        .into()
+    }
+
+    pub fn ctype(&self) -> String {
+        match self {
+            Card::Adversary { .. } => "Adversary",
+            Card::Buzzword { .. } => "Buzzword",
+            Card::UseCase { .. } => "UseCase",
+            Card::Special { .. } => "Special",
+            Card::MarketEvent { .. } => "MarketEvent",
+        }
+        .into()
+    }
+    pub fn effect(&self) -> String {
+        match self {
+            Card::Adversary { effect, .. } => effect,
+            Card::Buzzword { effect, .. } => effect,
+            Card::UseCase { effect, .. } => effect,
+            Card::Special { effect, .. } => effect,
+            Card::MarketEvent { effect, .. } => effect,
+        }
+        .to_string()
+    }
+
+    pub fn description(&self) -> String {
+        match self {
+            Card::Adversary { description, .. } => description,
+            Card::Buzzword { description, .. } => description,
+            Card::UseCase { description, .. } => description,
+            Card::Special { description, .. } => description,
+            Card::MarketEvent { description, .. } => description,
+        }
+        .into()
     }
 }
 
 /// This enum contains all possible effects in the game
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
 pub enum CardEffect {
     NoEffect,
 

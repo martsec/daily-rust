@@ -12,6 +12,7 @@ use leptos::use_context;
 use leptos::ServerFnError;
 use tokio::sync::broadcast;
 
+use super::msg::ServerMsg;
 use crate::game::Game;
 use crate::web::{Error, Result as Res};
 
@@ -26,12 +27,12 @@ pub struct Player {
 pub struct GameRoom {
     pub id: Uuid,
     pub game: Arc<RwLock<Game>>,
-    pub tx: broadcast::Sender<String>,
+    pub tx: broadcast::Sender<ServerMsg>,
 }
 
 impl GameRoom {
     pub fn new(id: Uuid, players: &[(Uuid, String)]) -> Self {
-        let (tx, _rx) = broadcast::channel(5);
+        let (tx, _rx) = broadcast::channel::<ServerMsg>(5);
 
         let game = Game::new(players);
         Self {
@@ -58,14 +59,19 @@ impl GameController {
         let gr = GameRoom::new(
             Uuid::from_str("9cb14765-bbfd-447a-b29e-bb203801acb6").unwrap(),
             &[
-                (Uuid::new_v4(), "p1".to_string()),
-                (Uuid::new_v4(), "p2".to_string()),
                 (
-                    Uuid::from_str("59f99963-fddf-49b2-9a4c-8381b7668ec3").unwrap(),
-                    "p3".to_string(),
+                    Uuid::from_str("541f4eec-07c3-46b3-942c-4ed15e07f8e4").unwrap(),
+                    // http://127.0.0.1:3000/plai/nLFHZbv9RHqynrsgOAGstg/VB9O7AfDRrOULE7RXgf45A
+                    "MetaTrust".to_string(),
                 ),
-                (Uuid::new_v4(), "p4".to_string()),
-                (Uuid::new_v4(), "p5".to_string()),
+                //(Uuid::new_v4(), "GigaSpy".to_string()),
+                (
+                    // http://127.0.0.1:3000/plai/nLFHZbv9RHqynrsgOAGstg/WfmZY_3fSbKaTIOBt2aOww
+                    Uuid::from_str("59f99963-fddf-49b2-9a4c-8381b7668ec3").unwrap(),
+                    "MalaTesta".to_string(),
+                ),
+                //(Uuid::new_v4(), "Idefix".to_string()),
+                //(Uuid::new_v4(), "BadBiker".to_string()),
             ],
         );
 

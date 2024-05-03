@@ -10,12 +10,13 @@ use axum::{
     routing::get,
     Router,
 };
-use leptos::{Props, get_configuration, provide_context, tracing};
+use leptos::{get_configuration, provide_context, tracing, Props};
 use leptos_axum::{
     generate_route_list, handle_server_fns_with_context, render_app_to_stream_with_context,
     LeptosRoutes,
 };
 
+use tower_http::compression::CompressionLayer;
 // Tracing
 use tracing::Instrument;
 use tracing::{event, info, instrument, span, Level};
@@ -91,6 +92,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         routes: routes.clone(),
     };
 
+    let compression_layer = CompressionLayer::new().deflate(true).gzip(true);
+
     // build our application with a route
     let app = Router::new()
         .route(
@@ -101,7 +104,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/game/ws", get(board_handler))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
-        .with_state(app_state);
+        .with_state(app_state)
+        .layer(compression_layer);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     info!("Starting server. Listening on http://{}", &addr);

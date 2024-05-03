@@ -12,27 +12,25 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Arc;
 use std::sync::Mutex;
-use tracing::event;
-use tracing::instrument;
-use tracing::trace;
-use tracing::Level;
-use tracing::{debug, info};
 use uuid::Uuid;
 
 use super::Ctx;
 use super::Result as Res;
 
 fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> (String, Uuid) {
-    let raw = params
-        .with(|ps| ps.get(param_name).map(std::borrow::ToOwned::to_owned).unwrap_or_default())
-        ;
+    let raw = params.with(|ps| {
+        ps.get(param_name)
+            .map(std::borrow::ToOwned::to_owned)
+            .unwrap_or_default()
+    });
 
     let uuid = from_url_uuid(&raw);
     let url = to_url_uuid(uuid);
     (url, uuid)
 }
 
-#[must_use] pub fn from_url_uuid(url_id: &str) -> Uuid {
+#[must_use]
+pub fn from_url_uuid(url_id: &str) -> Uuid {
     let res = Uuid::try_from(
         BASE64URL_NOPAD
             .decode(url_id.as_bytes())
@@ -46,7 +44,8 @@ fn to_url_uuid(id: Uuid) -> String {
 }
 
 #[component]
-#[must_use] pub fn Lobby() -> impl IntoView {
+#[must_use]
+pub fn Lobby() -> impl IntoView {
     let params = use_params_map();
 
     // FIXME Every time we use this, we call this function
@@ -66,7 +65,6 @@ fn to_url_uuid(id: Uuid) -> String {
 
     // Update signals when new data arrives from the webhook
     let update_signals = move |m: String| {
-        info!("received message {}", m);
         if m.starts_with("PLAYERS") {
             let slice = &m[7..];
             let ps: Vec<Player> = serde_json::from_str(slice).unwrap_or_default();
@@ -192,11 +190,13 @@ pub mod ssr {
     }
 
     impl Lobby {
-        #[must_use] pub fn new() -> Self {
+        #[must_use]
+        pub fn new() -> Self {
             Self::from_id(Uuid::new_v4())
         }
 
-        #[must_use] pub fn from_id(id: Uuid) -> Self {
+        #[must_use]
+        pub fn from_id(id: Uuid) -> Self {
             let (tx, _rx) = broadcast::channel(10);
             Self {
                 id,
@@ -260,7 +260,6 @@ pub mod ssr {
     }
 }
 
-#[instrument]
 #[server(AddPlayer, "/api/lobby")]
 pub async fn add_player(
     lobby_id: String,
@@ -284,7 +283,6 @@ pub async fn add_player(
 
     //Redirect to correct URI
     let redirect = format!("/lobby/{}/{}", to_url_uuid(lobby.id), to_url_uuid(p.id));
-    info!("Redirecting to {}", &redirect);
     leptos_axum::redirect(&redirect);
 
     // TODO How to update the other clients?
@@ -294,7 +292,6 @@ pub async fn add_player(
 
 #[server(GetPlayers, "/api/lobby")]
 pub async fn get_players(lobby_id: String) -> Result<Vec<Player>, ServerFnError> {
-    debug!("Get players of lobby {lobby_id}");
     use self::ssr::*;
     let lobbys = lobbys()?;
     let lobby_uuid = from_url_uuid(&lobby_id);

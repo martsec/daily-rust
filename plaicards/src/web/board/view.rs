@@ -14,7 +14,6 @@ use leptos_router::*;
 use leptos_use::{
     use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebsocketReturn,
 };
-use tracing::info;
 use uuid::Uuid;
 
 use super::msg;

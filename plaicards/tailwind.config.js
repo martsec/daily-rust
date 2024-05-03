@@ -12,6 +12,26 @@ module.exports = {
         'card-buzzword': "url('../img/card_buzzword.png')",
         'card-adversary': "url('../img/card_adversary.png')",
       },
+      keyframes: {
+          slideIn: {
+            "0%": { 
+              opacity: 1, 
+              transform: "translateX(2rem)" 
+            },
+            "100%": { 
+              opacity: 1, 
+              transform: "translateX(0)" 
+            }
+          },
+          wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+      },
+      animation: {
+          slideIn: "slideIn 1s ease-in",
+        wiggle: 'wiggle 1s ease-in-out infinite',
+      },
       colors: {
         green: {
           DEFAULT: '#287d3b',

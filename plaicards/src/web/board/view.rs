@@ -328,7 +328,7 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
         <div class="drawer-container">
       {move || vec![0; cards()]
             .into_iter()
-            .map(|_| view!{<div class="card-vertical bg-card-back bg-cover will-change-transform"></div>})
+            .map(|_| view!{<div class="animate-slideIn card-vertical bg-card-back bg-cover will-change-transform"></div>})
             .collect_view()
       }
         </div>
@@ -356,7 +356,7 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
       <div class="card-container p-2">
       {move || vec![0; cards()]
             .into_iter()
-            .map(|_| view!{<div class="card bg-card-back bg-cover will-change-transform"></div>})
+            .map(|_| view!{<div class="animate-slideIn card bg-card-back bg-cover will-change-transform"></div>})
             .collect_view()
         }
       </div>
@@ -422,7 +422,7 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
             each=move || updated_hand().into_iter().enumerate()
             key=|(_, c)| c.title.clone()
             children=move |(i, c)| view! {
-            <div class={&format!("card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}", c.ctype.to_lowercase())}
+            <div class={&format!("animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}", c.ctype.to_lowercase())}
                 class=("bg-card-adversary", || false)
                  class=("bg-card-usecase",  || false)
                  class=("bg-card-buzzword", || false)

@@ -58,6 +58,7 @@ pub mod msg {
     pub enum ServerMsg {
         Hello,
         NotYourTurn,
+        BadMove,
         BadRequest,
         PlayerLeft,
         GameEnded,
@@ -74,6 +75,7 @@ pub mod msg {
         fn from(e: GError) -> Self {
             match e {
                 GError::NotYourTurn => Self::NotYourTurn,
+                GError::RuleBreak => Self::BadMove,
                 GError::GameEnded | GError::EmptyDeck => Self::GameEnded,
             }
         }
@@ -92,7 +94,8 @@ pub mod msg {
     }
 
     impl Card {
-        #[must_use] pub fn ctype(&self) -> String {
+        #[must_use]
+        pub fn ctype(&self) -> String {
             self.ctype.clone()
         }
     }

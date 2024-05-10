@@ -10,6 +10,7 @@ pub enum Error {
     EmptyDeck,
     GameEnded,
     NotYourTurn,
+    RuleBreak,
 }
 
 impl Display for Error {

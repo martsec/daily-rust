@@ -142,7 +142,7 @@ impl Game {
     }
 
     fn do_special(&mut self, c: &Card) -> Result<()> {
-        use crate::game::cards::CardEffect::{DrawThree, DrawTwo};
+        use crate::game::cards::CardEffect::*;
         self.active_player_mut().hand.use_card(c);
         let deck = &mut self.deck;
         if let Card::Special { effect, .. } = c {
@@ -155,7 +155,46 @@ impl Game {
                     let cards = deck.draw(3)?;
                     self.active_player_mut().hand.add_multiple(cards);
                 }
-                _ => todo!(),
+
+                AllDrawFour => {
+                    self.players.iter_mut().try_for_each(|p| {
+                        let cards = deck.draw(4)?;
+                        p.hand.add_multiple(cards);
+                        Ok(())
+                    })?;
+                }
+                AllDiscardFour => todo!(),
+                Antitrust => todo!(),
+                CardsToNextPlayer => todo!(),
+                ChangeHands => todo!(),
+                AllDiscardOne => todo!(),
+                FourCardVc => todo!(),
+                ReviveCard => todo!(),
+                SpyPlayer => todo!(),
+                StealCat => todo!(),
+                Steal2Cards => todo!(),
+                DiscardAttack => todo!(),
+
+                DiscardBuzzwords
+                | PlusTwoVsData
+                | PlusTwoVsDeceptive
+                | PlusFourVsData
+                | PlusOneData
+                | PlusOnePython
+                | PlusTwoVsManagers
+                | PlusTwoBuzzwords
+                | PlusThreeCEOs
+                | RemovesEffect
+                | DiscardOne
+                | DiscardBuzzwordsRival
+                | DiscardTwo
+                | DiscardOneEach
+                | CannotDiscard
+                | DiscardThreeDrawTwo
+                | DiscardThree => return Err(Error::RuleBreak),
+
+                NoEffect => {}
+                StopEffect | StopAttack => return Err(Error::RuleBreak),
             }
         };
 
@@ -288,11 +327,9 @@ mod test_game_actions {
         active_p.hand.add_multiple(vec![card.clone()]);
         let active_pid = active_p.id;
 
-        dbg!(game.active_player());
         let action = TurnAction::SpecialCard(&card);
         let _ = game.turn_action(active_pid, action);
 
-        dbg!(game.active_player());
         assert!(
             !game.active_player().hand.contains(&card),
             "Card used must be removed from hand"
@@ -317,6 +354,24 @@ mod test_game_actions {
             game.get_player(active_pid).hand.len(),
             original_card_num + 3
         );
+    }
+
+    #[rstest]
+    fn special_all_draw_four(mut game: Game) {
+        let should_be_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len() + 4).collect();
+        let card = special_card(CardEffect::AllDrawFour);
+        {
+            game.active_player_mut().hand.add(card.clone());
+        }
+        dbg!(&game.active_player().hand);
+        let p = game.active_player().id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(p, action);
+
+        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
+
+        assert_eq!(end_cards, should_be_cards);
     }
 }
 

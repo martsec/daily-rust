@@ -24,6 +24,7 @@ use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::FmtSubscriber;
 
 use plaicards::web::board::{board_handler, GameController};
+use plaicards::web::lobby::lobby_handler;
 use plaicards::web::{lobby::Player, ssr::AppState, Result as Res};
 use plaicards::{app::App, web::lobby::ssr::LobbyController};
 use plaicards::{fileserv::file_and_error_handler, web::lobby::ssr::Lobby};
@@ -61,8 +62,13 @@ async fn leptos_routes_handler(
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Tracing
     // See https://github.com/tokio-rs/tracing?tab=readme-ov-file
+    let log_level = if cfg!(debug_assertions) {
+        tracing::Level::TRACE
+    } else {
+        tracing::Level::INFO
+    };
     let subscriber = tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::TRACE)
+        .with_max_level(log_level)
         .compact()
         .finish();
     tracing::subscriber::set_global_default(subscriber)?;
@@ -100,7 +106,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/api/*fn_name",
             get(server_fn_handler).post(server_fn_handler),
         )
-        .route("/lobby/:id/ws", get(handler))
+        .route("/lobby/:lobby_id/ws", get(lobby_handler))
         .route("/game/ws", get(board_handler))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
@@ -124,85 +130,3 @@ pub fn main() {
 // TODO move me out just for testing
 //
 //
-
-use axum::extract::ws::{WebSocket, WebSocketUpgrade};
-use futures::{sink::SinkExt, stream::StreamExt};
-use uuid::Uuid;
-
-async fn handler(
-    ws: WebSocketUpgrade,
-    Path(lobby_id): Path<Uuid>,
-    State(lc): State<LobbyController>,
-) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, lobby_id, lc))
-}
-
-/// Currently this handles all the websocket connections for the lobby
-///
-/// It allows to send and receive information
-async fn handle_socket(socket: WebSocket, lobby_id: Uuid, lc: LobbyController) {
-    // By splitting, we can send and receive at the same time.
-    let (mut sender, mut receiver) = socket.split();
-    // TODO get path params for lobby_id
-    //
-    let lobby = lc.get_lobby(lobby_id).await.unwrap();
-
-    let mut rx = lobby.tx.subscribe();
-
-    let _ = lobby.tx.send("A new player joined".to_string());
-
-    // Spawn the first task that will receive broadcast messages and send text
-    // messages over the websocket to our client.
-    let mut send_task = tokio::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            // In any websocket error, break loop.
-            if sender.send(Message::Text(msg)).await.is_err() {
-                break;
-            }
-        }
-    });
-
-    let tx = lobby.tx.clone();
-    let lb = lobby.clone();
-
-    let mut recv_task = tokio::spawn(async move {
-        while let Some(Ok(Message::Text(msg))) = receiver.next().await {
-            info!("Message received: {:?}", msg);
-            if msg.starts_with("REFRESH_PLAIERS") {
-                let slice = &msg[15..];
-                let p: Player = serde_json::from_str(slice).expect("malformed player");
-                let () = add_player(&lb, p).await.expect("Failed with p");
-                // Refresh player list to all
-                let updated_players = get_players(&lb).await;
-                let _ = tx.send(updated_players);
-            } else {
-                continue;
-            }
-        }
-    });
-
-    // If any one of the tasks run to completion, we abort the other.
-    tokio::select! {
-        _ = (&mut send_task) => recv_task.abort(),
-        _ = (&mut recv_task) => send_task.abort(),
-    };
-
-    // Send "user left" message (similar to "joined" above).
-    let msg = "Player left.".to_string();
-    tracing::debug!("{msg}");
-    let _ = lobby.tx.send(msg);
-}
-
-#[instrument]
-async fn get_players(lobby: &Lobby) -> String {
-    let players = lobby.players.lock().unwrap().clone();
-    let json = serde_json::to_string(&players).unwrap();
-    info!("{}", &json);
-    format!("PLAYERS{json}")
-}
-
-#[instrument]
-async fn add_player(lobby: &Lobby, p: Player) -> Res<()> {
-    let p = lobby.update_player(p)?;
-    Ok(())
-}

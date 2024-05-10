@@ -19,25 +19,23 @@ use uuid::Uuid;
 use super::msg;
 use super::msg::{ClientMsg, ServerMsg, WsSerDe};
 
-fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> Uuid {
+fn from_param_uuid(params: Memo<ParamsMap>, param_name: &str) -> Option<Uuid> {
     let raw = params.with_untracked(|ps| {
         ps.get(param_name)
             .map(std::borrow::ToOwned::to_owned)
             .unwrap_or_default()
     });
 
-    let uuid = from_url_uuid(&raw);
-    let url = to_url_uuid(uuid);
-    uuid
+    from_url_uuid(&raw)
 }
 
-fn from_url_uuid(url_id: &str) -> Uuid {
+fn from_url_uuid(url_id: &str) -> Option<Uuid> {
     let res = Uuid::try_from(
         BASE64URL_NOPAD
             .decode(url_id.as_bytes())
             .unwrap_or_default(),
     );
-    res.unwrap_or_else(|_| Uuid::new_v4())
+    res.ok()
 }
 fn to_url_uuid(id: Uuid) -> String {
     BASE64URL_NOPAD.encode(id.as_bytes())
@@ -135,6 +133,13 @@ pub fn Board() -> impl IntoView {
     let id = move || from_param_uuid(params, "id");
     let player_id = move || from_param_uuid(params, "player_id");
 
+    if id().is_none() || player_id().is_none() {
+        let lobby = format!("/lobby/{}/{}", Uuid::new_v4(), Uuid::new_v4());
+        return view! {<Redirect path={lobby} />}.into_view();
+    }
+    let id = move || id().expect("Internal error with params");
+    let player_id = move || player_id().expect("Internal error with params");
+
     let ws = Ws::new("/game/ws");
     provide_context(ws.clone());
 
@@ -175,6 +180,7 @@ pub fn Board() -> impl IntoView {
     </div>
     </div>
     }
+    .into_view()
 }
 
 #[component]

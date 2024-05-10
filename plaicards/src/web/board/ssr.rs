@@ -51,7 +51,7 @@ pub struct GameController {
 
 impl GameController {
     pub async fn new() -> Self {
-        let mut gc = Self {
+        let gc = Self {
             store: Arc::default(),
         };
 
@@ -75,18 +75,6 @@ impl GameController {
             ],
         );
 
-        {
-            let mut g = gr.game.write().await;
-            // Simulate a first round
-            let pid = g.active_player().id;
-            trace!("Doing action for player {}", pid);
-
-            let _ = g.turn_action(
-                pid,
-                crate::game::TurnAction::Funding(crate::game::Funding::Family),
-            );
-        }
-
         gc.put(gr).await.unwrap();
 
         gc
@@ -94,7 +82,12 @@ impl GameController {
 }
 
 impl GameController {
-    pub async fn put(&mut self, gr: GameRoom) -> Res<()> {
+    pub async fn new_game(&self, id: Uuid, players: &[(Uuid, String)]) -> Res<()> {
+        let g = GameRoom::new(id, &players);
+        self.put(g).await
+    }
+
+    pub async fn put(&self, gr: GameRoom) -> Res<()> {
         let mut store = self.store.write().await;
         if let std::collections::hash_map::Entry::Vacant(e) = store.entry(gr.id) {
             e.insert(gr);

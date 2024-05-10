@@ -64,7 +64,6 @@ impl Hand {
 
     pub fn remove(&mut self, f: impl FnMut(&mut Card) -> bool) -> Vec<Card> {
         let extracted = self.cards.extract_if(f).collect::<Vec<Card>>();
-        dbg!(&extracted);
         extracted
     }
 

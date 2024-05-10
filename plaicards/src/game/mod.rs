@@ -7,8 +7,8 @@ mod cards;
 mod errors;
 mod player;
 mod round;
-pub use crate::game::cards::Card;
 use crate::game::cards::{get_cards_available, Deck, DeckEmptyError};
+pub use crate::game::cards::{Card, Hand};
 pub use crate::game::player::Player;
 use crate::game::player::PlayerState;
 use crate::game::round::Round;
@@ -178,7 +178,20 @@ impl Game {
                     })?;
                 }
                 Antitrust => todo!(),
-                CardsToNextPlayer => todo!(),
+                CardsToNextPlayer => {
+                    // Shifht hands
+                    let mut hands = self
+                        .players
+                        .iter()
+                        .map(|p| p.hand.clone())
+                        .collect::<Vec<Hand>>();
+                    hands.rotate_right(1);
+                    // Assign shifted hands to players
+                    self.players
+                        .iter_mut()
+                        .zip(hands)
+                        .for_each(|(p, h)| p.hand = h);
+                }
                 ChangeHands => todo!(),
                 FourCardVc => todo!(),
                 ReviveCard => todo!(),
@@ -487,6 +500,33 @@ mod test_game_actions {
             .count();
 
         assert_eq!(num_attack_cards, 0);
+    }
+
+    #[rstest]
+    fn special_change_all_hands(mut game: Game) {
+        use crate::game::cards::Hand;
+        let mut should_be_hands = game
+            .players
+            .iter()
+            .map(|p| p.hand.clone())
+            .collect::<Vec<Hand>>();
+        should_be_hands.rotate_right(1);
+
+        let card = special_card(CardEffect::CardsToNextPlayer);
+        {
+            game.active_player_mut().hand.add(card.clone());
+        }
+        // When
+        let p = game.active_player().id;
+        let _ = game.turn_action(p, TurnAction::SpecialCard(&card));
+
+        let result_hands = game
+            .players
+            .iter()
+            .map(|p| p.hand.clone())
+            .collect::<Vec<Hand>>();
+        // Then
+        assert_eq!(should_be_hands, result_hands);
     }
 }
 

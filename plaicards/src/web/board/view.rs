@@ -70,7 +70,11 @@ type History = RwSignal<Vec<String>>;
 ///   In order to pass it to Children (sub components), use the `provide_context`
 ///   in the parent and `expect_context` functions from leptos.
 ///
-///   ```
+///   ```rust,ignore
+///   use leptos::{expect_context, provide_context};
+///   use crate::web::board::view::Ws;
+///
+///   let ws = Ws::new(..);
 ///   provide_context(ws);
 ///
 ///   // And inside any child component

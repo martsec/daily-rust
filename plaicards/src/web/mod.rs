@@ -5,8 +5,6 @@ mod home;
 pub mod lobby;
 
 /// Context to pass variables around
-///
-
 #[derive(Clone, Debug)]
 pub struct Ctx {
     user_id: u64,
@@ -14,14 +12,16 @@ pub struct Ctx {
 
 // Constructor
 impl Ctx {
-    #[must_use] pub fn new(user_id: u64) -> Self {
+    #[must_use]
+    pub fn new(user_id: u64) -> Self {
         Self { user_id }
     }
 }
 
 // Accessor
 impl Ctx {
-    #[must_use] pub fn user_id(&self) -> u64 {
+    #[must_use]
+    pub fn user_id(&self) -> u64 {
         self.user_id
     }
 }

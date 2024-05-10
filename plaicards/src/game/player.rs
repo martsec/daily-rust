@@ -105,9 +105,9 @@ mod test_player {
         for i in 1..=60 {
             cards.push(Card::Adversary {
                 title: format!("Card_{i}"),
-                effect: None,
+                effect: CardEffect::NoEffect,
                 description: String::new(),
-                strenght: 0,
+                strength: 0,
             });
         }
         cards

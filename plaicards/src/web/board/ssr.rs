@@ -83,7 +83,7 @@ impl GameController {
 
 impl GameController {
     pub async fn new_game(&self, id: Uuid, players: &[(Uuid, String)]) -> Res<()> {
-        let g = GameRoom::new(id, &players);
+        let g = GameRoom::new(id, players);
         self.put(g).await
     }
 

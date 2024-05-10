@@ -1,8 +1,8 @@
-/// Keeps information on the round.
-///
-/// * Round number
-/// * Player order
-///
+//! Keeps information on the round.
+//!
+//! * Round number
+//! * Player order
+
 use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -46,7 +46,7 @@ impl Round {
     }
 
     pub fn next_player(&mut self) {
-        let _ = self.remaining_players.pop().map_or(Uuid::default(), |p| p);
+        let _ = self.remaining_players.pop().unwrap_or(Uuid::default());
         if self.remaining_players.is_empty() {
             self.next_round();
         }

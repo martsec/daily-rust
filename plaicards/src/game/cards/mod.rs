@@ -39,43 +39,43 @@ pub enum Card {
 impl Card {
     pub fn title(&self) -> String {
         match self {
-            Card::Adversary { title, .. } => title,
-            Card::Buzzword { title, .. } => title,
-            Card::UseCase { title, .. } => title,
-            Card::Special { title, .. } => title,
-            Card::MarketEvent { title, .. } => title,
+            Self::Adversary { title, .. }
+            | Self::Buzzword { title, .. }
+            | Self::UseCase { title, .. }
+            | Self::Special { title, .. }
+            | Self::MarketEvent { title, .. } => title,
         }
         .into()
     }
 
     pub fn ctype(&self) -> String {
         match self {
-            Card::Adversary { .. } => "Adversary",
-            Card::Buzzword { .. } => "Buzzword",
-            Card::UseCase { .. } => "UseCase",
-            Card::Special { .. } => "Special",
-            Card::MarketEvent { .. } => "MarketEvent",
+            Self::Adversary { .. } => "Adversary",
+            Self::Buzzword { .. } => "Buzzword",
+            Self::UseCase { .. } => "UseCase",
+            Self::Special { .. } => "Special",
+            Self::MarketEvent { .. } => "MarketEvent",
         }
         .into()
     }
     pub fn effect(&self) -> String {
         match self {
-            Card::Adversary { effect, .. } => effect,
-            Card::Buzzword { effect, .. } => effect,
-            Card::UseCase { effect, .. } => effect,
-            Card::Special { effect, .. } => effect,
-            Card::MarketEvent { effect, .. } => effect,
+            Self::Adversary { effect, .. }
+            | Self::Buzzword { effect, .. }
+            | Self::UseCase { effect, .. }
+            | Self::Special { effect, .. }
+            | Self::MarketEvent { effect, .. } => effect,
         }
         .to_string()
     }
 
     pub fn description(&self) -> String {
         match self {
-            Card::Adversary { description, .. } => description,
-            Card::Buzzword { description, .. } => description,
-            Card::UseCase { description, .. } => description,
-            Card::Special { description, .. } => description,
-            Card::MarketEvent { description, .. } => description,
+            Self::Adversary { description, .. }
+            | Self::Buzzword { description, .. }
+            | Self::UseCase { description, .. }
+            | Self::Special { description, .. }
+            | Self::MarketEvent { description, .. } => description,
         }
         .into()
     }
@@ -126,40 +126,40 @@ pub enum CardEffect {
 impl ToString for CardEffect {
     fn to_string(&self) -> String {
         match self {
-            CardEffect::NoEffect => "",
-            CardEffect::PlusTwoVsData => "+2 against data cards",
-            CardEffect::DiscardBuzzwords => "Discard all buzzword cards plaied",
-            CardEffect::PlusTwoVsDeceptive => "+2 against a deceptive Use-case",
-            CardEffect::PlusFourVsData => "+4 against data cards",
-            CardEffect::RemovesEffect => "Removes all card effects ",
-            CardEffect::DiscardOne => "Discard 1 of your rival's plaied cards",
-            CardEffect::DiscardBuzzwordsRival => "Your rival discards all buzzword cards they plaied",
-            CardEffect::DiscardTwo => "Discard 2 of your rival's plaied cards",
-            CardEffect::PlusOneData => "+1 with other data cards",
-            CardEffect::PlusOnePython => "+1 with python",
-            CardEffect::DiscardOneEach => "Randomly discard 1 plaied card each",
-            CardEffect::CannotDiscard => "Your plaied cards cannot be discarded",
-            CardEffect::DiscardThreeDrawTwo => "Discard 3 cards, draw 2",
-            CardEffect::DiscardThree => "Discard 3 cards",
-            CardEffect::DiscardAttack => "Discard all your attack cards",
-            CardEffect::AllDrawFour => "Everybody draws 4 cards",
-            CardEffect::AllDiscardFour => "Everybody discards 4 cards",
-            CardEffect::AllDiscardOne => "Everybody discards 1 card",
-            CardEffect::CardsToNextPlayer => "All plaiers give their cards to the next plaier. Cannot be blocked.",
-            CardEffect::Antitrust => "All plaiers with more than 9 cards discard 10 cards ",
-            CardEffect::ChangeHands => "Change hands with another plaier",
-            CardEffect::FourCardVc => "Do a 4 card VC funding",
-            CardEffect::DrawTwo => "Draw 2 cards from the deck",
-            CardEffect::DrawThree => "Draw 3 cards from the deck",
-            CardEffect::ReviveCard => "Revive any card from the discard pile",
-            CardEffect::SpyPlayer => "Spy any plAIer's hand and steal one card",
-            CardEffect::StealCat => "Steal 1 card from a plAIer. 4 if used as counter for the 'CEO has requested this'. Use it any time.",
-            CardEffect::Steal2Cards => "Steal 2 cards from a plAIer",
-            CardEffect::StopEffect => "plAI anytime to stop any effect",
-            CardEffect::StopAttack => "plAI anytime to stop an attack",
-            CardEffect::PlusTwoVsManagers => "+2 against  CEOs and Managers",
-            CardEffect::PlusTwoBuzzwords => "+2 to all buzzwords",
-            CardEffect::PlusThreeCEOs => "+3 against CEOs and Companies",
+            Self::NoEffect => "",
+            Self::PlusTwoVsData => "+2 against data cards",
+            Self::DiscardBuzzwords => "Discard all buzzword cards plaied",
+            Self::PlusTwoVsDeceptive => "+2 against a deceptive Use-case",
+            Self::PlusFourVsData => "+4 against data cards",
+            Self::RemovesEffect => "Removes all card effects ",
+            Self::DiscardOne => "Discard 1 of your rival's plaied cards",
+            Self::DiscardBuzzwordsRival => "Your rival discards all buzzword cards they plaied",
+            Self::DiscardTwo => "Discard 2 of your rival's plaied cards",
+            Self::PlusOneData => "+1 with other data cards",
+            Self::PlusOnePython => "+1 with python",
+            Self::DiscardOneEach => "Randomly discard 1 plaied card each",
+            Self::CannotDiscard => "Your plaied cards cannot be discarded",
+            Self::DiscardThreeDrawTwo => "Discard 3 cards, draw 2",
+            Self::DiscardThree => "Discard 3 cards",
+            Self::DiscardAttack => "Discard all your attack cards",
+            Self::AllDrawFour => "Everybody draws 4 cards",
+            Self::AllDiscardFour => "Everybody discards 4 cards",
+            Self::AllDiscardOne => "Everybody discards 1 card",
+            Self::CardsToNextPlayer => "All plaiers give their cards to the next plaier. Cannot be blocked.",
+            Self::Antitrust => "All plaiers with more than 9 cards discard 10 cards ",
+            Self::ChangeHands => "Change hands with another plaier",
+            Self::FourCardVc => "Do a 4 card VC funding",
+            Self::DrawTwo => "Draw 2 cards from the deck",
+            Self::DrawThree => "Draw 3 cards from the deck",
+            Self::ReviveCard => "Revive any card from the discard pile",
+            Self::SpyPlayer => "Spy any plAIer's hand and steal one card",
+            Self::StealCat => "Steal 1 card from a plAIer. 4 if used as counter for the 'CEO has requested this'. Use it any time.",
+            Self::Steal2Cards => "Steal 2 cards from a plAIer",
+            Self::StopEffect => "plAI anytime to stop any effect",
+            Self::StopAttack => "plAI anytime to stop an attack",
+            Self::PlusTwoVsManagers => "+2 against  CEOs and Managers",
+            Self::PlusTwoBuzzwords => "+2 to all buzzwords",
+            Self::PlusThreeCEOs => "+3 against CEOs and Companies",
         }.to_string()
     }
 }

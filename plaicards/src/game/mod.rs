@@ -52,7 +52,7 @@ impl Game {
                 self.deck
                     .draw(Self::INITIAL_CARDS.into())
                     .expect("INTERNAL ERROR dealing cards"),
-            )
+            );
         });
     }
 }

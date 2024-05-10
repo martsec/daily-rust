@@ -196,7 +196,7 @@ async fn handle_socket(socket: WebSocket, gc: GameController) {
                 ClientMsg::DoFunding(funding) => {
                     let mut game = r.game.write().await;
                     match game.turn_action(player_id, TurnAction::Funding(funding)) {
-                        Ok(_) => {}
+                        Ok(()) => {}
                         Err(e) => {
                             s.to_client(e.into()).await.expect("WSERR");
                             continue;

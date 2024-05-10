@@ -46,7 +46,7 @@ pub mod msg {
     impl From<&GPlayer> for Player {
         fn from(p: &GPlayer) -> Self {
             Self {
-                id: p.id.clone(),
+                id: p.id,
                 name: p.name().clone(),
             }
         }
@@ -92,7 +92,7 @@ pub mod msg {
     }
 
     impl Card {
-        pub fn ctype(&self) -> String {
+        #[must_use] pub fn ctype(&self) -> String {
             self.ctype.clone()
         }
     }

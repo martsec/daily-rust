@@ -76,7 +76,7 @@ async fn handle_socket(socket: WebSocket, lobby_id: Uuid, lc: LobbyController, g
                 let players = lobby.players.lock().unwrap().clone();
                 let players: Vec<(Uuid, String)> =
                     players.iter().map(|p| (p.id, p.name.clone())).collect();
-                let game = gc
+                gc
                     .new_game(lobby_id, &players)
                     .await
                     .expect("ERROR adding new game");

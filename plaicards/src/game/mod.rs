@@ -163,11 +163,21 @@ impl Game {
                         Ok(())
                     })?;
                 }
-                AllDiscardFour => todo!(),
+                AllDiscardFour => {
+                    self.players.iter_mut().try_for_each(|p| {
+                        p.hand.take(4);
+                        Ok(())
+                    })?;
+                }
+                AllDiscardOne => {
+                    self.players.iter_mut().try_for_each(|p| {
+                        p.hand.take(1);
+                        Ok(())
+                    })?;
+                }
                 Antitrust => todo!(),
                 CardsToNextPlayer => todo!(),
                 ChangeHands => todo!(),
-                AllDiscardOne => todo!(),
                 FourCardVc => todo!(),
                 ReviveCard => todo!(),
                 SpyPlayer => todo!(),
@@ -360,6 +370,70 @@ mod test_game_actions {
     fn special_all_draw_four(mut game: Game) {
         let should_be_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len() + 4).collect();
         let card = special_card(CardEffect::AllDrawFour);
+        {
+            game.active_player_mut().hand.add(card.clone());
+        }
+        dbg!(&game.active_player().hand);
+        let p = game.active_player().id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(p, action);
+
+        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
+
+        assert_eq!(end_cards, should_be_cards);
+    }
+
+    #[rstest]
+    fn special_all_discard_one(mut game: Game) {
+        let should_be_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len() - 1).collect();
+        let card = special_card(CardEffect::AllDiscardOne);
+        {
+            game.active_player_mut().hand.add(card.clone());
+        }
+        dbg!(&game.active_player().hand);
+        let p = game.active_player().id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(p, action);
+
+        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
+
+        assert_eq!(end_cards, should_be_cards);
+    }
+
+    #[rstest]
+    fn special_all_discard_four(mut game: Game) {
+        let should_be_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len() - 4).collect();
+        let card = special_card(CardEffect::AllDiscardFour);
+        {
+            game.active_player_mut().hand.add(card.clone());
+        }
+        dbg!(&game.active_player().hand);
+        let p = game.active_player().id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(p, action);
+
+        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
+
+        assert_eq!(end_cards, should_be_cards);
+    }
+
+    #[rstest]
+    fn special_all_discard_four_players_with_low_card_num(mut game: Game) {
+        // Set active player with few cards
+        {
+            let hand = &mut game.active_player_mut().hand;
+            let num: u32 = hand.len() as u32;
+            hand.take(num - 1);
+        }
+        let should_be_cards: Vec<usize> = game
+            .players
+            .iter()
+            .map(|p| p.hand.len().saturating_sub(4)) // Saturating at 0
+            .collect();
+        let card = special_card(CardEffect::AllDiscardFour);
         {
             game.active_player_mut().hand.add(card.clone());
         }

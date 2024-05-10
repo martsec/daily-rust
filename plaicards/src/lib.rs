@@ -1,3 +1,4 @@
+#![feature(extract_if)]
 #![allow(clippy::wildcard_imports)]
 
 //#[cfg(feature = "ssr")]

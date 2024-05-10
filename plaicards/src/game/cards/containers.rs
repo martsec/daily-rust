@@ -62,6 +62,11 @@ impl Hand {
         returned
     }
 
+    pub fn remove(&mut self, f: impl FnMut(&mut Card) -> bool) -> Vec<Card> {
+        let extracted = self.cards.extract_if(f).collect::<Vec<Card>>();
+        extracted
+    }
+
     #[must_use]
     pub fn len(&self) -> usize {
         self.cards.len()

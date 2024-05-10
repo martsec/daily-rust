@@ -183,7 +183,11 @@ impl Game {
                 SpyPlayer => todo!(),
                 StealCat => todo!(),
                 Steal2Cards => todo!(),
-                DiscardAttack => todo!(),
+                DiscardAttack => {
+                    self.active_player_mut()
+                        .hand
+                        .remove(|c| matches!(c, Card::Adversary { .. }));
+                }
 
                 DiscardBuzzwords
                 | PlusTwoVsData
@@ -331,7 +335,7 @@ mod test_game_actions {
     }
 
     #[rstest]
-    fn special_removes_from_player_hand(mut game: Game) {
+    fn special_draw_two(mut game: Game) {
         let active_p = game.active_player_mut();
         let card = special_card(CardEffect::DrawTwo);
         active_p.hand.add_multiple(vec![card.clone()]);
@@ -373,7 +377,6 @@ mod test_game_actions {
         {
             game.active_player_mut().hand.add(card.clone());
         }
-        dbg!(&game.active_player().hand);
         let p = game.active_player().id;
 
         let action = TurnAction::SpecialCard(&card);
@@ -391,7 +394,6 @@ mod test_game_actions {
         {
             game.active_player_mut().hand.add(card.clone());
         }
-        dbg!(&game.active_player().hand);
         let p = game.active_player().id;
 
         let action = TurnAction::SpecialCard(&card);
@@ -409,7 +411,6 @@ mod test_game_actions {
         {
             game.active_player_mut().hand.add(card.clone());
         }
-        dbg!(&game.active_player().hand);
         let p = game.active_player().id;
 
         let action = TurnAction::SpecialCard(&card);
@@ -446,6 +447,42 @@ mod test_game_actions {
         let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
 
         assert_eq!(end_cards, should_be_cards);
+    }
+
+    #[rstest]
+    fn special_discard_attack(mut game: Game) {
+        let card = special_card(CardEffect::DiscardAttack);
+        {
+            let p = game.active_player_mut();
+            p.hand.add(card.clone());
+            p.hand.add(Card::Adversary {
+                title: "test".to_string(),
+                description: "test".to_string(),
+                strength: 0,
+                effect: CardEffect::NoEffect,
+            })
+        }
+        let original_attack_cards = game
+            .active_player()
+            .hand
+            .card_iter()
+            .filter(|c| matches!(c, Card::Adversary { .. }))
+            .count();
+        assert!(original_attack_cards > 0, "Test setup failure");
+        let p = game.active_player().id;
+
+        let action = TurnAction::SpecialCard(&card);
+        let _ = game.turn_action(p, action);
+
+        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
+
+        let num_attack_cards = game
+            .active_player()
+            .hand
+            .card_iter()
+            .filter(|c| matches!(c, Card::Adversary { .. }))
+            .count();
+        assert_eq!(num_attack_cards, 0);
     }
 }
 

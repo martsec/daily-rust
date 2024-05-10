@@ -164,6 +164,8 @@ impl Game {
                     })?;
                 }
                 AllDiscardFour => {
+                    // TODO players should be able to choose discarded cards
+                    // TODO discarded cards should go to the discard pile
                     self.players.iter_mut().try_for_each(|p| {
                         p.hand.take(4);
                         Ok(())
@@ -451,6 +453,7 @@ mod test_game_actions {
 
     #[rstest]
     fn special_discard_attack(mut game: Game) {
+        // Given
         let card = special_card(CardEffect::DiscardAttack);
         {
             let p = game.active_player_mut();
@@ -471,17 +474,18 @@ mod test_game_actions {
         assert!(original_attack_cards > 0, "Test setup failure");
         let p = game.active_player().id;
 
+        // When
         let action = TurnAction::SpecialCard(&card);
         let _ = game.turn_action(p, action);
 
-        let end_cards: Vec<usize> = game.players.iter().map(|p| p.hand.len()).collect();
-
+        // Then
         let num_attack_cards = game
-            .active_player()
+            .get_player(p)
             .hand
             .card_iter()
             .filter(|c| matches!(c, Card::Adversary { .. }))
             .count();
+
         assert_eq!(num_attack_cards, 0);
     }
 }

@@ -1,4 +1,3 @@
-use leptos::math::Mo;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use uuid::Uuid;
@@ -74,6 +73,14 @@ impl Game {
             .expect("INNER ERROR: Player not found.")
     }
 
+    /// # Panics
+    /// If user id does not exist
+    pub fn get_player_mut(&mut self, id: Uuid) -> &mut Player {
+        self.players
+            .iter_mut()
+            .find(|p| p.id == id)
+            .expect("INNER ERROR: Player not found.")
+    }
     /// # Panics
     /// If user id does not exist
     #[must_use]
@@ -177,7 +184,17 @@ impl Game {
                         Ok(())
                     })?;
                 }
-                Antitrust => todo!(),
+                Antitrust => {
+                    // TODO players should be able to choose discarded cards
+                    // TODO discarded cards should go to the discard pile
+                    self.players
+                        .iter_mut()
+                        .filter(|p| p.hand.len() > 9)
+                        .try_for_each(|p| {
+                            p.hand.take(10);
+                            Ok(())
+                        })?;
+                }
                 CardsToNextPlayer => {
                     // Shifht hands
                     let mut hands = self
@@ -192,7 +209,13 @@ impl Game {
                         .zip(hands)
                         .for_each(|(p, h)| p.hand = h);
                 }
-                ChangeHands => todo!(),
+                ChangeHands => {
+                    //let hand = self.active_player().hand.clone();
+                    //let other_player_hand = self.get_player(rival_id).hand.clone();
+                    //self.active_player_mut().hand = other_player_hand;
+                    //self.get_player_mut(rival_id).hand = hand;
+                    todo!();
+                }
                 FourCardVc => todo!(),
                 ReviveCard => todo!(),
                 SpyPlayer => todo!(),

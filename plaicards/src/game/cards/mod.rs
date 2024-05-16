@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 mod containers;
 
 pub use containers::{Deck, DeckEmptyError, Hand};
+use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Card {

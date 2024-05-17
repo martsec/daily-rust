@@ -27,10 +27,42 @@ module.exports = {
           '0%, 100%': { transform: 'rotate(-3deg)' },
           '50%': { transform: 'rotate(3deg)' },
         },
+        animatedgradient: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        slide: {
+          "0%": { transform: "translateY(100%)", opacity: 0.1 },
+          "15%": { transform: "translateY(0)", opacity: 1 },
+          "30%": { transform: "translateY(0)", opacity: 1 },
+          "45%": { transform: "translateY(-100%)", opacity: 1 },
+          "100%": { transform: "translateY(-100%)", opacity: 0.1 },
+        },
+        'scroll-right': {
+          "0%": { transform: 'translateX(0)' },
+          "50%": { transform: 'translateX(-50%)' },
+          "100%": { transform: 'translateX(0)' },
+        },
+        'scroll-left': {
+          "0%": { transform: 'translateX(-50%)' },
+          "50%": { transform: 'translateX(0)' },
+          "100%": { transform: 'translateX(-50%)' },
+        },
+      },
+      backgroundSize: {
+        '300%': '300%',
       },
       animation: {
-          slideIn: "slideIn 1s ease-in",
+        slideIn: "slideIn 1s ease-in",
         wiggle: 'wiggle 1s ease-in-out infinite',
+        // https://www.andrealves.dev/blog/how-to-make-an-animated-gradient-text-with-tailwindcss/
+        gradient: 'animatedgradient 6s ease infinite alternate',
+        // https://www.ibelick.com/blog/create-text-sliding-effect-with-tailwind-css
+        slide: "slide 9s linear infinite",
+
+        scrollRight: "scroll-right 60s linear infinite",
+        scrollLeft: "scroll-left 60s linear infinite",
       },
       colors: {
         green: {

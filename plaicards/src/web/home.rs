@@ -87,7 +87,7 @@ fn Hero() -> impl IntoView {
         <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           <div class="z-30 lg:pr-8">
               <div class="lg:max-w-lg">
-              <p class="text-lg leading-8 text-gray-600">Seize control of <mark>your carrer</mark></p>
+              <p class="text-lg leading-8 text-gray-600">Seize control of <mark>your career</mark></p>
               <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">PAVE YOUR OWN PATH*</p>
 
               <p class="mt-10 text-lg leading-8 text-gray-600">Guide your <mark>tech startup</mark> to</p>

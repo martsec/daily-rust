@@ -29,7 +29,7 @@ pub async fn add_email_alert(email: String) -> Result<(), ServerFnError> {
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open("crowdfunding-emails.txt")
+        .open("data/crowdfunding-emails.txt")
         .unwrap();
 
     let date_as_string = Utc::now().to_string();

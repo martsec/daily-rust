@@ -20,10 +20,12 @@ RUN cargo leptos build --release -vv
 FROM rustlang/rust:nightly-alpine as runner
 
 WORKDIR /app
+RUN mkdir -p /app/data
 
 COPY --from=builder /work/target/release/plaicards /app/
 COPY --from=builder /work/target/site /app/site
 COPY --from=builder /work/Cargo.toml /app/
+
 
 EXPOSE $PORT
 ENV LEPTOS_SITE_ROOT=./site

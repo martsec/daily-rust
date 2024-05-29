@@ -1,75 +1,213 @@
+use chrono::prelude::*;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
+
 use leptos::*;
 use leptos_meta::*;
+use leptos_router::ActionForm;
+use leptos_use::use_window_scroll;
 
 /// Renders the home page of the app
 #[component]
 pub fn HomePage() -> impl IntoView {
     view! {
         <Title text="PLAI the game for tech workers"/>
-        <main>
 
-        <WordCloud />
         <Hero />
         <HeaderStats />
-        <LogoCloud />
+        <Features />
+        //<LogoCloud />
         <Newsletter />
-        </main>
+        <WordCloud />
+
+        <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.js"></script>
+    }
+}
+
+#[server(EmailAlert, "/api")]
+pub async fn add_email_alert(email: String) -> Result<(), ServerFnError> {
+    let mut file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("crowdfunding-emails.txt")
+        .unwrap();
+
+    let date_as_string = Utc::now().to_string();
+    if let Err(e) = writeln!(file, "{},{}", date_as_string, email) {
+        eprintln!("Couldn't write to file: {}", e);
+    }
+    Ok(())
+}
+
+#[component]
+fn Hand() -> impl IntoView {
+    let (x, y) = use_window_scroll();
+
+    view! {
+      <div class="mx-auto px-6 lg:px-8 overflow-visible mb-10">
+
+        <div class="grid grid-cols-5 place-content-center justify-items-center">
+        <div class="z-10  hover:z-40 bg-card-hr bg-cover -rotate-12" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
+          style:margin-left=move || format!("{}rem", 25_f64.min(y() /25.))
+          style:margin-top=move || format!("{}rem", 4.5_f64.min(y() /50.))
+            style=("--tw-rotate", move || format!("-{}deg", 12. - y()/60.))
+        />
+        <div class=" z-20  hover:z-40 mt-10 bg-card-aiarmy bg-cover -rotate-6" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
+          style:margin-left=move || format!("{}rem", 12_f64.min(y() /50.))
+          style:margin-top=move || format!("{}rem", 4.6_f64.min(2.5 + y() /80.))
+            style=("--tw-rotate", move || format!("-{}deg", 7. - y()/120.))
+        />
+        <div class="z-30  hover:z-40 mt-20 bg-card-dotcom bg-cover" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"></div>
+        <div class="z-20  hover:z-40 mt-10 bg-card-moredata bg-cover rotate-6" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
+          style:margin-left=move || format!("-{}rem", 12_f64.min(y() /50.))
+          style:margin-top=move || format!("{}rem", 4.6_f64.min(2.5 + y() /80.))
+            style=("--tw-rotate", move || format!("{}deg", 7. - y()/120.))
+        />
+        <div class="z-10 hover:z-40 bg-card-toxic bg-cover rotate-12" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
+          style:margin-left=move || format!("-{}rem", 25_f64.min(y() /25.))
+            style=("--tw-rotate", move || format!("{}deg", 12. - y()/60.))
+          style:margin-top=move || format!("{}rem", 4.5_f64.min(y() /50.))
+        />
+        </div>
+
+      </div>
     }
 }
 
 #[component]
 fn Hero() -> impl IntoView {
+    let add_email = create_server_action::<EmailAlert>();
+    let value = add_email.value();
+    let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
+
     view! {
-
-
-    <div class="overflow-hidden bg-white py-24 sm:py-32">
+    <div class="overflow-hidden bg-white py-24 sm:py-16 lg:py-32 lg:h-svh content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
-        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <div class="lg:pr-8 lg:pt-4">
-            <div class="lg:max-w-lg">
-              <h2 class="text-base font-semibold leading-7 text-emerald-600">Fun times</h2>
-              <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">PLAI, the game for tech workers</p>
-              <p class="mt-6 text-lg leading-8 text-gray-600">Seize control of your carrer and pave your own path.* Guide your tech AI startup to undisputed market dominance.</p>
-              <dl class="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
-                <div class="relative pl-9">
-                  <dt class="inline font-semibold text-gray-900">
-                    <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm3.75-2.75a.75.75 0 001.5 0V9.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.1 0l-3.25 3.5a.75.75 0 101.1 1.02l1.95-2.1v4.59z" clip-rule="evenodd" />
-                    </svg>
-                    Cloud agnostic.
-                  </dt>
-                  <dd class="inline">Do you use one of the big clouds? None of them? No worries, PLAI is designed to be resillient to cloud downtimes.</dd>
-                </div>
-                <div class="relative pl-9">
-                  <dt class="inline font-semibold text-gray-900">
-                    <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
-                    </svg>
-                    Privacy.
-                  </dt>
-                  <dd class="inline">"It's your game so you decide how to plai. Our cards respect your privacy and have no trackers within."</dd>
-                </div>
-                <div class="relative pl-9">
-                  <dt class="inline font-semibold text-gray-900">
-                    <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
-                      <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
-                    </svg>
-                    A box.
-                  </dt>
-                  <dd class="inline">"Unlike laptops, computers and servers, we provide a box you'll want to use most of the time to store the cards away."</dd>
-                </div>
-              </dl>
+        <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div class="z-30 lg:pr-8">
+              <div class="lg:max-w-lg">
+              <p class="text-lg leading-8 text-gray-600">Seize control of <mark>your carrer</mark></p>
+              <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">PAVE YOUR OWN PATH*</p>
+
+              <p class="mt-10 text-lg leading-8 text-gray-600">Guide your <mark>tech startup</mark> to</p>
+              <div class="bg-card-back bg-clip-text bg-fixed bg-parallax opacity-90">
+              <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent" style="-webkit-text-stroke: 1px #808080;">MARKET DOMINANCE</p>
+              </div>
+
+              <div class="mt-20 mb-6">
+                <p class="text-lg text-gray-600 leading-8"><mark>Next sprint</mark> on Kickstarter</p>
+
+            <ActionForm action=add_email>
+            <div class="mt-6 grid grid-rows-2 px-10 gap-4">
+              <label for="email-address" class="sr-only">Email address</label>
+              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder="Enter your email" />
+              <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Top">
+              Get your copy
+
+            </button>
             </div>
+            </ActionForm>
+              </div>
+              </div>
           </div>
-          <img src="img/home_image.jpg" alt="Cards image" class="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0" width="2432" height="1442" />
+
+          <Hand />
         </div>
       </div>
     </div>
 
 
     }
+}
+
+#[component]
+fn Features() -> impl IntoView {
+    view! {
+
+
+          <div class="overflow-hidden bg-white py-24 sm:py-32">
+            <div class="flex justify-center mx-auto max-w-7xl px-6 lg:px-8">
+
+              <dl class="max-w-xl text-base leading-7 text-gray-600 lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute left-1 top-1 size-5 text-emerald-600">
+                            <path fill-rule="evenodd" d="M3.5 2A1.5 1.5 0 0 0 2 3.5V5c0 1.149.15 2.263.43 3.326a13.022 13.022 0 0 0 9.244 9.244c1.063.28 2.177.43 3.326.43h1.5a1.5 1.5 0 0 0 1.5-1.5v-1.148a1.5 1.5 0 0 0-1.175-1.465l-3.223-.716a1.5 1.5 0 0 0-1.767 1.052l-.267.933c-.117.41-.555.643-.95.48a11.542 11.542 0 0 1-6.254-6.254c-.163-.395.07-.833.48-.95l.933-.267a1.5 1.5 0 0 0 1.052-1.767l-.716-3.223A1.5 1.5 0 0 0 4.648 2H3.5Zm9.78.22a.75.75 0 1 0-1.06 1.06L13.94 5l-1.72 1.72a.75.75 0 0 0 1.06 1.06L15 6.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L16.06 5l1.72-1.72a.75.75 0 0 0-1.06-1.06L15 3.94l-1.72-1.72Z" clip-rule="evenodd" />
+                          </svg>
+                          Board game.
+                        </dt>
+                        <dd class="inline">"Let's leave the phones home and go back to play like in Mesopotamia. Because analog is the new retro."</dd>
+                      </div>
+
+
+
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute left-1 top-1 size-5 text-emerald-600">
+        <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z" clip-rule="evenodd" />
+        <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z" />
+      </svg>
+
+                          With friends.
+                        </dt>
+                        <dd class="inline">"Play with friends and work colleagues while you have them."</dd>
+                      </div>
+
+
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute left-1 top-1 size-5 text-emerald-600">
+    <path fill-rule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z" clip-rule="evenodd" />
+
+      </svg>
+
+                          Win.
+                        </dt>
+                        <dd class="inline">"Nothing else matters. It's you against the market. Don't let them have any funding and hang them dry."</dd>
+                      </div>
+
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm3.75-2.75a.75.75 0 001.5 0V9.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.1 0l-3.25 3.5a.75.75 0 101.1 1.02l1.95-2.1v4.59z" clip-rule="evenodd" />
+                          </svg>
+                          Cloud agnostic.
+                        </dt>
+                        <dd class="inline">Do you use one of the big clouds? None of them? No worries, PLAI is designed to be local-first and resillient to cloud downtimes.</dd>
+                      </div>
+
+
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+                          </svg>
+                          Privacy.
+                        </dt>
+                        <dd class="inline">"It's your game so you decide how to plai. Our cards respect your privacy and have no trackers within."</dd>
+                      </div>
+
+
+                      <div class="relative pl-9">
+                        <dt class="inline font-semibold text-gray-900">
+                          <svg class="absolute left-1 top-1 h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M4.632 3.533A2 2 0 016.577 2h6.846a2 2 0 011.945 1.533l1.976 8.234A3.489 3.489 0 0016 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234z" />
+                            <path fill-rule="evenodd" d="M4 13a2 2 0 100 4h12a2 2 0 100-4H4zm11.24 2a.75.75 0 01.75-.75H16a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V15zm-2.25-.75a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 00.75-.75V15a.75.75 0 00-.75-.75h-.01z" clip-rule="evenodd" />
+                          </svg>
+                          A box.
+                        </dt>
+                        <dd class="inline">"Unlike laptops, computers and servers, we provide a box you'll want to use most of the time to store the cards away."</dd>
+                      </div>
+
+
+
+              </dl>
+            </div>
+          </div>
+
+
+          }
 }
 
 #[component]
@@ -103,7 +241,7 @@ fn HeaderStats() -> impl IntoView {
       </span>
 
             tested</h2>
-            <p class="mt-6 text-lg leading-8 text-gray-300">"Being developed over a couple years, we've done multiple playtests with people like you and different than you."</p>
+            <p class="mt-6 text-lg leading-8 text-gray-300">"Developed over a couple years, we've done multiple playtests with people like you and different than you."</p>
           </div>
           <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
             //<div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
@@ -112,22 +250,22 @@ fn HeaderStats() -> impl IntoView {
             //  <a href="#">Our values <span aria-hidden="true">&rarr;</span></a>
             //  <a href="#">Meet our leadership <span aria-hidden="true">&rarr;</span></a>
             //</div>
-            <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
+            <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:items-center sm:grid-cols-2 lg:grid-cols-4">
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Revisions</dt>
-                <dd class="text-2xl font-bold leading-9 tracking-tight text-white">9</dd>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">9</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Beta testers</dt>
-                <dd class="text-2xl font-bold leading-9 tracking-tight text-white">60+</dd>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">60+</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Avg. game time</dt>
-                <dd class="text-2xl font-bold leading-9 tracking-tight text-white">"~25 min"</dd>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"~25 min"</dd>
               </div>
               <div class="flex flex-col-reverse">
-                <dt class="text-base leading-7 text-gray-300">Their startup potential</dt>
-                <dd class="text-2xl font-bold leading-9 tracking-tight text-white">Unlimited</dd>
+                <dt class="text-base leading-7 text-gray-300">Satire potential</dt>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">Unlimited</dd>
               </div>
             </dl>
           </div>
@@ -141,9 +279,9 @@ fn HeaderStats() -> impl IntoView {
 fn WordCloud() -> impl IntoView {
     view! {
 
-        <div class="bg-gray py-24 sm:py-32">
-    <div class="w-full inline-flex flex-nowrap text-9xl font-mono">
-        <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollRight">
+    <div class="overflow-hidden">
+    <div class="w-full inline-flex flex-nowrap text-13xl font-mono bg-card-antitrust bg-clip-text bg-fixed bg-parallax opacity-50">
+        <ul class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollRight uppercase font-black" style="-webkit-text-stroke: 1px black;">
             <li>PLAI</li>
             <li>GAME</li>
             <li>Startup</li>
@@ -153,8 +291,8 @@ fn WordCloud() -> impl IntoView {
             <li>Data</li>
         </ul>
     </div>
-    <div class="w-full inline-flex flex-nowrap text-9xl font-mono">
-        <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollLeft">
+    <div class="w-full py-2 inline-flex flex-nowrap text-13xl font-mono bg-card-back bg-clip-text bg-fixed bg-parallax opacity-50">
+        <ul class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollLeft uppercase font-black">
           <li>PYTHON</li>
           <li>Artificial</li>
           <li>Intelligence</li>
@@ -163,7 +301,7 @@ fn WordCloud() -> impl IntoView {
           <li>Rust</li>
         </ul>
     </div>
-        </div>
+    </div>
       }
 }
 
@@ -187,6 +325,9 @@ fn LogoCloud() -> impl IntoView {
 
 #[component]
 fn Newsletter() -> impl IntoView {
+    let add_email = create_server_action::<EmailAlert>();
+    let value = add_email.value();
+    let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
     view! {
     <div class="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -194,11 +335,13 @@ fn Newsletter() -> impl IntoView {
           <div class="max-w-xl lg:max-w-lg">
             <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Get your copy!</h2>
             <p class="mt-4 text-lg leading-8 text-gray-300">We want to release this product to production, but we need your help</p>
-            <div class="mt-6 flex max-w-md gap-x-4">
-              <label for="email-address" class="sr-only">Email address</label>
-              <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6" placeholder="Enter your email" />
-              <button type="submit" class="flex-none rounded-md bg-emerald-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500">Alert me!</button>
-            </div>
+            <ActionForm action=add_email>
+              <div class="mt-6 flex max-w-md gap-x-4">
+                <label for="email-address" class="sr-only">Email address</label>
+                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6" placeholder="Enter your email" />
+                <button type="submit" class="flex-none rounded-md bg-emerald-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Bottom">Alert me!</button>
+              </div>
+            </ActionForm>
           </div>
           <dl class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2">
             <div class="flex flex-col items-start">

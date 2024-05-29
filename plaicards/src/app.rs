@@ -7,7 +7,8 @@ use leptos_meta::*;
 use leptos_router::*;
 
 #[component]
-#[must_use] pub fn App() -> impl IntoView {
+#[must_use]
+pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
@@ -36,8 +37,8 @@ use leptos_router::*;
             <main>
                 <Routes>
                     <Route path="/" view=HomePage/>
-                    <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
-                    <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
+                    //<Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
+                    //<Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
                 </Routes>
             </main>
         </Router>

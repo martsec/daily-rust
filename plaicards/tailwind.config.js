@@ -4,6 +4,9 @@ module.exports = {
   content: ["*.html", "./src/**/*.rs",],
   theme: {
     extend: {
+      fontSize: {
+        "13xl": "12rem",
+      },
       backgroundImage: {
         'card-back': "url('../img/card_back.png')",
         'card-special': "url('../img/card_special.png')",
@@ -11,6 +14,12 @@ module.exports = {
         'card-marketevent': "url('../img/card_marketEvent.png')",
         'card-buzzword': "url('../img/card_buzzword.png')",
         'card-adversary': "url('../img/card_adversary.png')",
+        'card-antitrust': "url('../img/card_antitrust.png')",
+        'card-dotcom': "url('../img/card_dotcom.png')",
+        'card-hr': "url('../img/card_hr.png')",
+        'card-moredata': "url('../img/card_more_data.png')",
+        'card-aiarmy': "url('../img/card_ai_army.png')",
+        'card-toxic': "url('../img/card_toxic_manager.png')",
       },
       keyframes: {
           slideIn: {
@@ -61,8 +70,8 @@ module.exports = {
         // https://www.ibelick.com/blog/create-text-sliding-effect-with-tailwind-css
         slide: "slide 9s linear infinite",
 
-        scrollRight: "scroll-right 60s linear infinite",
-        scrollLeft: "scroll-left 60s linear infinite",
+        scrollRight: "scroll-right 90s linear infinite",
+        scrollLeft: "scroll-left 80s linear infinite",
       },
       colors: {
         green: {

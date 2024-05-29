@@ -8,6 +8,7 @@ module.exports = {
         "13xl": "12rem",
       },
       backgroundImage: {
+        'texture-paper': "url('../img/texture-paper.jpg')",
         'card-back': "url('../img/card_back.png')",
         'card-special': "url('../img/card_special.png')",
         'card-usecase': "url('../img/card_useCase.png')",
@@ -58,6 +59,10 @@ module.exports = {
           "50%": { transform: 'translateX(0)' },
           "100%": { transform: 'translateX(-50%)' },
         },
+        'infinite-scroll': {
+            from: { transform: 'translateX(0)' },
+            to: { transform: 'translateX(-100%)' },
+        },
       },
       backgroundSize: {
         '300%': '300%',
@@ -69,7 +74,7 @@ module.exports = {
         gradient: 'animatedgradient 6s ease infinite alternate',
         // https://www.ibelick.com/blog/create-text-sliding-effect-with-tailwind-css
         slide: "slide 9s linear infinite",
-
+        'infinite-scroll': 'infinite-scroll 100s linear infinite',
         scrollRight: "scroll-right 90s linear infinite",
         scrollLeft: "scroll-left 80s linear infinite",
       },

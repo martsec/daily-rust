@@ -17,6 +17,7 @@ pub fn HomePage() -> impl IntoView {
         <HeaderStats />
         <Features />
         //<LogoCloud />
+        <CardTypes />
         <Newsletter />
         <WordCloud />
 
@@ -44,7 +45,7 @@ fn Hand() -> impl IntoView {
     let (x, y) = use_window_scroll();
 
     view! {
-      <div class="mx-auto px-6 lg:px-8 overflow-visible mb-10">
+      <div class="mx-auto pt-3 lg:px-8 overflow-visible mb-10">
 
         <div class="grid grid-cols-5 place-content-center justify-items-center">
         <div class="z-10  hover:z-40 bg-card-hr bg-cover -rotate-12" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
@@ -81,7 +82,7 @@ fn Hero() -> impl IntoView {
     let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
 
     view! {
-    <div class="overflow-hidden bg-white py-24 sm:py-16 lg:py-32 lg:h-svh content-center">
+    <div class="overflow-hidden bg-white pt-8 sm:py-16 lg:py-32 lg:h-svh content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
         <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
@@ -91,17 +92,17 @@ fn Hero() -> impl IntoView {
               <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">PAVE YOUR OWN PATH*</p>
 
               <p class="mt-10 text-lg leading-8 text-gray-600">Guide your <mark>tech startup</mark> to</p>
-              <div class="bg-card-back bg-clip-text bg-fixed bg-parallax opacity-90">
-              <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent" style="-webkit-text-stroke: 1px #808080;">MARKET DOMINANCE</p>
+              <div class="bg-texture-paper bg-repeat  bg-clip-text bg-fixed bg-parallax">
+              <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent">MARKET DOMINANCE</p>
               </div>
 
-              <div class="mt-20 mb-6">
+              <div class="mt-8 sm:mt-20 mb-6">
                 <p class="text-lg text-gray-600 leading-8"><mark>Next sprint</mark> on Kickstarter</p>
 
             <ActionForm action=add_email>
             <div class="mt-6 grid grid-rows-2 px-10 gap-4">
               <label for="email-address" class="sr-only">Email address</label>
-              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder="Enter your email" />
+              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder="Enter your best email" />
               <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Top">
               Get your copy
 
@@ -243,7 +244,7 @@ fn HeaderStats() -> impl IntoView {
             tested</h2>
             <p class="mt-6 text-lg leading-8 text-gray-300">"Developed over a couple years, we've done multiple playtests with people like you and different than you."</p>
           </div>
-          <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+          <div class="mx-auto mt-10 mb-4 max-w-2xl lg:mx-0 lg:max-w-none">
             //<div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
             //  <a href="#">Open roles <span aria-hidden="true">&rarr;</span></a>
             //  <a href="#">Internship program <span aria-hidden="true">&rarr;</span></a>
@@ -276,11 +277,82 @@ fn HeaderStats() -> impl IntoView {
 }
 
 #[component]
+fn CardTypes() -> impl IntoView {
+    view! {
+     <div class="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
+        <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll">
+            <li>
+                <img src="./img/TheCards-1.png" alt="Adversary" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-1.png" alt="Attack Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-2.png" alt="Defense Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-2.png" alt="Use Case" />
+            </li>
+            <li>
+                <img src="./img/TheCards-3.png" alt="Buzzwords" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-3.png" alt="Support Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-4.png" alt="Special" />
+            </li>
+            <li>
+                <img src="./img/TheCards-4.png" alt="Game changing" />
+            </li>
+            <li>
+                <img src="./img/TheCards-5.png" alt="Market Events" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-5.png" alt="Immediate Use" />
+            </li>
+        </ul>
+        <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll" aria-hidden="true">
+            <li>
+                <img src="./img/TheCards-1.png" alt="Adversary" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-1.png" alt="Attack Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-2.png" alt="Defense Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-2.png" alt="Use Case" />
+            </li>
+            <li>
+                <img src="./img/TheCards-3.png" alt="Buzzwords" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-3.png" alt="Support Cards" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-4.png" alt="Special" />
+            </li>
+            <li>
+                <img src="./img/TheCards-4.png" alt="Game changing" />
+            </li>
+            <li>
+                <img src="./img/TheCards-5.png" alt="Market Events" />
+            </li>
+            <li>
+                <img src="./img/TheCards-Title-5.png" alt="Immediate Use" />
+            </li>
+        </ul>
+    </div>
+      }
+}
+#[component]
 fn WordCloud() -> impl IntoView {
     view! {
 
     <div class="overflow-hidden">
-    <div class="w-full inline-flex flex-nowrap text-13xl font-mono bg-card-antitrust bg-clip-text bg-fixed bg-parallax opacity-50">
+    <div class="w-full inline-flex flex-nowrap text-13xl font-mono bg-card-antitrust bg-clip-text bg-fixed bg-parallax bg-repeat opacity-50">
         <ul class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollRight uppercase font-black" style="-webkit-text-stroke: 1px black;">
             <li>PLAI</li>
             <li>GAME</li>
@@ -291,7 +363,7 @@ fn WordCloud() -> impl IntoView {
             <li>Data</li>
         </ul>
     </div>
-    <div class="w-full py-2 inline-flex flex-nowrap text-13xl font-mono bg-card-back bg-clip-text bg-fixed bg-parallax opacity-50">
+    <div class="w-full py-2 inline-flex flex-nowrap text-13xl font-mono bg-card-back bg-clip-text bg-fixed bg-parallax bg-repeat opacity-50">
         <ul class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollLeft uppercase font-black">
           <li>PYTHON</li>
           <li>Artificial</li>
@@ -338,7 +410,7 @@ fn Newsletter() -> impl IntoView {
             <ActionForm action=add_email>
               <div class="mt-6 flex max-w-md gap-x-4">
                 <label for="email-address" class="sr-only">Email address</label>
-                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6" placeholder="Enter your email" />
+                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6" placeholder="Enter your gdpr email" />
                 <button type="submit" class="flex-none rounded-md bg-emerald-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Bottom">Alert me!</button>
               </div>
             </ActionForm>

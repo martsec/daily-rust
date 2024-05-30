@@ -132,11 +132,11 @@ fn Hero() -> impl IntoView {
                   <mark>PLAI: Next sprint</mark> on Kickstarter
                 </p>
 
-            <ActionForm action=add_email>
+            <ActionForm action=add_email class="plausible-DOESNOTWORK-event-name=Subscribe+Top">
             <div class="mt-6 grid grid-rows-2 px-10 gap-4">
               <label for="email-address" class="sr-only">Email address</label>
               <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder="Enter your best email" />
-              <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Top">
+              <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ">
               Get your copy
 
             </button>
@@ -148,6 +148,12 @@ fn Hero() -> impl IntoView {
 
           <Hand />
         </div>
+      </div>
+      // Scroll down icon
+      <div class="absolute inset-x-0 bottom-0 flex justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-16 text-blue motion-safe:animate-bounce">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
       </div>
     </div>
 

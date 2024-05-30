@@ -10,8 +10,39 @@ use leptos_use::use_window_scroll;
 /// Renders the home page of the app
 #[component]
 pub fn HomePage() -> impl IntoView {
+    provide_meta_context();
     view! {
-        <Title text="PLAI the game for tech workers"/>
+
+        <Title text="PLAI the board game for tech workers"/>
+        <Meta charset="utf-8"/>
+        <Meta name="description" content="Burned-out of your fast-paced environment? Too much workplace politics? Get ready for PLAI, the board game where you'll now be the CEO of your startup dedicated to... well, do AI things. And data. And also some Quantum stuff. I don't know really but actually your goal is to reign over your friends and fools! Muahahahah"/>
+        <Meta name="HandheldFriendly" content="True" />
+        <Meta property="og:site_name" content="plAI card game"/>
+
+            <Meta property="og:site_name" content="plAI card game"/>
+    <Meta property="og:type" content="website"/>
+    <Meta property="og:title" content="plAI the board game for (not only) tech workers"/>
+    <Meta property="og:description" content="Do you work in a fast-paced environment? Are you burned-out at work? Ready to create your AI startup? We are the solution to your challenges.
+
+Get your game!
+
+Sourced from professional situations, PLAI aims to be a great tool to blow off steam."/>
+    <Meta property="og:url" content="https://plai.cards/links/"/>
+    <Meta property="og:image" content="https://plai.cards/content/images/2024/04/Portada.png"/>
+    <Meta name="twitter:card" content="summary_large_image"/>
+    <Meta name="twitter:title" content="plAI, the board game for (not only) tech workers"/>
+    <Meta name="twitter:description" content="Do you work in a fast-paced environment? Are you burned-out at work? Ready to create your AI startup? We are the solution to your challenges.
+
+Get your game!
+
+Sourced from professional situations, PLAI aims to be an innovative tool to blow off steam."/>
+    <Meta name="twitter:url" content="https://plai.cards/links/"/>
+    <Meta name="twitter:image" content="https://plai.cards/content/images/2024/04/Portada.png"/>
+    <Meta name="twitter:label1" content="Written by"/>
+    <Meta name="twitter:data1" content="Marti"/>
+    <Meta name="twitter:site" content="@plai_cards"/>
+    <Meta property="og:image:width" content="1200"/>
+    <Meta property="og:image:height" content="675"/>
 
         <Hero />
         <HeaderStats />

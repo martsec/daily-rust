@@ -21,7 +21,7 @@ pub fn HomePage() -> impl IntoView {
         <Newsletter />
         <WordCloud />
 
-        <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.js"></script>
+        <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.outbound-links.js"></script>
     }
 }
 
@@ -82,7 +82,7 @@ fn Hero() -> impl IntoView {
     let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
 
     view! {
-    <div class="overflow-hidden bg-white pt-8 sm:py-16 lg:py-32 lg:h-svh content-center">
+    <div class="overflow-hidden bg-white pt-4 sm:py-8 lg:py-16 lg:h-svh content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
         <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
@@ -97,7 +97,9 @@ fn Hero() -> impl IntoView {
               </div>
 
               <div class="mt-8 sm:mt-20 mb-6">
-                <p class="text-lg text-gray-600 leading-8"><mark>Next sprint</mark> on Kickstarter</p>
+                <p class="text-lg text-gray-600 leading-8">
+                  <mark>PLAI: Next sprint</mark> on Kickstarter
+                </p>
 
             <ActionForm action=add_email>
             <div class="mt-6 grid grid-rows-2 px-10 gap-4">
@@ -279,7 +281,7 @@ fn HeaderStats() -> impl IntoView {
 #[component]
 fn CardTypes() -> impl IntoView {
     view! {
-     <div class="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
+     <div class="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_32px,_black_calc(100%-60px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
         <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll">
             <li>
                 <img src="./img/TheCards-1.png" alt="Adversary" />
@@ -432,7 +434,7 @@ fn Newsletter() -> impl IntoView {
                 </svg>
               </div>
               <dt class="mt-4 font-semibold text-white">No spam</dt>
-              <dd class="mt-2 leading-7 text-gray-400">"I'll just use your email 1-3 times to send you campaign related activities. For spam and seeign how cool is the game, check our instagram at @plai_cards"</dd>
+              <dd class="mt-2 leading-7 text-gray-400">"I'll just use your email 1-3 times to send you campaign related activities. For spam and seeign how cool the game is, check our instagram at " <a href="https://www.instagram.com/plai_cards/" target="_blank" class="underline decoration-green underline-offset-4 text-white font-bold hover:decoration-blue hover:underline-offset-8 decoration-2">@plai_cards</a></dd>
             </div>
           </dl>
         </div>

@@ -5,7 +5,7 @@ use std::io::prelude::*;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::ActionForm;
-use leptos_use::use_window_scroll;
+use leptos_use::{use_interval, use_interval_fn, use_window_scroll, UseIntervalReturn};
 
 /// Renders the home page of the app
 #[component]
@@ -16,26 +16,19 @@ pub fn HomePage() -> impl IntoView {
         <Title text="PLAI the board game for tech workers"/>
         <Meta charset="utf-8"/>
         <Meta name="description" content="Burned-out of your fast-paced environment? Too much workplace politics? Get ready for PLAI, the board game where you'll now be the CEO of your startup dedicated to... well, do AI things. And data. And also some Quantum stuff. I don't know really but actually your goal is to reign over your friends and fools! Muahahahah"/>
+        <Meta name="keywords" content="plai, board game, tech industry, strategy game, cards, satire, kickstarter, ai, data, startup, comedy" />
         <Meta name="HandheldFriendly" content="True" />
         <Meta property="og:site_name" content="plAI card game"/>
 
             <Meta property="og:site_name" content="plAI card game"/>
     <Meta property="og:type" content="website"/>
     <Meta property="og:title" content="plAI the board game for (not only) tech workers"/>
-    <Meta property="og:description" content="Do you work in a fast-paced environment? Are you burned-out at work? Ready to create your AI startup? We are the solution to your challenges.
-
-Get your game!
-
-Sourced from professional situations, PLAI aims to be a great tool to blow off steam."/>
+    <Meta property="og:description" content="Burned-out of your fast-paced environment? Too much workplace politics? Get ready for PLAI, the board game where you'll now be the CEO of your startup dedicated to... well, do AI things. And data. And also some Quantum stuff. I don't know really but actually your goal is to reign over your friends and fools! Muahahahah"/>
     <Meta property="og:url" content="https://plai.cards/links/"/>
     <Meta property="og:image" content="https://plai.cards/content/images/2024/04/Portada.png"/>
     <Meta name="twitter:card" content="summary_large_image"/>
     <Meta name="twitter:title" content="plAI, the board game for (not only) tech workers"/>
-    <Meta name="twitter:description" content="Do you work in a fast-paced environment? Are you burned-out at work? Ready to create your AI startup? We are the solution to your challenges.
-
-Get your game!
-
-Sourced from professional situations, PLAI aims to be an innovative tool to blow off steam."/>
+    <Meta name="twitter:description" content="Burned-out of your fast-paced environment? Too much workplace politics? Get ready for PLAI, the board game where you'll now be the CEO of your startup dedicated to... well, do AI things. And data. And also some Quantum stuff. I don't know really but actually your goal is to reign over your friends and fools! Muahahahah"/>
     <Meta name="twitter:url" content="https://plai.cards/links/"/>
     <Meta name="twitter:image" content="https://plai.cards/content/images/2024/04/Portada.png"/>
     <Meta name="twitter:label1" content="Written by"/>
@@ -76,7 +69,7 @@ fn Hand() -> impl IntoView {
     let (x, y) = use_window_scroll();
 
     view! {
-      <div class="mx-auto pt-3 lg:px-8 overflow-visible mb-10">
+      <div class="-mt-55 md:mt-0 md:pt-3 lg:px-8 overflow-visible mb-10">
 
         <div class="grid grid-cols-5 place-content-center justify-items-center">
         <div class="z-10  hover:z-40 bg-card-hr bg-cover -rotate-12" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
@@ -84,7 +77,7 @@ fn Hand() -> impl IntoView {
           style:margin-top=move || format!("{}rem", 4.5_f64.min(y() /50.))
             style=("--tw-rotate", move || format!("-{}deg", 12. - y()/60.))
         />
-        <div class=" z-20  hover:z-40 mt-10 bg-card-aiarmy bg-cover -rotate-6" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
+        <div class="z-20  hover:z-40 mt-10 bg-card-aiarmy bg-cover -rotate-6" style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
           style:margin-left=move || format!("{}rem", 12_f64.min(y() /50.))
           style:margin-top=move || format!("{}rem", 4.6_f64.min(2.5 + y() /80.))
             style=("--tw-rotate", move || format!("-{}deg", 7. - y()/120.))
@@ -112,12 +105,32 @@ fn Hero() -> impl IntoView {
     let value = add_email.value();
     let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
 
+    let email_adjectives = [
+        "gdpr-friendly",
+        "best",
+        "msn",
+        "cool",
+        "yahoo",
+        "work",
+        "tinet",
+        "active",
+        "friends'",
+        "spam",
+        "AOL",
+        "test",
+        "professional",
+        "apple",
+        "hotmail",
+    ];
+
+    let UseIntervalReturn { counter, .. } = use_interval(1500);
+
     view! {
     <div class="overflow-hidden bg-white pt-4 sm:py-8 lg:py-16 lg:h-svh content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
-        <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <div class="z-30 lg:pr-8">
+        <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 md:gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div class="z-50 lg:pr-8">
               <div class="lg:max-w-lg">
               <p class="text-lg leading-8 text-gray-600">Seize control of <mark>your career</mark></p>
               <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">PAVE YOUR OWN PATH*</p>
@@ -129,13 +142,16 @@ fn Hero() -> impl IntoView {
 
               <div class="mt-8 sm:mt-20 mb-6">
                 <p class="text-lg text-gray-600 leading-8">
-                  <mark>PLAI: Next sprint</mark> on Kickstarter
+                  PLAI, the board game for tech practitioners
+                </p>
+                <p class="text-lg text-gray-600 leading-8">
+                  <mark>Next sprint</mark> on Kickstarter
                 </p>
 
             <ActionForm action=add_email class="plausible-DOESNOTWORK-event-name=Subscribe+Top">
             <div class="mt-6 grid grid-rows-2 px-10 gap-4">
               <label for="email-address" class="sr-only">Email address</label>
-              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder="Enter your best email" />
+              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white opacity-90 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder={move || format!("Enter your {} email", email_adjectives[(counter()) as usize % email_adjectives.len()])} />
               <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ">
               Get your copy
 
@@ -150,7 +166,7 @@ fn Hero() -> impl IntoView {
         </div>
       </div>
       // Scroll down icon
-      <div class="absolute inset-x-0 bottom-0 flex justify-center">
+      <div class="z-50 absolute inset-x-0 bottom-0 flex justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-16 text-blue motion-safe:animate-bounce">
         <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>

@@ -38,10 +38,11 @@ pub fn HomePage() -> impl IntoView {
     <Meta property="og:image:height" content="675"/>
 
         <Hero />
+        <Testimonials />
+        <CardTypes />
         <HeaderStats />
         <Features />
         //<LogoCloud />
-        <CardTypes />
         <Newsletter />
         <WordCloud />
 
@@ -178,6 +179,62 @@ fn Hero() -> impl IntoView {
 }
 
 #[component]
+fn Testimonials() -> impl IntoView {
+    view! {
+
+    //<!-- This example requires Tailwind CSS v2.0+ -->
+    <section class="bg-gray-900">
+      <div class="max-w-7xl mx-auto md:grid md:grid-cols-3 md:px-6 lg:px-8">
+        <Testimonial
+          comment="I thought working in tech was intense, but this game takes it to a whole new level. At least in PLAI, I can be the CEO."
+          name="Casey C."
+          title="Data Unicorn, Nat20 Corp"
+        />
+
+        <Testimonial
+          comment="Who needs real-life success when you can dominate the tech world on your living room table?"
+          name="Mark Z."
+          title="Head of Data Manipulation, TrustMe Inc."
+        />
+        <Testimonial
+          comment="Finally, a way to experience startup stress without the paycheck!"
+          name="Esther L."
+          title="Prompt Engineer, AItomate"
+        />
+
+
+      </div>
+    </section>
+
+
+      }
+}
+
+#[component]
+fn Testimonial(comment: &'static str, name: &'static str, title: &'static str) -> impl IntoView {
+    view! {
+          <div class="py-12 px-4 sm:px-6 md:flex md:flex-col md:py-16 md:pl-0 md:pr-10 lg:pr-16">
+            <blockquote class="mt-6 md:flex-grow md:flex md:flex-col">
+              <div class="relative text-lg font-medium text-white md:flex-grow">
+                <svg class="absolute top-0 left-0 transform -translate-x-3 -translate-y-2 h-8 w-8 text-blue-700" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
+                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                </svg>
+                <p class="relative">{comment}</p>
+              </div>
+              <div class="mt-8">
+                <div class="flex items-start">
+                  <div class="ml-4">
+                    <div class="text-base font-medium text-white">{name}</div>
+                    <div class="text-base font-medium text-gray-200">{title}</div>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+          </div>
+    }
+}
+
+#[component]
 fn Features() -> impl IntoView {
     view! {
 
@@ -297,7 +354,7 @@ fn HeaderStats() -> impl IntoView {
       </span>
 
             tested</h2>
-            <p class="mt-6 text-lg leading-8 text-gray-300">"Developed over a couple years, we've done multiple playtests with people like you and different than you."</p>
+            <p class="mt-6 text-lg leading-8 text-gray-300">"PLAI is a ready to play board game. Developed over a couple years, we've done multiple playtests with people like you and different than you so you can enjoy the thrill of building the next tech giant."</p>
           </div>
           <div class="mx-auto mt-10 mb-4 max-w-2xl lg:mx-0 lg:max-w-none">
             //<div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
@@ -306,18 +363,22 @@ fn HeaderStats() -> impl IntoView {
             //  <a href="#">Our values <span aria-hidden="true">&rarr;</span></a>
             //  <a href="#">Meet our leadership <span aria-hidden="true">&rarr;</span></a>
             //</div>
-            <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:items-center sm:grid-cols-2 lg:grid-cols-4">
+            <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:items-center sm:grid-cols-2 lg:grid-cols-5">
+              <div class="flex flex-col-reverse">
+                <dt class="text-base leading-7 text-gray-300">Players</dt>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"2-5"</dd>
+              </div>
+              <div class="flex flex-col-reverse">
+                <dt class="text-base leading-7 text-gray-300">Avg. game time</dt>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"~25 min"</dd>
+              </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Revisions</dt>
                 <dd class="text-4xl font-bold leading-9 tracking-tight text-white">9</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Beta testers</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">60+</dd>
-              </div>
-              <div class="flex flex-col-reverse">
-                <dt class="text-base leading-7 text-gray-300">Avg. game time</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"~25 min"</dd>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">100+</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Satire potential</dt>
@@ -334,7 +395,7 @@ fn HeaderStats() -> impl IntoView {
 #[component]
 fn CardTypes() -> impl IntoView {
     view! {
-     <div class="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_32px,_black_calc(100%-60px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
+     <div class="w-full my-6 lg:my-12 inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_32px,_black_calc(100%-60px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
         <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll">
             <li>
                 <img src="./img/TheCards-1.png" alt="Adversary" />

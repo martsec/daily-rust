@@ -70,3 +70,49 @@ mark {
   margin-top: -7rem; /* Overlap cards */
 }
 
+
+
+.sized-card {
+  width: 28rem;
+  aspect-ratio: 28/39;
+  max-width: 100%;
+}
+
+.deck > .sized-card:not(:first-child) {
+  margin-top: -39.2rem; /* Overlap cards */
+}
+
+.card-border {
+  border-radius: .5rem;
+  border-color: #000;
+  border-width: 0.1rem;
+}
+
+.flip-card {
+  will-change: transform;
+  transition: transform 1.5s cubic-bezier(.09,-0.39,.27,1.38); 
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.flip-card:hover {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  border-radius: .5rem;
+  border-color: #000;
+  border-width: 0.1rem;
+}
+
+.flip-card-back {
+  will-change: transform;
+  transform: rotateY(180deg);
+}
+
+

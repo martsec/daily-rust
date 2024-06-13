@@ -1,11 +1,16 @@
 use leptos::*;
 use leptos_meta::*;
+use leptos_router::A;
 
 #[component]
-pub fn Button(title: String) -> impl IntoView {
+pub fn Button(
+    #[prop(into)] title: String,
+    #[prop(into, default = "green".into())] color: String,
+    #[prop(into, default = "".into())] class: String,
+) -> impl IntoView {
     view! {
 
-        <button class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-75">
+        <button class=format!("flex w-full justify-center rounded-md bg-{color}-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-{color}-500 disabled:opacity-75 {class}")>
             {title}
         </button>
     }
@@ -25,10 +30,29 @@ pub fn ButtonDisablable(title: String, disabled: Signal<bool>) -> impl IntoView 
 }
 
 #[component]
-pub fn ButtonLink(title: String, href: String) -> impl IntoView {
+pub fn ButtonLink(
+    #[prop(into)] title: String,
+    #[prop(into)] href: String,
+    #[prop(into, default = "green".into())] color: String,
+) -> impl IntoView {
     view! {
-        <a href={href} class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <a href={href} class=format!("flex w-full justify-center rounded-md bg-{color}-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-{color}-500")>
             {title}
         </a>
+    }
+}
+
+#[component]
+pub fn ButtonLinkSecond(
+    #[prop(into)] title: String,
+    #[prop(into)] href: String,
+    #[prop(into, default = "_self".into())] target: String,
+    #[prop(into, default = "green".into())] color: String,
+    #[prop(into, default = "".into())] class: String,
+) -> impl IntoView {
+    view! {
+        <A href={href} target={target} class=format!("flex w-full justify-center rounded-md border-2 border-{color} px-3 py-1.5 text-sm text-color-{color} font-semibold leading-6 shadow-sm hover:border-{color}-900 hover:bg-{color}-100 my-2 {class}")>
+            {title}
+        </A>
     }
 }

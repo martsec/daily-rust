@@ -2,6 +2,29 @@
 const plugin = require('tailwindcss/plugin')
 module.exports = {
   content: ["*.html", "./src/**/*.rs",],
+  // Need to force some classes since we use them parametrized
+  safelist: [
+    'text-2xl',
+    'text-3xl',
+    'text-color-green',
+    {
+      pattern: /bg-card-*/,
+    },
+    {
+      pattern: /text-color-(orange|green|blue|yellow)/,
+    },
+    {
+      pattern: /bg-(orange|green|blue|yellow)-(100|500|600|900)/,
+      variants: ['lg', 'hover', 'focus', 'lg:hover'],
+    },
+    {
+      pattern: /border-(orange|green|blue|yellow)/,
+    },
+    {
+      pattern: /border-(orange|green|blue|yellow)-(100|900)/,
+      variants: ['lg', 'hover', 'focus', 'lg:hover'],
+    },
+  ],
   theme: {
     extend: {
       fontSize: {
@@ -21,8 +44,23 @@ module.exports = {
         'card-moredata': "url('../img/card_more_data.png')",
         'card-aiarmy': "url('../img/card_ai_army.png')",
         'card-toxic': "url('../img/card_toxic_manager.png')",
+        'card-daily': "url('../img/card_daily.png')", 
+        'card-criminals': "url('../img/card_criminals_faces.png')", 
+        'card-winart': "url('../img/card_winart.png')", 
       },
       keyframes: {
+          "fade-in": {
+            "0%": {"opacity": "0" },
+            "100%": { "opacity": "1"}
+          },
+          "fade-slide-in-right": {
+            "0%": {opacity: "0", transform: "translateX(75%)"},
+            "100%": {opacity: "1", transform: "translateX(0)"},
+          },
+          "fade-slide-in-left": {
+            "0%": {opacity: "0", transform: "translateX(-75%)"},
+            "100%": {opacity: "1", transform: "translateX(0)"},
+          },
           slideIn: {
             "0%": { 
               opacity: 1, 
@@ -68,6 +106,9 @@ module.exports = {
         '300%': '300%',
       },
       animation: {
+        "fade-in": "fade-in 0.6s ease-in",
+        "fade-slide-in-left": "fade-slide-in-left 1s ease-in",
+        "fade-slide-in-right": "fade-slide-in-right 1s ease-in",
         slideIn: "slideIn 1s ease-in",
         wiggle: 'wiggle 1s ease-in-out infinite',
         // https://www.andrealves.dev/blog/how-to-make-an-animated-gradient-text-with-tailwindcss/

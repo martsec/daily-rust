@@ -7,6 +7,8 @@ use leptos_meta::*;
 use leptos_router::ActionForm;
 use leptos_use::{use_interval, use_interval_fn, use_window_scroll, UseIntervalReturn};
 
+use crate::web::common::ButtonLinkSecond;
+
 /// Renders the home page of the app
 #[component]
 pub fn HomePage() -> impl IntoView {
@@ -155,10 +157,16 @@ fn Hero() -> impl IntoView {
               <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white opacity-90 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder={move || format!("Enter your {} email", email_adjectives[(counter()) as usize % email_adjectives.len()])} />
               <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ">
               Get your copy
-
             </button>
+
             </div>
             </ActionForm>
+            <div class="px-10 my-6">
+              <ButtonLinkSecond
+                title="See the cards"
+                class="plausible-event-name=LandingSeeCards"
+                href="/cards" />
+            </div>
               </div>
               </div>
           </div>
@@ -512,7 +520,7 @@ fn LogoCloud() -> impl IntoView {
 }
 
 #[component]
-fn Newsletter() -> impl IntoView {
+pub fn Newsletter() -> impl IntoView {
     let add_email = create_server_action::<EmailAlert>();
     let value = add_email.value();
     let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
@@ -521,13 +529,13 @@ fn Newsletter() -> impl IntoView {
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
           <div class="max-w-xl lg:max-w-lg">
-            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Get your copy!</h2>
-            <p class="mt-4 text-lg leading-8 text-gray-300">We want to release this product to production, but we need your help</p>
+            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Help us!</h2>
+            <p class="mt-4 text-lg leading-8 text-gray-300">We want to release PLAI to production, but we need enough mass to print them. </p>
             <ActionForm action=add_email>
               <div class="mt-6 flex max-w-md gap-x-4">
                 <label for="email-address" class="sr-only">Email address</label>
-                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6" placeholder="Enter your gdpr email" />
-                <button type="submit" class="flex-none rounded-md bg-emerald-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 plausible-event-name=Subscribe+Bottom">Alert me!</button>
+                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6" placeholder="Enter your best email" />
+                <button type="submit" class="flex-none rounded-md bg-green-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 plausible-event-name=Subscribe+Bottom">I want them!</button>
               </div>
             </ActionForm>
           </div>
@@ -548,7 +556,7 @@ fn Newsletter() -> impl IntoView {
                 </svg>
               </div>
               <dt class="mt-4 font-semibold text-white">No spam</dt>
-              <dd class="mt-2 leading-7 text-gray-400">"I'll just use your email 1-3 times to send you campaign related activities. For spam and seeign how cool the game is, check our instagram at " <a href="https://www.instagram.com/plai_cards/" target="_blank" class="underline decoration-green underline-offset-4 text-white font-bold hover:decoration-blue hover:underline-offset-8 decoration-2">@plai_cards</a></dd>
+              <dd class="mt-2 leading-7 text-gray-400">"I'll just use your email 1-3 times to send you campaign related activities. For spam and seeign how cool the game is, follow our instagram at " <a href="https://www.instagram.com/plai_cards/" target="_blank" class="underline decoration-green underline-offset-4 text-white font-bold hover:decoration-blue hover:underline-offset-8 decoration-2">@plai_cards</a></dd>
             </div>
           </dl>
         </div>

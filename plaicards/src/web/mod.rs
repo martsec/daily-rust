@@ -1,7 +1,7 @@
 pub mod board;
 mod common;
 mod errors;
-mod home;
+pub mod landing;
 pub mod lobby;
 
 /// Context to pass variables around
@@ -27,7 +27,6 @@ impl Ctx {
 }
 
 pub use errors::{Error, Result};
-pub use home::HomePage;
 
 #[cfg(feature = "ssr")]
 pub mod ssr {

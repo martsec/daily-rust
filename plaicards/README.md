@@ -1,7 +1,94 @@
-<picture>
-    <source srcset="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_Solid_White.svg" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_RGB.svg" alt="Leptos Logo">
-</picture>
+# plai website
+The repository contains the code used for the plai website. 
+Current features:
+
+* Landing page 
+* Game (in development)
+
+## Multiple languages
+
+We are using [fluent templates](https://projectfluent.org/) to support multiple languages
+in a more natural-sounding translation. 
+For example supporting different genders and gramatical cases (for plural for example).
+
+This is done via `leptos-fluent` package and translations can be found inside `locales/` dir.
+
+## Wishes
+
+I would love to have web analytics capabilities integrated within leptos. 
+Currently I'm using [plausible](https://plausible.io/), an 
+_Easy to use and privacy-friendly Google Analytics alternative_ that can be self-hosted,
+but some of the tracking script collides with some leptos automations (e.g. `ActionForm`).
+
+So ideally I would like to integrate it within leptos for:
+
+* pageviews
+* Link clicks
+* Button/Form clicks 
+* Page scroll %
+* Time in page
+
+Some links: 
+
+* [Events API reference](https://plausible.io/docs/events-api)
+* [plausible-rs](https://github.com/goddtriffin/plausible-rs) Missing self-hosted support
+
+
+Flashy things and CSS libraries that I do not know much:
+
+* [heroicons](https://heroicons.com/) SVG icons
+* [DaisyUI components](https://daisyui.com/)
+* [Aceternity animations](https://ui.aceternity.com/)
+* [SVGrepo](https://www.svgrepo.com/collection/lets-duotone-glyph-icons/4)
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    devtool: "source-map",
+    content: {
+      files: ["*.html", "./src/**/*.rs"],
+    },
+    theme: {
+      extend: {},
+    },
+    plugins: [
+      require("@tailwindcss/typography"), 
+      require("daisyui"),
+    ],
+    daisyui: {
+      themes: ["light", "business"],
+    }
+  }
+```
+
+
+And, train an algorithm to evaluate the balance and play against players:
+[RL Card](https://rlcard.org/index.html)
+
+```mermaid
+mindmap
+  root((card<br/>game))
+    Player
+      Hand
+        Cards
+          Play
+          Steal
+      Drawer
+        Cards
+    Card
+      Type
+      Number
+      Effect
+    Deck
+      Draw
+      Peek
+      Shuffle
+    Discard Pile
+      Put
+      Recover
+```
+
+
 
 # Leptos Axum Starter Template
 

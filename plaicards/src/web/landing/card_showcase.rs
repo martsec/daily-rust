@@ -3,6 +3,7 @@ use std::collections::HashSet;
 
 use leptos::*;
 use leptos_fluent::{expect_i18n, leptos_fluent, move_tr, tr};
+use leptos_meta::*;
 
 use super::page::Newsletter;
 use crate::web::common::{Button, ButtonLinkSecond};
@@ -13,9 +14,11 @@ pub fn Showcase() -> impl IntoView {
     let (card, set_card) = create_signal(0);
     let seen_cards = create_rw_signal(HashSet::<String>::new());
     provide_context(seen_cards);
+    provide_meta_context();
     let total_cards = 7;
 
     view! {
+        <Title text="PLAI - our cards"/>
 
     <div class="overflow-hidden bg-white py-8 sm:py-8 lg:py-16 md:h-[60rem] content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">

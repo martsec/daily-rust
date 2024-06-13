@@ -90,6 +90,7 @@ pub fn App() -> impl IntoView {
                     //<Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
                 </Routes>
             </main>
+            <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.outbound-links.js"></script>
         </Router>
     }
 }

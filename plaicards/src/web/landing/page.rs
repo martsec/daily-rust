@@ -48,7 +48,6 @@ pub fn HomePage() -> impl IntoView {
         <Newsletter />
         <WordCloud />
 
-        <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.outbound-links.js"></script>
     }
 }
 

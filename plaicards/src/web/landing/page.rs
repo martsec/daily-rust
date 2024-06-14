@@ -52,7 +52,7 @@ pub fn HomePage() -> impl IntoView {
 }
 
 #[server(EmailAlert, "/api")]
-pub async fn add_email_alert(email: String) -> Result<(), ServerFnError> {
+pub async fn add_email_alert(email: String) -> Result<String, ServerFnError> {
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
@@ -63,7 +63,7 @@ pub async fn add_email_alert(email: String) -> Result<(), ServerFnError> {
     if let Err(e) = writeln!(file, "{},{}", date_as_string, email) {
         eprintln!("Couldn't write to file: {}", e);
     }
-    Ok(())
+    Ok("OK".into())
 }
 
 #[component]
@@ -105,6 +105,7 @@ fn Hand() -> impl IntoView {
 fn Hero() -> impl IntoView {
     let add_email = create_server_action::<EmailAlert>();
     let value = add_email.value();
+    let is_ok = move || value().is_some_and(|v| v == Ok("OK".into()));
     let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
 
     let email_adjectives = [
@@ -151,14 +152,23 @@ fn Hero() -> impl IntoView {
                 </p>
 
             <ActionForm action=add_email class="plausible-DOESNOTWORK-event-name=Subscribe+Top">
-            <div class="mt-6 grid grid-rows-2 px-10 gap-4">
-              <label for="email-address" class="sr-only">Email address</label>
-              <input id="email-address" name="email" type="email" autocomplete="email" required class="text-center min-w-0 flex-auto rounded-md border-0 bg-white opacity-90 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6" placeholder={move || format!("Enter your {} email", email_adjectives[(counter()) as usize % email_adjectives.len()])} />
-              <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ">
-              Get your copy
-            </button>
+              <div class="mt-6 grid grid-rows-2 px-10 gap-4">
+                <label for="email-address" class="sr-only">Email address</label>
+                <input
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  class="text-center min-w-0 flex-auto rounded-md border-0 bg-white opacity-90 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6"
+                  placeholder={move || format!("Enter your {} email", email_adjectives[(counter()) as usize % email_adjectives.len()])}
+                />
+                <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 ">
+                  "Get your copy "
+                  {move || if value().is_some_and(|v| v == Ok("OK".into())) {"✔️"} else {""} }
+                </button>
 
-            </div>
+              </div>
             </ActionForm>
             <div class="px-10 my-6">
               <ButtonLinkSecond
@@ -376,8 +386,8 @@ fn HeaderStats() -> impl IntoView {
                 <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"2-5"</dd>
               </div>
               <div class="flex flex-col-reverse">
-                <dt class="text-base leading-7 text-gray-300">Avg. game time</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"~25 min"</dd>
+                <dt class="text-base leading-7 text-gray-300">Game time</dt>
+                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"7-34 min"</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Revisions</dt>
@@ -522,7 +532,6 @@ fn LogoCloud() -> impl IntoView {
 pub fn Newsletter() -> impl IntoView {
     let add_email = create_server_action::<EmailAlert>();
     let value = add_email.value();
-    let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
     view! {
     <div class="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -533,8 +542,19 @@ pub fn Newsletter() -> impl IntoView {
             <ActionForm action=add_email>
               <div class="mt-6 flex max-w-md gap-x-4">
                 <label for="email-address" class="sr-only">Email address</label>
-                <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6" placeholder="Enter your best email" />
-                <button type="submit" class="flex-none rounded-md bg-green-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 plausible-event-name=Subscribe+Bottom">I want them!</button>
+                <input
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6" placeholder="Enter your best email" />
+                <button
+                  type="submit"
+                  class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 plausible-event-name=Subscribe+Bottom">
+                  "I want them! "
+                  {move || if value().is_some_and(|v| v == Ok("OK".into())) {"✔️"} else {""} }
+                </button>
               </div>
             </ActionForm>
           </div>

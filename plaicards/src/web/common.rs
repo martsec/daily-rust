@@ -56,3 +56,14 @@ pub fn ButtonLinkSecond(
         </A>
     }
 }
+
+#[component]
+pub fn BuiltWith() -> impl IntoView {
+    view! {
+    <footer>
+        <div class="my-4 text-center text-gray-700">
+            "Built with 💜, linux, vim, 🦀, leptos and tailwindCSS"
+        </div>
+    </footer>
+    }
+}

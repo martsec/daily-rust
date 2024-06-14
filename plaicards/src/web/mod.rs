@@ -1,5 +1,5 @@
 pub mod board;
-mod common;
+pub mod common;
 mod errors;
 pub mod landing;
 pub mod lobby;

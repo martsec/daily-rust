@@ -1,11 +1,13 @@
 use chrono::prelude::*;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::time::Duration;
 
 use leptos::*;
+use leptos_animation::*;
 use leptos_meta::*;
 use leptos_router::ActionForm;
-use leptos_use::{use_interval, use_interval_fn, use_window_scroll, UseIntervalReturn};
+use leptos_use::*;
 
 use crate::web::common::ButtonLinkSecond;
 
@@ -106,6 +108,23 @@ fn Hero() -> impl IntoView {
 
     let UseIntervalReturn { counter, .. } = use_interval(1500);
 
+    let UseMouseReturn { x, y, .. } = use_mouse();
+    AnimationContext::provide();
+    let (num_users, set_num_users) = create_signal(0.0);
+    let animated_num_users = create_animated_signal(
+        move || num_users().into(),
+        |from, to, progress| ((to - from) * progress).ceil() + from,
+    );
+    create_render_effect(move |_| {
+        x();
+        set_num_users.update(|v| *v = 179.);
+    });
+    create_effect(move |_| {
+        if is_ok() {
+            set_num_users.update(|v| *v += 1.0);
+        }
+    });
+
     view! {
     <div class="overflow-hidden bg-white pt-4 sm:py-8 lg:py-16 lg:h-svh content-center">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -142,7 +161,7 @@ fn Hero() -> impl IntoView {
                   placeholder={move || format!("Enter your {} email", email_adjectives[(counter()) as usize % email_adjectives.len()])}
                 />
                 <button type="submit" class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 ">
-                  "Get your copy "
+                  "Join " {animated_num_users} "+ plaiers "
                   {move || if value().is_some_and(|v| v == Ok("OK".into())) {"✔️"} else {""} }
                 </button>
 

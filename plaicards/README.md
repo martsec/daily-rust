@@ -31,11 +31,14 @@ So ideally I would like to integrate it within leptos for:
 Some links: 
 
 * [Events API reference](https://plausible.io/docs/events-api)
-* [plausible-rs](https://github.com/goddtriffin/plausible-rs) Missing self-hosted support
+* [plausible-rs](https://github.com/goddtriffin/plausible-rs) Missing self-hosted support and automatic IP and user_agent. Probably need to obtain them from [`web-sys`](https://docs.rs/web-sys/latest/web_sys/struct.Navigator.html#method.user_agent)
 
 
 Flashy things and CSS libraries that I do not know much:
 
+* [Leptos text animations](https://paulwagener.github.io/leptos_animation/text)
+* [TailwindCSS animation gallery](https://animation.ibelick.com/)
+* [CSS transitions](https://www.joshwcomeau.com/animation/css-transitions/) plus [cubic-bezier](https://cubic-bezier.com)
 * [heroicons](https://heroicons.com/) SVG icons
 * [DaisyUI components](https://daisyui.com/)
 * [Aceternity animations](https://ui.aceternity.com/)
@@ -88,6 +91,9 @@ mindmap
       Recover
 ```
 
+## Examples and inspirations
+
+[hive - a web game built with rust and leptos](https://github.com/hiveboardgame/hive/tree/main) [web](https://hivegame.com/)
 
 
 # Leptos Axum Starter Template

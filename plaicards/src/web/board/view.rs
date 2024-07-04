@@ -139,7 +139,7 @@ pub fn Board() -> impl IntoView {
 
     if id().is_none() || player_id().is_none() {
         let lobby = format!("/lobby/{}/{}", Uuid::new_v4(), Uuid::new_v4());
-        return view! {<Redirect path={lobby} />}.into_view();
+        return view! { <Redirect path=lobby/> }.into_view();
     }
     let id = move || id().expect("Internal error with params");
     let player_id = move || player_id().expect("Internal error with params");
@@ -162,27 +162,26 @@ pub fn Board() -> impl IntoView {
     });
 
     view! {
-    <div class="h-screen bg-gray-200">
-    <Nav/>
+      <div class="h-screen bg-gray-200">
+        <Nav/>
 
+        <PlayersHands current_player=player_id()/>
 
-    <PlayersHands current_player=player_id() />
-
-    <MiddleBoard />
-    <div class="mt-0.5 flex justify-around">
-              <div class="py-20">
-                                        <ul>
-                        <For
-                            each=move || ws.history.get().into_iter().enumerate()
-                            key=|(index, _)| *index
-                            let:item
-                        >
-                            <li>{item.1}</li>
-                        </For>
-                    </ul>
-            </div>
-    </div>
-    </div>
+        <MiddleBoard/>
+        <div class="mt-0.5 flex justify-around">
+          <div class="py-20">
+            <ul>
+              <For
+                each=move || ws.history.get().into_iter().enumerate()
+                key=|(index, _)| *index
+                let:item
+              >
+                <li>{item.1}</li>
+              </For>
+            </ul>
+          </div>
+        </div>
+      </div>
     }
     .into_view()
 }
@@ -204,42 +203,39 @@ fn Nav() -> impl IntoView {
     });
 
     view! {
-     <nav class="flex justify-center">
-      <div class="fixed top-2 content-center w-11/12 bg-white/30 backdrop-blur-md py-2 z-50 rounded-2xl">
-         <div class="container mx-auto px-4 grid grid-cols-3 justify-items-center items-center text-white">
-           <div class="justify-self-start">
-             <h1>Rounds: 12</h1>
-           </div>
+      <nav class="flex justify-center">
+        <div class="fixed top-2 content-center w-11/12 bg-white/30 backdrop-blur-md py-2 z-50 rounded-2xl">
+          <div class="container mx-auto px-4 grid grid-cols-3 justify-items-center items-center text-white">
+            <div class="justify-self-start">
+              <h1>Rounds: 12</h1>
+            </div>
 
-           //<!-- Game Title -->
-           <div class="justify-self-center">
-             <h1 class="text-2xl">PLAI</h1>
-           </div>
+            // <!-- Game Title -->
+            <div class="justify-self-center">
+              <h1 class="text-2xl">PLAI</h1>
+            </div>
 
-           //<!-- Players' Icons -->
-           <div class="justify-self-end flex">
-              <For
-                each=move || updated_players().into_iter().enumerate()
-                key=|(_, p) | p.id
-                let:ip
-              >
-              <div class="group flex relative">
-                  <span class="mx-1 h-6 w-6 rounded-full"
+            // <!-- Players' Icons -->
+            <div class="justify-self-end flex">
+              <For each=move || updated_players().into_iter().enumerate() key=|(_, p)| p.id let:ip>
+                <div class="group flex relative">
+                  <span
+                    class="mx-1 h-6 w-6 rounded-full"
                     class=("bg-blue", move || ip.0 == 0)
                     class=("bg-green", move || ip.0 == 1)
                     class=("bg-orange", move || ip.0 == 2)
                     class=("bg-yellow", move || ip.0 == 3)
                     class=("bg-gray-illustration", move || ip.0 == 4)
-                  />
-    <span class="group-hover:opacity-100 transition-opacity bg-gray-800 px-1 text-sm text-gray-100 rounded-md absolute left-1/2
-    -translate-x-1/2 translate-y-full opacity-0 m-4 p-1 mx-auto">{ip.1.name}</span>
-              </div>
+                  ></span>
+                  <span class="group-hover:opacity-100 transition-opacity bg-gray-800 px-1 text-sm text-gray-100 rounded-md absolute left-1/2
+                  -translate-x-1/2 translate-y-full opacity-0 m-4 p-1 mx-auto">{ip.1.name}</span>
+                </div>
               </For>
-           </div>
-         </div>
-       </div>
-    </nav>
-       }
+            </div>
+          </div>
+        </div>
+      </nav>
+    }
 }
 
 #[component]
@@ -266,53 +262,46 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
     };
 
     view! {
-    <Show
-        when=move || !updated_players().is_empty()
-        fallback=|| view!{}
-    >
-
+      <Show when=move || !updated_players().is_empty() fallback=|| view! {}>
 
         <PlayerDrawer player=players.get()[0].clone()/>
         <Show
-            when=move || {players().len() > 2}
-                fallback=move || view!{
-                    <div class="mt-0.5 flex justify-around">
-                        <HandHorizontal player=players.get()[1].clone() />
-                    </div>}
+          when=move || { players().len() > 2 }
+          fallback=move || {
+              view! {
+                <div class="mt-0.5 flex justify-around">
+                  <HandHorizontal player=players.get()[1].clone()/>
+                </div>
+              }
+          }
         >
-            <HandVertical player=players.get()[1].clone() left=true/>
-        <div class="mt-0.5 flex justify-around">
-            <HandHorizontal player=players.get()[2].clone() />
-            <Show
-                when=move || players().len() == 5
-                fallback = || view!{}
-            >
-                <HandHorizontal player=players.get()[3].clone() />
+          <HandVertical player=players.get()[1].clone() left=true/>
+          <div class="mt-0.5 flex justify-around">
+            <HandHorizontal player=players.get()[2].clone()/>
+            <Show when=move || players().len() == 5 fallback=|| view! {}>
+              <HandHorizontal player=players.get()[3].clone()/>
             </Show>
-        </div>
-            <Show
-                when=move || players().len() == 5
-                fallback = move || view!{<HandVertical player=players.get()[3].clone() left=false />}
-            >
-                <HandVertical player=players.get()[4].clone() left=false />
-            </Show>
+          </div>
+          <Show
+            when=move || players().len() == 5
+            fallback=move || view! { <HandVertical player=players.get()[3].clone() left=false/> }
+          >
+            <HandVertical player=players.get()[4].clone() left=false/>
+          </Show>
 
         </Show>
-    </Show>
-
-
+      </Show>
     }
 }
 
 #[component]
 fn MiddleBoard() -> impl IntoView {
     view! {
-    //<!-- Middle Area for Decks -->
-    <div class="my-8 flex justify-center space-x-4">
-      <div class="h-32 w-24 bg-gray-700"></div>
-      <div class="h-32 w-24 bg-gray-500"></div>
-    </div>
-      }
+      <div class="my-8 flex justify-center space-x-4">
+        <div class="h-32 w-24 bg-gray-700"></div>
+        <div class="h-32 w-24 bg-gray-500"></div>
+      </div>
+    }
 }
 
 #[component]
@@ -329,21 +318,24 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
     };
 
     view! {
-    <div class="absolute top-1/4"
-        class=("left-5",  move || left)
-        class=("right-5", move || !left)
-        >
-      <div class="rounded bg-white p-3">
-        <h2>{player.name}</h2>
-        <div class="drawer-container">
-      {move || vec![0; cards()]
-            .into_iter()
-            .map(|_| view!{<div class="animate-slideIn card-vertical bg-card-back bg-cover will-change-transform"></div>})
-            .collect_view()
-      }
+      <div class="absolute top-1/4" class=("left-5", move || left) class=("right-5", move || !left)>
+        <div class="rounded bg-white p-3">
+          <h2>{player.name}</h2>
+          <div class="drawer-container">
+            {move || {
+                vec![0; cards()]
+                    .into_iter()
+                    .map(|_| {
+                        view! {
+                          <div class="animate-slideIn card-vertical bg-card-back bg-cover will-change-transform"></div>
+                        }
+                    })
+                    .collect_view()
+            }}
+
+          </div>
         </div>
       </div>
-    </div>
     }
 }
 
@@ -362,16 +354,22 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
     };
 
     view! {
-    <div class="rounded bg-white p-2">
-      <div class="card-container p-2">
-      {move || vec![0; cards()]
-            .into_iter()
-            .map(|_| view!{<div class="animate-slideIn card bg-card-back bg-cover will-change-transform"></div>})
-            .collect_view()
-        }
+      <div class="rounded bg-white p-2">
+        <div class="card-container p-2">
+          {move || {
+              vec![0; cards()]
+                  .into_iter()
+                  .map(|_| {
+                      view! {
+                        <div class="animate-slideIn card bg-card-back bg-cover will-change-transform"></div>
+                      }
+                  })
+                  .collect_view()
+          }}
+
+        </div>
+        <h2>{player.name}</h2>
       </div>
-      <h2>{player.name}</h2>
-    </div>
     }
 }
 
@@ -411,43 +409,55 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
     ]);
 
     view! {
-    //<!-- Bottom Drawer for Player's Cards -->
-    <div id="playersDrawer" class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md hover:z-20">
+      <div
+        id="playersDrawer"
+        class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md hover:z-20"
+      >
 
-      <div class="grid grid-cols-3 justify-items-center">
-        <div class="justify-self-start">
-            <PlayerActions player=player.clone() />
+        <div class="grid grid-cols-3 justify-items-center">
+          <div class="justify-self-start">
+            <PlayerActions player=player.clone()/>
+          </div>
+          <div>
+            <h2>Your Cards {player.name}</h2>
+          </div>
+          <div class="justify-self-end">
+            <p>{move || if check_player_turn() { "Your turn" } else { "" }}</p>
+          </div>
         </div>
-        <div>
-          <h2>Your Cards {player.name}</h2>
-        </div>
-        <div class="justify-self-end">
-            <p>{move || if check_player_turn() {"Your turn"} else {""} }</p>
+
+        <div class="grid justify-center">
+          <div class="card-container pt-4">
+            <For
+              each=move || updated_hand().into_iter().enumerate()
+              key=|(_, c)| c.title.clone()
+              children=move |(i, c)| {
+                  view! {
+                    <div
+                      class=&format!(
+                          "animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}",
+                          c.ctype.to_lowercase(),
+                      )
+                      class=("bg-card-adversary", || false)
+                      class=("bg-card-usecase", || false)
+                      class=("bg-card-buzzword", || false)
+                      class=("bg-card-special", || false)
+                      class=("bg-card-marketevent", || false)
+                    >
+                      <p class=format!(
+                          "select-none uppercase text-gray-illustration font-extrabold mt-10 {}",
+                          type_to_color.get(&c.ctype).unwrap_or(&"text-gray-illustration"),
+                      )>{c.title}</p>
+                      <p class="select-none uppercase text-black font-bold mt-2">{c.effect}</p>
+                      <p class="select-none text-dove-gray italic mt-2">{c.description}</p>
+                    </div>
+                  }
+              }
+            />
+
+          </div>
         </div>
       </div>
-
-      <div class="grid justify-center">
-      <div class="card-container pt-4">
-      <For
-            each=move || updated_hand().into_iter().enumerate()
-            key=|(_, c)| c.title.clone()
-            children=move |(i, c)| view! {
-            <div class={&format!("animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}", c.ctype.to_lowercase())}
-                class=("bg-card-adversary", || false)
-                 class=("bg-card-usecase",  || false)
-                 class=("bg-card-buzzword", || false)
-                 class=("bg-card-special", || false)
-                 class=("bg-card-marketevent", ||false)
-            >
-                <p class={format!("select-none uppercase text-gray-illustration font-extrabold mt-10 {}", type_to_color.get(&c.ctype).unwrap_or(&"text-gray-illustration"))}>{c.title}</p>
-                <p class="select-none uppercase text-black font-bold mt-2">{c.effect}</p>
-                <p class="select-none text-dove-gray italic mt-2">{c.description}</p>
-            </div>
-        }
-    />
-      </div>
-    </div>
-    </div>
     }
 }
 
@@ -467,26 +477,28 @@ fn PlayerActions(player: msg::Player) -> impl IntoView {
     });
 
     view! {
-        <ButtonDisablable
-            title="Family Funding".into()
-            disabled=is_not_turn
-            on:click= move |_| {
-                funding_button.set(Some(Funding::Family));
-            }
-        />
-        <ButtonDisablable
-            title="Regional Funding".into()
-            disabled=is_not_turn
-            on:click= move |_| {
-                funding_button.set(Some(Funding::Regional));
-            }
-        />
-        <ButtonDisablable
-            title="VC Funding".into()
-            disabled=is_not_turn
-            on:click= move |_| {
-                funding_button.set(Some(Funding::VC));
-            }
-        />
+      <ButtonDisablable
+        title="Family Funding".into()
+        disabled=is_not_turn
+        on:click=move |_| {
+            funding_button.set(Some(Funding::Family));
+        }
+      />
+
+      <ButtonDisablable
+        title="Regional Funding".into()
+        disabled=is_not_turn
+        on:click=move |_| {
+            funding_button.set(Some(Funding::Regional));
+        }
+      />
+
+      <ButtonDisablable
+        title="VC Funding".into()
+        disabled=is_not_turn
+        on:click=move |_| {
+            funding_button.set(Some(Funding::VC));
+        }
+      />
     }
 }

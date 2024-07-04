@@ -18,37 +18,40 @@ pub fn Showcase() -> impl IntoView {
     let total_cards = 7;
 
     view! {
-        <Title text="PLAI - our cards"/>
+      <Title text="PLAI - our cards"/>
 
-    <div class="overflow-hidden bg-white py-8 sm:py-8 lg:py-16 md:h-[60rem] content-center">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="overflow-hidden bg-white py-8 sm:py-8 lg:py-16 md:h-[60rem] content-center">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
-        <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <Suspense fallback=|| ()>
-            <Card card=card/>
-          </Suspense>
+          <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+            <Suspense fallback=|| ()>
+              <Card card=card/>
+            </Suspense>
+          </div>
         </div>
+        <div class="m-8 px-4 mx-auto w-96">
+          <p class="m-4 text-center text-gray-400 text-lg">
+            {move_tr!(
+                "showcase-seen", { "cardsCount" => seen_cards().len(), "total" => total_cards }
+            )}
+
+          </p>
+          <Button
+            title="Draw card"
+            color="orange"
+            class="plausible-event-name=LandingDrawCard"
+            on:click=move |_| {
+                let mut rng = rand::thread_rng();
+                let num_card: u8 = rng.gen();
+                set_card(num_card % total_cards + 1);
+            }
+          />
+
+        </div>
+
       </div>
-      <div class="m-8 px-4 mx-auto w-96">
-      <p class="m-4 text-center text-gray-400 text-lg">
-        { move_tr!("showcase-seen", {"cardsCount" => seen_cards().len(), "total" => total_cards})}
-      </p>
-      <Button
-        title="Draw card"
-        color="orange"
-        class="plausible-event-name=LandingDrawCard"
-        on:click=move |_| {
-        let mut rng = rand::thread_rng();
-        let num_card: u8 = rng.gen();
-        set_card(num_card % total_cards + 1);
-        }
-      />
-      </div>
 
-    </div>
-
-    <Newsletter/>
-
+      <Newsletter/>
     }
 }
 
@@ -56,17 +59,15 @@ pub fn Showcase() -> impl IntoView {
 fn Deck() -> impl IntoView {
     view! {
       <div class="deck">
-        <div class="sized-card card-border bg-card-back bg-cover" />
-        <div class="sized-card card-border bg-card-back bg-cover" />
-        <div class="sized-card card-border bg-card-back bg-cover" />
-        <div class="sized-card card-border bg-card-back bg-cover" />
-        <div class="sized-card card-border bg-card-back bg-cover" />
-        <div class="sized-card card-border bg-card-back bg-cover" />
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="sized-card card-border bg-card-back bg-cover"></div>
       </div>
       <div class="lg:max-w-lg">
-        <p class="mt-6 text-xl text-center text-gray-600">
-          {move || tr!("showcase-intro")}
-        </p>
+        <p class="mt-6 text-xl text-center text-gray-600">{move || tr!("showcase-intro")}</p>
       </div>
     }
 }
@@ -74,19 +75,16 @@ fn Deck() -> impl IntoView {
 #[component]
 fn Card(#[prop(into)] card: Signal<u8>) -> impl IntoView {
     view! {
-      { move ||
-
-    match card() {
-        0 => view! {<Deck/>},
-        1 => view! {<Daily/>},
-        2 => view! {<Data/>},
-        3 => view! {<Antitrust/>},
-        4 => view! {<Dotcom/>},
-        5 => view! {<Criminals/>},
-        6 => view! {<ArtCompetitions/>},
-        _ => view! {<Hr/>},
-    }
-      }
+      {move || match card() {
+          0 => view! { <Deck/> },
+          1 => view! { <Daily/> },
+          2 => view! { <Data/> },
+          3 => view! { <Antitrust/> },
+          4 => view! { <Dotcom/> },
+          5 => view! { <Criminals/> },
+          6 => view! { <ArtCompetitions/> },
+          _ => view! { <Hr/> },
+      }}
     }
 }
 
@@ -96,10 +94,10 @@ fn FlipCard(
     #[prop(into, default="".into())] class: String,
 ) -> impl IntoView {
     view! {
-        <div class=format!("sized-card flip-card {class}")>
-          <div class=format!("sized-card card-border flip-card-front bg-cover bg-{image}") />
-          <div class="sized-card card-border flip-card-back bg-card-back bg-cover" />
-        </div>
+      <div class=format!("sized-card flip-card {class}")>
+        <div class=format!("sized-card card-border flip-card-front bg-cover bg-{image}")></div>
+        <div class="sized-card card-border flip-card-back bg-card-back bg-cover"></div>
+      </div>
     }
 }
 
@@ -149,14 +147,14 @@ fn Antitrust() -> impl IntoView {
           href="https://news.bloomberglaw.com/business-and-practice/big-tech-in-spotlight-as-ex-ftc-head-joins-silicon-valley-firm"
           target="_blank"
           color="grey"
-          />
+        />
 
         <ButtonLinkSecond
           title="Amazon vs US FTC lawsuit"
           href="https://www.reuters.com/legal/amazon-has-deep-bench-defense-lawyers-fight-us-ftc-lawsuit-2023-09-26/"
           target="_blank"
           color="grey"
-          />
+        />
       </div>
     }
 }
@@ -181,14 +179,14 @@ fn ArtCompetitions() -> impl IntoView {
           href="https://glaze.cs.uchicago.edu/aboutus.html"
           target="_blank"
           color="green"
-          />
+        />
 
         <ButtonLinkSecond
           title="Cara: art social network with Glaze"
           href="https://cara.app/about"
           target="_blank"
           color="green"
-          />
+        />
       </div>
     }
 }
@@ -212,27 +210,27 @@ fn Criminals() -> impl IntoView {
           href="https://www.nbcnews.com/think/opinion/racist-police-practices-mug-shots-normalize-criminalization-black-americans-ncna1235694"
           target="_blank"
           color="green"
-          />
+        />
 
         <ButtonLinkSecond
           title="Against Face Analysis"
           href="https://kcimc.medium.com/against-face-analysis-55066903535b"
           target="_blank"
           color="green"
-          />
+        />
         <ButtonLinkSecond
           title="Predicting people's character from their appearance"
           href="https://www.nytimes.com/2019/07/10/opinion/facial-recognition-race.html"
           target="_blank"
           color="green"
-          />
+        />
         <ButtonLinkSecond
           title="It's sadly still being investigated"
           href="https://www.technologyreview.com/2016/11/22/107128/neural-network-learns-to-identify-criminals-by-their-faces/"
           target="_blank"
           color="green"
-          />
-          // https://en.wikipedia.org/wiki/Cesare_Lombroso
+        />
+      // https://en.wikipedia.org/wiki/Cesare_Lombroso
       </div>
     }
 }
@@ -273,14 +271,14 @@ fn Data() -> impl IntoView {
           href="https://nymag.com/intelligencer/2019/02/shoshana-zuboff-q-and-a-the-age-of-surveillance-capital.html"
           target="_blank"
           color="yellow"
-          />
+        />
 
         <ButtonLinkSecond
           title="The data labelers"
           href="https://www.theverge.com/features/23764584/ai-artificial-intelligence-data-notation-labor-scale-surge-remotasks-openai-chatbots"
           target="_blank"
           color="yellow"
-          />
+        />
 
       </div>
       <FlipCard image="card-moredata" class="animate-fade-slide-in-left"/>
@@ -305,13 +303,13 @@ fn Hr() -> impl IntoView {
           title="BBC article"
           href="https://www.bbc.com/worklife/article/20240214-ai-recruiting-hiring-software-bias-discrimination"
           target="_blank"
-          />
+        />
 
         <ButtonLinkSecond
           title="Mystery AI Hype post"
           href="https://buttondown.email/maiht3k/archive/in-praise-of-the-ephemeral/"
           target="_blank"
-          />
+        />
 
       </div>
       <FlipCard image="card-hr" class="animate-fade-slide-in-left"/>

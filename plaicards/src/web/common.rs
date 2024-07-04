@@ -1,6 +1,7 @@
 use leptos::*;
 use leptos_meta::*;
-use leptos_router::A;
+
+use crate::web::plausible::components::A;
 
 #[component]
 pub fn Button(
@@ -36,9 +37,9 @@ pub fn ButtonLink(
     #[prop(into, default = "green".into())] color: String,
 ) -> impl IntoView {
     view! {
-        <a href={href} class=format!("flex w-full justify-center rounded-md bg-{color}-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-{color}-500")>
+        <A href={href} class=format!("flex w-full justify-center rounded-md bg-{color}-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-{color}-500")>
             {title}
-        </a>
+        </A>
     }
 }
 

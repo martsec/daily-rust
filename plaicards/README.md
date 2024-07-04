@@ -22,10 +22,11 @@ but some of the tracking script collides with some leptos automations (e.g. `Act
 
 So ideally I would like to integrate it within leptos for:
 
-* pageviews
-* Link clicks
+* pageviews ✔️
+* Link clicks✔️
 * Button/Form clicks 
 * Page scroll %
+ * Bottom of page ✔️
 * Time in page
 
 Some links: 
@@ -67,6 +68,9 @@ module.exports = {
 
 And, train an algorithm to evaluate the balance and play against players:
 [RL Card](https://rlcard.org/index.html)
+
+
+Implement better deserialization with [rkyv](https://rkyv.org/rkyv.html) (uses zero copy which is faster ane memory efficient) (see an example https://github.com/leptos-rs/leptos/discussions/581) 
 
 ```mermaid
 mindmap

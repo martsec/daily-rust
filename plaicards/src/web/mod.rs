@@ -3,6 +3,7 @@ pub mod common;
 mod errors;
 pub mod landing;
 pub mod lobby;
+pub mod plausible;
 
 /// Context to pass variables around
 #[derive(Clone, Debug)]

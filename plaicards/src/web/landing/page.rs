@@ -1,7 +1,9 @@
 use chrono::prelude::*;
+use leptos::ev::{keydown, load, visibilitychange};
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::time::Duration;
+use web_sys::Event;
 
 use leptos::*;
 use leptos_animation::*;
@@ -10,15 +12,23 @@ use leptos_router::ActionForm;
 use leptos_use::*;
 
 use crate::web::common::ButtonLinkSecond;
+use crate::web::plausible::components::{TrackElement, A};
+
+use leptos::html::{Div, Input};
+use leptos::logging::{debug_warn, log};
 
 /// Renders the home page of the app
+#[allow(clippy::module_name_repetitions)]
 #[component]
 pub fn HomePage() -> impl IntoView {
     provide_meta_context();
+
     view! {
+
 
         <Title text="PLAI the board game for tech workers"/>
 
+        <A href="https://8vi.cat"> Click me </A>
         <Hero />
         <Testimonials />
         <CardTypes />
@@ -27,7 +37,9 @@ pub fn HomePage() -> impl IntoView {
         //<LogoCloud />
         <Newsletter />
         <WordCloud />
+        //{tracking.pageview().send()}
 
+        <TrackElement name="EndPage" />
     }
 }
 

@@ -3,6 +3,7 @@ use crate::web::board::Board;
 use crate::web::common::BuiltWith;
 use crate::web::landing::{HomePage, Showcase};
 use crate::web::lobby::Lobby;
+use crate::web::plausible::components::PageView;
 
 use fluent_templates::static_loader;
 use leptos::*;
@@ -94,8 +95,9 @@ pub fn App() -> impl IntoView {
         <Meta property="og:image:width" content="1552"/>
         <Meta property="og:image:height" content="873"/>
 
-        // content for this welcome page
+             <PageView />
         <Router fallback=|| {
+
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
             view! {
@@ -114,7 +116,7 @@ pub fn App() -> impl IntoView {
                 </Routes>
             </main>
             <BuiltWith />
-            <script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.outbound-links.js"></script>
+            //<script defer data-domain="get.plai.cards" src="https://frumentarii.8vi.cat/js/script.tagged-events.outbound-links.js"></script>
         </Router>
     }
 }

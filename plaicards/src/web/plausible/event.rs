@@ -1,23 +1,48 @@
+//! Track pageviews and send custom events to plausible
+//!
+//!
 use gloo_net::http::Request;
 use gloo_utils::format::JsValueSerdeExt;
-use leptos::{self, document, window};
+use leptos::{self, document, logging::debug_warn, spawn_local, window};
 use serde::{Deserialize, Serialize};
-/// Track pageviews and custom events to plausible
-///
-///
 use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 use web_sys::Navigator;
 
+use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
+
 /// Main intro class handling Plausible events API.
 ///
-/// ```rust
-/// use plaicards::web::plausible::event::Plausible;
-///
+/// ```
+/// # use plaicards::web::plausible::Plausible;
+/// # use std::collections::HashMap;
+/// # async fn no_run() {
 /// let p = Plausible::new("your_domain");
 ///
-/// p.pageview.send.await;
+/// p.pageview().send().await;
+///
+/// let mut event = p.event("MyCustomEvent");
+///
+/// event.props(HashMap::from([
+///         ("experiment".into(), "experiment_name".into()),
+///         ("variant".into(), "A".into()),
+///     ]));
+///     
+/// event.send().await;
+///
+/// # }
 /// ```
+///
+/// Or if you use a self-hosted instance or a proxy url:
+///
+/// ```
+/// # use plaicards::web::plausible::Plausible;
+/// # async fn no_run() {
+/// let p = Plausible::new_private("your_domain", "https://your_plausible_instance.com");
+/// # }
+/// ```
+///
+#[derive(Clone, Debug)]
 pub struct Plausible {
     /// This domain name you used when you added your site to your Plausible account
     domain: String,
@@ -29,10 +54,9 @@ impl Plausible {
     // Handy methods
     //
     #[must_use]
-    pub fn link_click(&self, outbound_url: String) -> EventBuilder {
-        let mut builder = self.build_event(EventName::OutboundLinkClick);
-        builder.props(HashMap::from([(String::from("url"), outbound_url.into())]));
-        builder
+    pub fn link_click(&self, outbound_url: &str) -> EventBuilder {
+        self.build_event(EventName::OutboundLinkClick)
+            .props(HashMap::from([(String::from("url"), outbound_url.into())]))
     }
 
     #[must_use]
@@ -41,16 +65,16 @@ impl Plausible {
     }
 
     #[must_use]
-    pub fn event(&self, name: String) -> EventBuilder {
-        self.build_event(EventName::Custom(name))
+    pub fn event(&self, name: &str) -> EventBuilder {
+        self.build_event(EventName::Custom(name.into()))
     }
 }
 
 impl Plausible {
     #[must_use]
-    pub fn new(domain: String) -> Self {
+    pub fn new(domain: &str) -> Self {
         Self {
-            domain,
+            domain: domain.into(),
             plausible_url: "https://plausible.io".into(),
         }
     }
@@ -71,6 +95,7 @@ impl Plausible {
     }
 
     fn build_event(&self, name: EventName) -> EventBuilder {
+        debug_warn!("Preparing plausible event: `{:?}`", &name);
         let header = PlausibleHeader {
             user_agent: window()
                 .navigator()
@@ -102,8 +127,11 @@ impl Plausible {
             body,
             plausible_url: self.plausible_url.clone(),
         }
+        .experiments()
     }
 }
+
+// From https://github.com/goddtriffin/plausible-rs/ under MIT license
 #[derive(Debug, Clone)]
 #[allow(clippy::module_name_repetitions)]
 struct PlausibleHeader {
@@ -134,6 +162,7 @@ pub struct RevenueValue {
     amount: String,
 }
 
+// From https://github.com/goddtriffin/plausible-rs/ under MIT license
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct PlausiblePayload {
     /// Name of the event
@@ -158,9 +187,7 @@ struct PlausiblePayload {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 pub enum EventName {
-    // TODO serialize them to string
     Pageview,
-    // TODO need to add property `url`
     OutboundLinkClick,
     FileDownload,
     Purchase,
@@ -191,8 +218,8 @@ pub struct EventBuilder {
 }
 
 impl EventBuilder {
-    pub fn props(&mut self, props: HashMap<String, PropValue>) -> &mut Self {
-        // TODO avoid overwritting and support adding if body.props already exists
+    /// Adds new properties overwriting if the key already exists
+    pub fn props(mut self, props: HashMap<String, PropValue>) -> Self {
         match &mut self.body.props {
             None => self.body.props = Some(props),
             Some(existing) => {
@@ -204,19 +231,32 @@ impl EventBuilder {
         self
     }
 
-    pub fn revenue(&mut self, revenue: RevenueValue) -> &mut Self {
+    /// Adds revenue information. As of now it does not work
+    /// on plausible community
+    pub fn revenue(mut self, revenue: RevenueValue) -> Self {
         self.body.revenue = Some(revenue);
         self
     }
 
-    pub fn referrer(&mut self, referrer: String) -> &mut Self {
+    pub fn referrer(mut self, referrer: String) -> Self {
         self.body.referrer = Some(referrer);
         self
     }
 
-    pub fn screen_width(&mut self, screen_width: usize) -> &mut Self {
+    pub fn screen_width(mut self, screen_width: usize) -> Self {
         self.body.screen_width = Some(screen_width);
         self
+    }
+
+    /// Adds experiment properties. See [`ExperimentCtx`]
+    ///
+    /// WARNING: Does not run well inside `spawn_local` or `on:` functions
+    // FIXME
+    pub fn experiments(self) -> Self {
+        match use_experiment_props() {
+            Some(props) => self.props(props),
+            None => self,
+        }
     }
 
     /// Use it to specify custom locations for your page URL.
@@ -237,7 +277,7 @@ impl EventBuilder {
         // TODO disable sending event if localhost like done in the official script
         // TODO don't send pageview event if already visited before (window.history)
         // FIXME this from_serde should work but returns JSValue(Object(...)) which fails
-        let body = JsValue::from_serde(&self.body).expect("ERR serializing");
+        //let body = JsValue::from_serde(&self.body).expect("ERR serializing");
         let body = JsValue::from_str(&serde_json::to_string(&self.body).expect("ERR"));
 
         let resp = Request::post(&format!("{}/api/event", self.plausible_url))
@@ -249,10 +289,21 @@ impl EventBuilder {
 
         let resp = resp.expect("Error building the body").send().await;
     }
+
+    /// Creates a `spawn_local` thread and sends the event.
+    ///
+    /// Use this function instead of [`send`] for simplicity
+    /// unless you want to do more things in the local thread.
+    pub fn send_local(self) {
+        spawn_local(async move {
+            self.send().await;
+        });
+    }
 }
 
 /// Custom properties only accepts scalar values such as strings, numbers and booleans.
 /// Data structures such as objects, arrays etc. aren't accepted.
+// From https://github.com/goddtriffin/plausible-rs/ under MIT license
 // Implementation on how to constrain types easily from: https://stackoverflow.com/a/52582432/11767294
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -282,6 +333,11 @@ pub enum PropValue {
     F64(f64),
 }
 
+impl From<&str> for PropValue {
+    fn from(s: &str) -> Self {
+        Self::String(s.into())
+    }
+}
 impl From<String> for PropValue {
     fn from(s: String) -> Self {
         Self::String(s)

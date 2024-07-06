@@ -42,6 +42,7 @@ pub fn ButtonLink(
             "flex w-full justify-center rounded-md bg-{color}-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-{color}-500",
         )
       >
+
         {title}
       </A>
     }
@@ -63,6 +64,7 @@ pub fn ButtonLinkSecond(
             "flex w-full justify-center rounded-md border-2 border-{color} px-3 py-1.5 text-sm text-color-{color} font-semibold leading-6 shadow-sm hover:border-{color}-900 hover:bg-{color}-100 my-2 {class}",
         )
       >
+
         {title}
       </A>
     }

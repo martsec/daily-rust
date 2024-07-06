@@ -17,16 +17,46 @@ use crate::web::plausible::components::{TrackElement, A};
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
 
+use crate::web::plausible::experiments::{Experiment, ExperimentView, Variant};
+
+#[component]
+fn ComponentA() -> impl IntoView {
+    view! {
+      <div>"I'm A"</div>
+
+      <TrackElement name="SeenA"/>
+    }
+}
+#[component]
+fn ComponentB() -> impl IntoView {
+    view! {
+      <div>"I'm B"</div>
+
+      <A href="https://8vi.cat">Click me</A>
+    }
+}
+
 /// Renders the home page of the app
 #[allow(clippy::module_name_repetitions)]
 #[component]
 pub fn HomePage() -> impl IntoView {
     provide_meta_context();
 
+    let e = Experiment::new(
+        "Experiment",
+        Variant {
+            name: String::from("A"),
+            weight: 1,
+        },
+        Variant {
+            name: String::from("B"),
+            weight: 1,
+        },
+    );
+
     view! {
       <Title text="PLAI the board game for tech workers"/>
 
-      <A href="https://8vi.cat">Click me</A>
       <Hero/>
       <Testimonials/>
       <CardTypes/>
@@ -37,7 +67,10 @@ pub fn HomePage() -> impl IntoView {
       <WordCloud/>
       // {tracking.pageview().send()}
 
-      <TrackElement name="EndPage"/>
+      <ExperimentView exp=e a=ComponentA>
+        <ComponentB/>
+        <TrackElement name="EndPage"/>
+      </ExperimentView>
     }
 }
 
@@ -102,6 +135,7 @@ fn Hand() -> impl IntoView {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 #[component]
 fn Hero() -> impl IntoView {
     let add_email = create_server_action::<EmailAlert>();
@@ -131,7 +165,7 @@ fn Hero() -> impl IntoView {
 
     let UseMouseReturn { x, y, .. } = use_mouse();
     AnimationContext::provide();
-    let (num_users, set_num_users) = create_signal(0.0);
+    let (num_users, set_num_users) = create_signal(50.0);
     let animated_num_users = create_animated_signal(
         move || num_users().into(),
         |from, to, progress| ((to - from) * progress).ceil() + from,

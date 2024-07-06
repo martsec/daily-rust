@@ -120,6 +120,7 @@ pub fn Lobby() -> impl IntoView {
                 on:input=move |ev| {
                     set_name(event_target_value(&ev));
                 }
+
                 required
               />
             </div>

@@ -275,6 +275,7 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
               }
           }
         >
+
           <HandVertical player=players.get()[1].clone() left=true/>
           <div class="mt-0.5 flex justify-around">
             <HandHorizontal player=players.get()[2].clone()/>
@@ -438,6 +439,7 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
                           "animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}",
                           c.ctype.to_lowercase(),
                       )
+
                       class=("bg-card-adversary", || false)
                       class=("bg-card-usecase", || false)
                       class=("bg-card-buzzword", || false)

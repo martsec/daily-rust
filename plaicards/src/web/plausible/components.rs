@@ -11,6 +11,19 @@ use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
 use leptos_router::A as ARouter;
 
+use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
+
+pub fn provide_plausible_context() {
+    let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
+    provide_context(tracking);
+}
+
+#[must_use]
+pub fn expect_plausible_context() -> Plausible {
+    expect_context::<Plausible>()
+}
+
+#[must_use]
 #[component]
 pub fn PageView() -> impl IntoView {
     let el = create_node_ref::<Div>();
@@ -19,11 +32,7 @@ pub fn PageView() -> impl IntoView {
 
     create_effect(move |_| {
         if is_visible() && !triggered_pageview() {
-            debug_warn!("Sending Plausible pageview event");
-            spawn_local(async move {
-                let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
-                tracking.pageview().send().await;
-            });
+            expect_plausible_context().pageview().send_local();
             triggered_pageview.set(true);
         }
     });
@@ -45,11 +54,7 @@ pub fn TrackElement(
     create_effect(move |_| {
         if is_visible() && !triggered() {
             let nam = name.clone();
-            spawn_local(async move {
-                let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
-                tracking.event(nam).send().await;
-            });
-            debug_warn!("Sending Plausible '{}' event", name);
+            expect_plausible_context().event(&nam).send_local();
             triggered.set(true);
         }
     });
@@ -58,6 +63,7 @@ pub fn TrackElement(
 }
 
 /// Substitute for `<a>` and `<A>` that tracks the links to plausible
+#[must_use]
 #[cfg_attr(
     any(debug_assertions, feature = "ssr"),
     tracing::instrument(level = "trace", skip_all,)
@@ -78,11 +84,9 @@ pub fn A(
         if let Some(target) = ev.target() {
             if let Some(anchor) = target.dyn_ref::<HtmlAnchorElement>() {
                 let url = anchor.href();
-                let url_c = url.clone();
-                spawn_local(async move {
-                    let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
-                    tracking.link_click(url_c).send().await;
-                });
+
+                // FIXME it does not find the experiment context
+                expect_plausible_context().link_click(&url).send_local();
 
                 let target = anchor.target();
 

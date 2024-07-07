@@ -17,7 +17,7 @@ use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
 /// Sets the plausible context. It should usually be somewhere near the
 /// root of your application (Similar to the `<Router />` component).
 pub fn provide_plausible_context() {
-    let tracking = Plausible::new_private("get.plai.cards", "https://frumentarii.8vi.cat");
+    let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
     provide_context(tracking);
 }
 
@@ -36,19 +36,22 @@ pub fn expect_plausible_context() -> Plausible {
 pub fn track_active_elements() {
     let active_element = use_active_element();
 
-    create_effect(move |_| {
-        let id = active_element()
-            .map(|el| el.dataset().get("id"))
-            .unwrap_or_default();
+    let id_with_event = create_memo(move |_| {
+        active_element()
+            .map(|el| {
+                el.dataset()
+                    .get("id")
+                    .filter(|id| id.starts_with("plausible-"))
+                    .map(|id| id.replace("plausible-", ""))
+            })
+            .flatten()
+    });
 
-        if let Some(id) = id {
-            if id.starts_with("plausible-") {
-                expect_plausible_context()
-                    .event("active_element")
-                    .prop("id", id.replace("plausible-", "").into())
-                    .send_local();
-            }
-        }
+    create_effect(move |_| {
+        expect_plausible_context()
+            .event("active_element")
+            .prop("id", id_with_event().into())
+            .send_local();
     });
 }
 /// Track a standard page view event.

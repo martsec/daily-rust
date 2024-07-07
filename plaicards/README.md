@@ -28,6 +28,7 @@ So ideally I would like to integrate it within leptos for:
 * Page scroll %
  * Bottom of page ✔️
 * Time in page
+* Active elements ✔️
 
 Some links: 
 
@@ -37,6 +38,7 @@ Some links:
 
 Flashy things and CSS libraries that I do not know much:
 
+* [Implementing a WebAssembly WebGL viewer using Rust](https://julien-decharentenay.medium.com/implementing-a-webassembly-webgl-viewer-using-rust-a6d8a703153d)
 * [Leptos text animations](https://paulwagener.github.io/leptos_animation/text)
 * [TailwindCSS animation gallery](https://animation.ibelick.com/)
 * [CSS transitions](https://www.joshwcomeau.com/animation/css-transitions/) plus [cubic-bezier](https://cubic-bezier.com)

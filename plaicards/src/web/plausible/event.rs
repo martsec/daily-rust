@@ -239,6 +239,10 @@ impl EventBuilder {
         self
     }
 
+    pub fn prop(self, name: &str, value: PropValue) -> Self {
+        self.props(HashMap::from([(name.into(), value)]))
+    }
+
     /// Adds revenue information. As of now it does not work
     /// on plausible community
     pub fn revenue(mut self, revenue: RevenueValue) -> Self {
@@ -251,7 +255,7 @@ impl EventBuilder {
         self
     }
 
-    pub fn screen_width(mut self, screen_width: usize) -> Self {
+    pub const fn screen_width(mut self, screen_width: usize) -> Self {
         self.body.screen_width = Some(screen_width);
         self
     }

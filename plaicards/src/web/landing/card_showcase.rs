@@ -7,6 +7,7 @@ use leptos_meta::*;
 
 use super::page::Newsletter;
 use crate::web::common::{Button, ButtonLinkSecond};
+use crate::web::plausible::components::expect_plausible_context;
 
 // Shows a random card
 #[component]
@@ -43,7 +44,12 @@ pub fn Showcase() -> impl IntoView {
             on:click=move |_| {
                 let mut rng = rand::thread_rng();
                 let num_card: u8 = rng.gen();
-                set_card(num_card % total_cards + 1);
+                let num_card = num_card % total_cards + 1;
+                set_card(num_card);
+                expect_plausible_context()
+                  .event("LandingDrawCard")
+                  .prop("card", num_card.into())
+                  .send_local();
             }
           />
 

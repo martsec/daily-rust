@@ -10,13 +10,14 @@ use crate::web::plausible::Plausible;
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
 use leptos_router::A as ARouter;
+use leptos_use::use_active_element;
 
 use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
 
 /// Sets the plausible context. It should usually be somewhere near the
 /// root of your application (Similar to the `<Router />` component).
 pub fn provide_plausible_context() {
-    let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
+    let tracking = Plausible::new_private("get.plai.cards", "https://frumentarii.8vi.cat");
     provide_context(tracking);
 }
 
@@ -26,6 +27,31 @@ pub fn expect_plausible_context() -> Plausible {
     expect_context::<Plausible>()
 }
 
+/// Sends an event if the user focused on an item with an ID starting with `plausible-`
+///
+/// It will send an `active_element` event with the property `data-id` with the value
+/// without `plausible-`
+///
+/// For example `plausible-email` becomes `email`
+pub fn track_active_elements() {
+    let active_element = use_active_element();
+
+    create_effect(move |_| {
+        let id = active_element()
+            .map(|el| el.dataset().get("id"))
+            .unwrap_or_default();
+        debug_warn!("Selecting item {:?}", id);
+
+        if let Some(id) = id {
+            if id.starts_with("plausible-") {
+                expect_plausible_context()
+                    .event("active_element")
+                    .prop("id", id.replace("plausible-", "").into())
+                    .send_local();
+            }
+        }
+    });
+}
 /// Track a standard page view event.
 #[must_use]
 #[component]

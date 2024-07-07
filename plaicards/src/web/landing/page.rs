@@ -12,7 +12,9 @@ use leptos_router::ActionForm;
 use leptos_use::*;
 
 use crate::web::common::ButtonLinkSecond;
-use crate::web::plausible::components::{EndPage, PageView, TrackElement, A};
+use crate::web::plausible::components::{
+    track_active_elements, EndPage, PageView, TrackElement, A,
+};
 
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
@@ -41,22 +43,12 @@ fn ComponentB() -> impl IntoView {
 pub fn HomePage() -> impl IntoView {
     provide_meta_context();
 
-    let e = Experiment::new(
-        "Experiment",
-        Variant {
-            name: String::from("A"),
-            weight: 1,
-        },
-        Variant {
-            name: String::from("B"),
-            weight: 1,
-        },
-    );
+    track_active_elements();
 
     view! {
       <Title text="PLAI the board game for tech workers"/>
 
-      //<PageView />
+
       <Hero/>
       <Testimonials/>
       <CardTypes/>
@@ -65,15 +57,6 @@ pub fn HomePage() -> impl IntoView {
       // <LogoCloud />
       <Newsletter/>
       <WordCloud/>
-
-
-      <div class="mx-100" />
-      <ExperimentView exp=e a=ComponentA>
-        <ComponentB/>
-      </ExperimentView>
-
-      //<EndPage />
-
 
     }
 }
@@ -191,31 +174,8 @@ fn Hero() -> impl IntoView {
           <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 md:gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
             <div class="z-50 lg:pr-8">
               <div class="lg:max-w-lg">
-                <p class="text-lg leading-8 text-gray-600">
-                  Seize control of <mark>your career</mark>
-                </p>
-                <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">
-                  PAVE YOUR OWN PATH*
-                </p>
-
-                <p class="mt-10 text-lg leading-8 text-gray-600">
-                  Guide your <mark>tech startup</mark> to
-                </p>
-                <div class="bg-texture-paper bg-repeat  bg-clip-text bg-fixed bg-parallax">
-                  <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent">
-                    MARKET DOMINANCE
-                  </p>
-                </div>
-
-                <div class="mt-8 sm:mt-20 mb-6">
-                  <p class="text-lg text-gray-600 leading-8">
-                    PLAI, the board game for tech practitioners
-                  </p>
-                  <p class="text-lg text-gray-600 leading-8">
-                    <mark>Next sprint</mark>
-                    on Kickstarter
-                  </p>
-
+                <HeroText />
+                <div class="text-lg mt-2">
                   <ActionForm
                     action=add_email
                     class="plausible-DOESNOTWORK-event-name=Subscribe+Top"
@@ -226,6 +186,7 @@ fn Hero() -> impl IntoView {
                       </label>
                       <input
                         id="email-address"
+                        data-id="plausible-email-form-top"
                         name="email"
                         type="email"
                         autocomplete="email"
@@ -294,6 +255,40 @@ fn Hero() -> impl IntoView {
 }
 
 #[component]
+fn HeroText() -> impl IntoView {
+    view! {
+
+                  <p class="text-lg leading-8 text-gray-600">
+                    Seize control of <mark>your career</mark>
+                  </p>
+                  <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">
+                    PAVE YOUR OWN PATH*
+                  </p>
+
+                  <p class="mt-10 text-lg leading-8 text-gray-600">
+                    Guide your <mark>tech startup</mark> to
+                  </p>
+                  <div class="bg-texture-paper bg-repeat  bg-clip-text bg-fixed bg-parallax">
+                    <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent">
+                      MARKET DOMINANCE
+                    </p>
+                  </div>
+
+                  <div class="mt-8 sm:mt-20">
+                    <p class="text-lg text-gray-600 leading-8">
+                      PLAI, the board game for tech practitioners
+                    </p>
+                    <p class="text-lg text-gray-600 leading-8">
+                      <mark>Next sprint</mark>
+                      on Kickstarter
+                    </p>
+
+                  </div>
+
+    }
+}
+
+#[component]
 fn Testimonials() -> impl IntoView {
     view! {
       <section class="bg-gray-900">
@@ -349,6 +344,7 @@ fn Testimonial(comment: &'static str, name: &'static str, title: &'static str) -
     }
 }
 
+#[allow(clippy::too_many_lines)]
 #[component]
 fn Features() -> impl IntoView {
     view! {
@@ -749,6 +745,7 @@ pub fn Newsletter() -> impl IntoView {
                     Email address
                   </label>
                   <input
+                    data-id="plausible-email-form-bottom"
                     id="email-address"
                     name="email"
                     type="email"

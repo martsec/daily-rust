@@ -161,6 +161,15 @@ pub struct RevenueValue {
     amount: String,
 }
 
+impl RevenueValue {
+    pub fn new(currency: &str, amount: &str) -> Self {
+        Self {
+            currency: currency.into(),
+            amount: amount.into(),
+        }
+    }
+}
+
 // From https://github.com/goddtriffin/plausible-rs/ under MIT license
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct PlausiblePayload {
@@ -254,6 +263,12 @@ impl EventBuilder {
     pub fn experiments(self) -> Self {
         match use_experiment_props() {
             Some(props) => self.props(props),
+            None => self,
+        }
+    }
+    pub fn set_experiment(self, experiment: Option<ExperimentCtx>) -> Self {
+        match experiment {
+            Some(e) => self.props(e.to_plausible()),
             None => self,
         }
     }

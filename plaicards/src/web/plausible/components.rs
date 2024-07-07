@@ -80,17 +80,22 @@ pub fn EndPage() -> impl IntoView {
 }
 
 /// Substitute for `<a>` and `<A>` that tracks the links to plausible
+// TODO implement id and attributes
+// FIXME it does not correctly find the experiment context
 #[must_use]
 #[component]
 pub fn A(
     #[prop(into)] href: String,
     #[prop(into, default = "_self".into())] target: String,
     #[prop(optional, into)] class: Option<AttributeValue>,
-    #[prop(optional, into)] id: Option<Oco<'static, str>>,
-    #[prop(attrs)] attributes: Vec<(&'static str, Attribute)>,
     /// The nodes or elements to be shown inside the link.
     children: Children,
 ) -> impl IntoView {
+    // Work around to provide experiment context. Complains of using it outside
+    // Suspense despite being inside one!
+    use super::experiments::use_experiment;
+    let exp = use_experiment();
+
     let handle = move |ev: MouseEvent| {
         ev.prevent_default();
 
@@ -98,27 +103,29 @@ pub fn A(
             if let Some(anchor) = target.dyn_ref::<HtmlAnchorElement>() {
                 let url = anchor.href();
 
-                // FIXME it does not find the experiment context
-                expect_plausible_context().link_click(&url).send_local();
+                expect_plausible_context()
+                    .link_click(&url)
+                    .set_experiment(exp)
+                    .send_local();
 
                 let target = anchor.target();
 
                 // Navigate to the new URL
-                // if let Some(window) = window() {
-                //     match target.as_str() {
-                //         "_blank" => {
-                //             window
-                //                 .open_with_url(&url)
-                //                 .expect("Failed to open in a new tab");
-                //         }
-                //         _ => {
-                //             window
-                //                 .location()
-                //                 .set_href(&url)
-                //                 .expect("Failed to navigate");
-                //         }
-                //     };
-                // }
+                if let Some(window) = window() {
+                    match target.as_str() {
+                        "_blank" => {
+                            window
+                                .open_with_url(&url)
+                                .expect("Failed to open in a new tab");
+                        }
+                        _ => {
+                            window
+                                .location()
+                                .set_href(&url)
+                                .expect("Failed to navigate");
+                        }
+                    };
+                }
             }
         }
     };
@@ -128,10 +135,11 @@ pub fn A(
         href=href
         target=target
         class=class
-        // id=id
+        //id=id
         on:click=handle
       >
         {children()}
       </ARouter>
+
     }
 }

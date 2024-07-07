@@ -13,16 +13,20 @@ use leptos_router::A as ARouter;
 
 use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
 
+/// Sets the plausible context. It should usually be somewhere near the
+/// root of your application (Similar to the `<Router />` component).
 pub fn provide_plausible_context() {
     let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
     provide_context(tracking);
 }
 
+/// Retrieves plausible context
 #[must_use]
 pub fn expect_plausible_context() -> Plausible {
     expect_context::<Plausible>()
 }
 
+/// Track a standard page view event.
 #[must_use]
 #[component]
 pub fn PageView() -> impl IntoView {
@@ -40,6 +44,11 @@ pub fn PageView() -> impl IntoView {
     view! { <div node_ref=el></div> }
 }
 
+/// Send a custom event when a given part of a webpage is within
+/// the viewport of the user.
+///
+/// Use it to track when somenone has "viewed"/reached a given part of
+/// your website.
 #[must_use]
 #[component]
 pub fn TrackElement(
@@ -60,6 +69,14 @@ pub fn TrackElement(
     });
 
     view! { <div node_ref=el></div> }
+}
+
+/// Send and `endpage` event. Similar to page view but to know when a
+/// visitor reached the end of the page.
+#[must_use]
+#[component]
+pub fn EndPage() -> impl IntoView {
+    view! {<TrackElement name="endpage" />}
 }
 
 /// Substitute for `<a>` and `<A>` that tracks the links to plausible

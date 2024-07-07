@@ -16,8 +16,10 @@ use rand::prelude::*;
 use leptos::*;
 use serde::{Deserialize, Serialize};
 
+use super::components::TrackElement;
 use super::event::PropValue;
 
+/// Represents the variant of an experiment with its custom name and weight
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Variant {
     pub name: String,
@@ -25,6 +27,7 @@ pub struct Variant {
 }
 
 impl Variant {
+    #[must_use]
     pub fn new(name: &str, weight: u16) -> Self {
         Self {
             name: name.into(),
@@ -58,8 +61,12 @@ impl Experiment {
         }
     }
 
+    /// Choose the variant to show given the weights.
+    ///
+    /// It's separated from the init since this needs to happen in a leptos' [`local_resource`]
+    /// to avoud hydration bugs
     fn choose(&mut self) {
-        // FIXME Using RNG in SSR will cause hydration bugs!
+        // Using RNG in SSR will cause hydration bugs unless it's within a `local_resource`
         let weights: Vec<u16> = vec![self.a.weight, self.b.weight];
         let dist = WeightedIndex::new(weights).expect("ERR in experiment");
         let mut rng = thread_rng();
@@ -67,6 +74,7 @@ impl Experiment {
         self.selected = res;
     }
 
+    /// Returns the choosen variant
     #[must_use]
     pub const fn variant(&self) -> &Variant {
         match self.selected {
@@ -76,7 +84,24 @@ impl Experiment {
     }
 }
 
+impl Default for Experiment {
+    /// Inits a default experiment with A and B variants with the same weight.
+    fn default() -> Self {
+        Self {
+            name: String::from("Experiment"),
+            a: Variant::new("A", 1),
+            b: Variant::new("B", 1),
+            selected: 0,
+        }
+    }
+}
+
 /// A component that will show the choosen variant of the experiment.
+///
+/// It will always send an event called `ExperimentView` when any of the
+/// variants appears in the viewport (see
+/// [`leptos_use::use_element_visibility`](https://leptos-use.rs/elements/use_element_visibility.html))
+/// and will provide the experiment as context to be used by the downstream events.
 ///
 /// ```rust
 /// # use leptos::*;
@@ -146,6 +171,7 @@ where
 
     view! {
       <Suspense fallback=|| ()>
+        <TrackElement name="ExperimentView" />
         <Show
           when=move || variant().map_or_else(|| false, |v| v.selected == 1)
           fallback=move || a.with_value(|a| a())

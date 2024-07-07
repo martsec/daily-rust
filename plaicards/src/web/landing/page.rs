@@ -12,7 +12,7 @@ use leptos_router::ActionForm;
 use leptos_use::*;
 
 use crate::web::common::ButtonLinkSecond;
-use crate::web::plausible::components::{TrackElement, A};
+use crate::web::plausible::components::{EndPage, TrackElement, A};
 
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
@@ -65,12 +65,11 @@ pub fn HomePage() -> impl IntoView {
       // <LogoCloud />
       <Newsletter/>
       <WordCloud/>
-      // {tracking.pageview().send()}
 
       <ExperimentView exp=e a=ComponentA>
         <ComponentB/>
-        <TrackElement name="EndPage"/>
       </ExperimentView>
+      <EndPage />
     }
 }
 

@@ -81,10 +81,6 @@ pub fn EndPage() -> impl IntoView {
 
 /// Substitute for `<a>` and `<A>` that tracks the links to plausible
 #[must_use]
-#[cfg_attr(
-    any(debug_assertions, feature = "ssr"),
-    tracing::instrument(level = "trace", skip_all,)
-)]
 #[component]
 pub fn A(
     #[prop(into)] href: String,
@@ -108,21 +104,21 @@ pub fn A(
                 let target = anchor.target();
 
                 // Navigate to the new URL
-                if let Some(window) = window() {
-                    match target.as_str() {
-                        "_blank" => {
-                            window
-                                .open_with_url(&url)
-                                .expect("Failed to open in a new tab");
-                        }
-                        _ => {
-                            window
-                                .location()
-                                .set_href(&url)
-                                .expect("Failed to navigate");
-                        }
-                    };
-                }
+                // if let Some(window) = window() {
+                //     match target.as_str() {
+                //         "_blank" => {
+                //             window
+                //                 .open_with_url(&url)
+                //                 .expect("Failed to open in a new tab");
+                //         }
+                //         _ => {
+                //             window
+                //                 .location()
+                //                 .set_href(&url)
+                //                 .expect("Failed to navigate");
+                //         }
+                //     };
+                // }
             }
         }
     };

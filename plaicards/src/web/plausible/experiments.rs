@@ -163,13 +163,16 @@ where
             e
         },
     );
-    provide_context(ExperimentCtx(variant));
+    //provide_context(ExperimentCtx(variant));
 
     // Store the views so we can "Copy" its references within other components
     let a = store_value(a);
     let b = store_value(children);
 
     view! {
+     <Provider value={ExperimentCtx(variant)} >
+        // This provides the value ONLY to its children
+        // see https://github.com/leptos-rs/book/issues/3
       <Suspense fallback=|| ()>
         <TrackElement name="ExperimentView" />
         <Show
@@ -179,6 +182,7 @@ where
           {b.with_value(|b| b())}
         </Show>
       </Suspense>
+      </Provider>
     }
 }
 
@@ -186,9 +190,7 @@ where
 ///
 #[must_use]
 pub fn use_experiment() -> Option<ExperimentCtx> {
-    let experiment = use_context::<ExperimentCtx>();
-    debug_warn!("Using experiment context {:?}", experiment);
-    experiment
+    use_context::<ExperimentCtx>()
 }
 
 #[must_use]

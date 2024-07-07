@@ -3,7 +3,7 @@ use crate::web::board::Board;
 use crate::web::common::BuiltWith;
 use crate::web::landing::{HomePage, Showcase};
 use crate::web::lobby::Lobby;
-use crate::web::plausible::components::{provide_plausible_context, PageView};
+use crate::web::plausible::components::{provide_plausible_context, EndPage, PageView};
 
 use fluent_templates::static_loader;
 use leptos::*;
@@ -43,7 +43,6 @@ pub fn App() -> impl IntoView {
       <Stylesheet id="leptos" href="/pkg/plaicards.css"/>
       <MetaInfo />
 
-      <PageView/>
       <Router
         fallback=|| {
             let mut outside_errors = Errors::default();
@@ -54,6 +53,7 @@ pub fn App() -> impl IntoView {
         trailing_slash=TrailingSlash::Redirect
       >
         <main>
+      <PageView/>
           <Routes>
             <Route path="/" view=HomePage/>
             <Route path="/cards" view=Showcase/>
@@ -62,6 +62,7 @@ pub fn App() -> impl IntoView {
           </Routes>
         </main>
         <BuiltWith/>
+        <EndPage />
       </Router>
     }
 }

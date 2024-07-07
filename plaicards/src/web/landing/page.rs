@@ -12,7 +12,7 @@ use leptos_router::ActionForm;
 use leptos_use::*;
 
 use crate::web::common::ButtonLinkSecond;
-use crate::web::plausible::components::{EndPage, TrackElement, A};
+use crate::web::plausible::components::{EndPage, PageView, TrackElement, A};
 
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
@@ -23,8 +23,7 @@ use crate::web::plausible::experiments::{Experiment, ExperimentView, Variant};
 fn ComponentA() -> impl IntoView {
     view! {
       <div>"I'm A"</div>
-
-      <TrackElement name="SeenA"/>
+      <A href="https://8vi.cat">Click me</A>
     }
 }
 #[component]
@@ -57,6 +56,7 @@ pub fn HomePage() -> impl IntoView {
     view! {
       <Title text="PLAI the board game for tech workers"/>
 
+      //<PageView />
       <Hero/>
       <Testimonials/>
       <CardTypes/>
@@ -66,10 +66,15 @@ pub fn HomePage() -> impl IntoView {
       <Newsletter/>
       <WordCloud/>
 
+
+      <div class="mx-100" />
       <ExperimentView exp=e a=ComponentA>
         <ComponentB/>
       </ExperimentView>
-      <EndPage />
+
+      //<EndPage />
+
+
     }
 }
 

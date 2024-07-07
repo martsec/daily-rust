@@ -95,7 +95,6 @@ impl Plausible {
     }
 
     fn build_event(&self, name: EventName) -> EventBuilder {
-        debug_warn!("Preparing plausible event: `{:?}`", &name);
         let header = PlausibleHeader {
             user_agent: window()
                 .navigator()
@@ -295,6 +294,7 @@ impl EventBuilder {
     /// Use this function instead of [`send`] for simplicity
     /// unless you want to do more things in the local thread.
     pub fn send_local(self) {
+        debug_warn!("Preparing plausible event: `{:?}`", &self);
         spawn_local(async move {
             self.send().await;
         });

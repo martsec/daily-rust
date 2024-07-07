@@ -40,7 +40,6 @@ pub fn track_active_elements() {
         let id = active_element()
             .map(|el| el.dataset().get("id"))
             .unwrap_or_default();
-        debug_warn!("Selecting item {:?}", id);
 
         if let Some(id) = id {
             if id.starts_with("plausible-") {

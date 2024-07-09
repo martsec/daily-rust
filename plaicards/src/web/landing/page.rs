@@ -48,7 +48,6 @@ pub fn HomePage() -> impl IntoView {
     view! {
       <Title text="PLAI the board game for tech workers"/>
 
-
       <Hero/>
       <Testimonials/>
       <CardTypes/>
@@ -57,7 +56,6 @@ pub fn HomePage() -> impl IntoView {
       // <LogoCloud />
       <Newsletter/>
       <WordCloud/>
-
     }
 }
 
@@ -81,36 +79,36 @@ fn Hand() -> impl IntoView {
     let (x, y) = use_window_scroll();
 
     view! {
-      <div class="-mt-55 md:mt-0 md:pt-3 lg:px-8 overflow-visible mb-10">
+      <div class="overflow-visible mb-10 md:pt-3 md:mt-0 lg:px-8 -mt-55">
 
-        <div class="grid grid-cols-5 place-content-center justify-items-center">
+        <div class="grid grid-cols-5 justify-items-center place-content-center">
           <div
-            class="z-10  hover:z-40 bg-card-hr bg-cover -rotate-12"
+            class="z-10 bg-cover -rotate-12 hover:z-40 bg-card-hr"
             style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
             style:margin-left=move || format!("{}rem", 25_f64.min(y() / 25.))
             style:margin-top=move || format!("{}rem", 4.5_f64.min(y() / 50.))
             style=("--tw-rotate", move || format!("-{}deg", 12. - y() / 60.))
           ></div>
           <div
-            class="z-20  hover:z-40 mt-10 bg-card-aiarmy bg-cover -rotate-6"
+            class="z-20 mt-10 bg-cover -rotate-6 hover:z-40 bg-card-aiarmy"
             style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
             style:margin-left=move || format!("{}rem", 12_f64.min(y() / 50.))
             style:margin-top=move || format!("{}rem", 4.6_f64.min(2.5 + y() / 80.))
             style=("--tw-rotate", move || format!("-{}deg", 7. - y() / 120.))
           ></div>
           <div
-            class="z-30  hover:z-40 mt-20 bg-card-dotcom bg-cover"
+            class="z-30 mt-20 bg-cover hover:z-40 bg-card-dotcom"
             style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
           ></div>
           <div
-            class="z-20  hover:z-40 mt-10 bg-card-moredata bg-cover rotate-6"
+            class="z-20 mt-10 bg-cover rotate-6 hover:z-40 bg-card-moredata"
             style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
             style:margin-left=move || format!("-{}rem", 12_f64.min(y() / 50.))
             style:margin-top=move || format!("{}rem", 4.6_f64.min(2.5 + y() / 80.))
             style=("--tw-rotate", move || format!("{}deg", 7. - y() / 120.))
           ></div>
           <div
-            class="z-10 hover:z-40 bg-card-toxic bg-cover rotate-12"
+            class="z-10 bg-cover rotate-12 hover:z-40 bg-card-toxic"
             style="width:20rem; height:27rem;border-radius:.5rem;border-color:#000; border-width:0.1rem;"
             style:margin-left=move || format!("-{}rem", 25_f64.min(y() / 25.))
             style=("--tw-rotate", move || format!("{}deg", 12. - y() / 60.))
@@ -168,19 +166,19 @@ fn Hero() -> impl IntoView {
     });
 
     view! {
-      <div class="overflow-hidden bg-white pt-4 sm:py-8 lg:py-16 lg:h-svh content-center">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="overflow-hidden content-center pt-4 bg-white sm:py-8 lg:py-16 lg:h-svh">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
 
-          <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 md:gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div class="grid grid-cols-1 place-items-center mx-auto max-w-2xl md:gap-y-10 lg:grid-cols-2 lg:gap-y-20 lg:mx-0 lg:max-w-none">
             <div class="z-50 lg:pr-8">
               <div class="lg:max-w-lg">
-                <HeroText />
-                <div class="text-lg mt-2">
+                <HeroText/>
+                <div class="mt-2 text-lg">
                   <ActionForm
                     action=add_email
                     class="plausible-DOESNOTWORK-event-name=Subscribe+Top"
                   >
-                    <div class="mt-6 grid grid-rows-2 px-10 gap-4">
+                    <div class="grid grid-rows-2 gap-4 px-10 mt-6">
                       <label for="email-address" class="sr-only">
                         Email address
                       </label>
@@ -191,7 +189,7 @@ fn Hero() -> impl IntoView {
                         type="email"
                         autocomplete="email"
                         required
-                        class="text-center min-w-0 flex-auto rounded-md border-0 bg-white opacity-90 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-green/10 focus:ring-2 focus:ring-inset focus:ring-green-700 sm:text-lg sm:leading-6"
+                        class="flex-auto py-2 px-3.5 min-w-0 text-center bg-white rounded-md border-0 ring-1 ring-inset shadow-sm opacity-90 sm:text-lg sm:leading-6 focus:ring-2 focus:ring-inset focus:ring-green-700 ring-green/10"
                         placeholder=move || {
                             format!(
                                 "Enter your {} email",
@@ -202,7 +200,7 @@ fn Hero() -> impl IntoView {
 
                       <button
                         type="submit"
-                        class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 "
+                        class="flex-none py-2.5 px-3.5 text-lg font-semibold text-white bg-green-700 rounded-md shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
                       >
                         "Join "
                         {animated_num_users}
@@ -234,7 +232,7 @@ fn Hero() -> impl IntoView {
           </div>
         </div>
         // Scroll down icon
-        <div class="z-50 absolute inset-x-0 bottom-0 flex justify-center">
+        <div class="flex absolute inset-x-0 bottom-0 z-50 justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -257,34 +255,26 @@ fn Hero() -> impl IntoView {
 #[component]
 fn HeroText() -> impl IntoView {
     view! {
+      <p class="text-lg leading-8 text-gray-600">Seize control of <mark>your career</mark></p>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-center text-transparent text-gray-900 bg-clip-text bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 sm:text-4xl bg-300% animate-gradient">
+        PAVE YOUR OWN PATH*
+      </p>
 
-                  <p class="text-lg leading-8 text-gray-600">
-                    Seize control of <mark>your career</mark>
-                  </p>
-                  <p class="mt-2 text-3xl text-center font-bold tracking-tight text-gray-900 sm:text-4xl bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient">
-                    PAVE YOUR OWN PATH*
-                  </p>
+      <p class="mt-10 text-lg leading-8 text-gray-600">Guide your <mark>tech startup</mark>to</p>
+      <div class="bg-fixed bg-clip-text bg-repeat bg-texture-paper bg-parallax">
+        <p class="flex mt-2 text-5xl font-black tracking-tight text-center text-transparent bg-clip-text sm:text-6xl">
+          MARKET DOMINANCE
+        </p>
+      </div>
 
-                  <p class="mt-10 text-lg leading-8 text-gray-600">
-                    Guide your <mark>tech startup</mark> to
-                  </p>
-                  <div class="bg-texture-paper bg-repeat  bg-clip-text bg-fixed bg-parallax">
-                    <p class="mt-2 text-5xl flex bg-clip-text text-center font-black tracking-tight sm:text-6xl text-transparent">
-                      MARKET DOMINANCE
-                    </p>
-                  </div>
+      <div class="mt-8 sm:mt-20">
+        <p class="text-lg leading-8 text-gray-600">PLAI, the board game for tech practitioners</p>
+        <p class="text-lg leading-8 text-gray-600">
+          <mark>Next sprint</mark>
+          on Kickstarter
+        </p>
 
-                  <div class="mt-8 sm:mt-20">
-                    <p class="text-lg text-gray-600 leading-8">
-                      PLAI, the board game for tech practitioners
-                    </p>
-                    <p class="text-lg text-gray-600 leading-8">
-                      <mark>Next sprint</mark>
-                      on Kickstarter
-                    </p>
-
-                  </div>
-
+      </div>
     }
 }
 
@@ -292,7 +282,7 @@ fn HeroText() -> impl IntoView {
 fn Testimonials() -> impl IntoView {
     view! {
       <section class="bg-gray-900">
-        <div class="max-w-7xl mx-auto md:grid md:grid-cols-3 md:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl md:grid md:grid-cols-3 md:px-6 lg:px-8">
           <Testimonial
             comment="I thought working in tech was intense, but this game takes it to a whole new level. At least in PLAI, I can be the CEO."
             name="Casey C."
@@ -318,11 +308,11 @@ fn Testimonials() -> impl IntoView {
 #[component]
 fn Testimonial(comment: &'static str, name: &'static str, title: &'static str) -> impl IntoView {
     view! {
-      <div class="py-12 px-4 sm:px-6 md:flex md:flex-col md:py-16 md:pl-0 md:pr-10 lg:pr-16">
-        <blockquote class="mt-6 md:flex-grow md:flex md:flex-col">
+      <div class="py-12 px-4 sm:px-6 md:flex md:flex-col md:py-16 md:pr-10 md:pl-0 lg:pr-16">
+        <blockquote class="mt-6 md:flex md:flex-col md:flex-grow">
           <div class="relative text-lg font-medium text-white md:flex-grow">
             <svg
-              class="absolute top-0 left-0 transform -translate-x-3 -translate-y-2 h-8 w-8 text-blue-700"
+              class="absolute top-0 left-0 w-8 h-8 text-blue-700 transform -translate-x-3 -translate-y-2"
               fill="currentColor"
               viewBox="0 0 32 32"
               aria-hidden="true"
@@ -348,17 +338,17 @@ fn Testimonial(comment: &'static str, name: &'static str, title: &'static str) -
 #[component]
 fn Features() -> impl IntoView {
     view! {
-      <div class="overflow-hidden bg-white py-24 sm:py-32">
-        <div class="flex justify-center mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="overflow-hidden py-24 bg-white sm:py-32">
+        <div class="flex justify-center px-6 mx-auto max-w-7xl lg:px-8">
 
-          <dl class="max-w-xl text-base leading-7 text-gray-600 lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <dl class="grid grid-cols-1 gap-10 max-w-xl text-base leading-7 text-gray-600 sm:grid-cols-2 lg:grid-cols-3 lg:max-w-none">
             <div class="relative pl-9">
               <dt class="inline font-semibold text-gray-900">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  class="absolute left-1 top-1 size-5 text-emerald-600"
+                  class="absolute top-1 left-1 text-emerald-600 size-5"
                 >
                   <path
                     fill-rule="evenodd"
@@ -379,7 +369,7 @@ fn Features() -> impl IntoView {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  class="absolute left-1 top-1 size-5 text-emerald-600"
+                  class="absolute top-1 left-1 text-emerald-600 size-5"
                 >
                   <path
                     fill-rule="evenodd"
@@ -400,7 +390,7 @@ fn Features() -> impl IntoView {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  class="absolute left-1 top-1 size-5 text-emerald-600"
+                  class="absolute top-1 left-1 text-emerald-600 size-5"
                 >
                   <path
                     fill-rule="evenodd"
@@ -420,7 +410,7 @@ fn Features() -> impl IntoView {
             <div class="relative pl-9">
               <dt class="inline font-semibold text-gray-900">
                 <svg
-                  class="absolute left-1 top-1 h-5 w-5 text-emerald-600"
+                  class="absolute top-1 left-1 w-5 h-5 text-emerald-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
@@ -441,7 +431,7 @@ fn Features() -> impl IntoView {
             <div class="relative pl-9">
               <dt class="inline font-semibold text-gray-900">
                 <svg
-                  class="absolute left-1 top-1 h-5 w-5 text-emerald-600"
+                  class="absolute top-1 left-1 w-5 h-5 text-emerald-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
@@ -462,7 +452,7 @@ fn Features() -> impl IntoView {
             <div class="relative pl-9">
               <dt class="inline font-semibold text-gray-900">
                 <svg
-                  class="absolute left-1 top-1 h-5 w-5 text-emerald-600"
+                  class="absolute top-1 left-1 w-5 h-5 text-emerald-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
@@ -490,41 +480,41 @@ fn Features() -> impl IntoView {
 #[component]
 fn HeaderStats() -> impl IntoView {
     view! {
-      <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+      <div class="overflow-hidden relative py-24 bg-gray-900 sm:py-32 isolate">
         <img
           src="img/home_cards.jpg"
           alt=""
-          class="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center"
+          class="object-cover object-right absolute inset-0 w-full h-full md:object-center -z-10"
         />
         <div
-          class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
+          class="hidden sm:block sm:absolute sm:-top-10 sm:right-1/2 sm:mr-10 sm:transform-gpu sm:-z-10 sm:blur-3xl"
           aria-hidden="true"
         >
           <div
-            class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-green to-orange opacity-20"
+            class="bg-gradient-to-tr opacity-20 aspect-[1097/845] w-[68.5625rem] from-green to-orange"
             style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
           ></div>
         </div>
         <div
-          class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
+          class="absolute -top-52 left-1/2 transform-gpu -translate-x-1/2 sm:ml-16 sm:transform-gpu sm:translate-x-0 -z-10 blur-3xl sm:top-[-28rem]"
           aria-hidden="true"
         >
           <div
-            class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-orange to-blue opacity-20"
+            class="bg-gradient-to-tr opacity-20 aspect-[1097/845] w-[68.5625rem] from-orange to-blue"
             style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
           ></div>
         </div>
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
           <div class="mx-auto max-w-2xl lg:mx-0">
-            <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl flex items-center">
-              <span class="relative ml-3 h-[1em] w-40 overflow-hidden">
-                <span class="absolute h-full w-full -translate-y-full animate-slide leading-none text-green-300">
+            <h2 class="flex items-center text-4xl font-bold tracking-tight text-white sm:text-6xl">
+              <span class="overflow-hidden relative ml-3 w-40 h-[1em]">
+                <span class="absolute w-full h-full leading-none text-green-300 -translate-y-full animate-slide">
                   Board
                 </span>
-                <span class="absolute h-full w-full -translate-y-full animate-slide leading-none text-orange-300 [animation-delay:3s]">
+                <span class="absolute w-full h-full leading-none text-orange-300 -translate-y-full animate-slide [animation-delay:3s]">
                   Field
                 </span>
-                <span class="absolute h-full w-full -translate-y-full animate-slide leading-none text-blue-300 line-through [animation-delay:6s]">
+                <span class="absolute w-full h-full leading-none text-blue-300 line-through -translate-y-full animate-slide [animation-delay:6s]">
                   AI
                 </span>
               </span>
@@ -542,26 +532,26 @@ fn HeaderStats() -> impl IntoView {
             // <a href="#">Our values <span aria-hidden="true">&rarr;</span></a>
             // <a href="#">Meet our leadership <span aria-hidden="true">&rarr;</span></a>
             // </div>
-            <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:items-center sm:grid-cols-2 lg:grid-cols-5">
+            <dl class="grid grid-cols-1 gap-8 mt-16 sm:grid-cols-2 sm:items-center sm:mt-20 lg:grid-cols-5">
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Players</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"2-5"</dd>
+                <dd class="text-4xl font-bold tracking-tight leading-9 text-white">"2-5"</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Game time</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">"7-34 min"</dd>
+                <dd class="text-4xl font-bold tracking-tight leading-9 text-white">"7-34 min"</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Revisions</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">9</dd>
+                <dd class="text-4xl font-bold tracking-tight leading-9 text-white">9</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Beta testers</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">100+</dd>
+                <dd class="text-4xl font-bold tracking-tight leading-9 text-white">100+</dd>
               </div>
               <div class="flex flex-col-reverse">
                 <dt class="text-base leading-7 text-gray-300">Satire potential</dt>
-                <dd class="text-4xl font-bold leading-9 tracking-tight text-white">Unlimited</dd>
+                <dd class="text-4xl font-bold tracking-tight leading-9 text-white">Unlimited</dd>
               </div>
             </dl>
           </div>
@@ -573,8 +563,8 @@ fn HeaderStats() -> impl IntoView {
 #[component]
 fn CardTypes() -> impl IntoView {
     view! {
-      <div class="w-full my-6 lg:my-12 inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_32px,_black_calc(100%-60px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
-        <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll">
+      <div class="inline-flex overflow-hidden flex-nowrap my-6 w-full lg:my-12 [mask-image:_linear-gradient(to_right,transparent_0,_black_32px,_black_calc(100%-60px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
+        <ul class="flex justify-center items-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll">
           <li>
             <img src="./img/TheCards-1.png" alt="Adversary"/>
           </li>
@@ -607,7 +597,7 @@ fn CardTypes() -> impl IntoView {
           </li>
         </ul>
         <ul
-          class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll"
+          class="flex justify-center items-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none [&_img]:max-h-40 animate-infinite-scroll"
           aria-hidden="true"
         >
           <li>
@@ -648,9 +638,9 @@ fn CardTypes() -> impl IntoView {
 fn WordCloud() -> impl IntoView {
     view! {
       <div class="overflow-hidden">
-        <div class="w-full inline-flex flex-nowrap text-13xl font-mono bg-card-antitrust bg-clip-text bg-fixed bg-parallax bg-repeat opacity-50">
+        <div class="inline-flex flex-nowrap w-full font-mono bg-fixed bg-clip-text bg-repeat opacity-50 text-13xl bg-card-antitrust bg-parallax">
           <ul
-            class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollRight uppercase font-black"
+            class="flex justify-center items-center font-black text-transparent uppercase md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollRight"
             style="-webkit-text-stroke: 1px black;"
           >
             <li>PLAI</li>
@@ -662,8 +652,8 @@ fn WordCloud() -> impl IntoView {
             <li>Data</li>
           </ul>
         </div>
-        <div class="w-full py-2 inline-flex flex-nowrap text-13xl font-mono bg-card-back bg-clip-text bg-fixed bg-parallax bg-repeat opacity-50">
-          <ul class="text-transparent flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollLeft uppercase font-black">
+        <div class="inline-flex flex-nowrap py-2 w-full font-mono bg-fixed bg-clip-text bg-repeat opacity-50 text-13xl bg-card-back bg-parallax">
+          <ul class="flex justify-center items-center font-black text-transparent uppercase md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scrollLeft">
             <li>PYTHON</li>
             <li>Artificial</li>
             <li>Intelligence</li>
@@ -679,42 +669,42 @@ fn WordCloud() -> impl IntoView {
 #[component]
 fn LogoCloud() -> impl IntoView {
     view! {
-      <div class="bg-white py-24 sm:py-32">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 class="text-center text-lg font-semibold leading-8 text-gray-900">
+      <div class="py-24 bg-white sm:py-32">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
+          <h2 class="text-lg font-semibold leading-8 text-center text-gray-900">
             Trusted by the worlds most innovative teams
           </h2>
-          <div class="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5">
+          <div class="grid grid-cols-4 gap-x-8 gap-y-10 items-center mx-auto mt-10 max-w-lg sm:grid-cols-6 sm:gap-x-10 sm:max-w-xl lg:grid-cols-5 lg:mx-0 lg:max-w-none">
             <img
-              class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+              class="object-contain col-span-2 w-full max-h-12 lg:col-span-1"
               src="https://tailwindui.com/img/logos/158x48/transistor-logo-gray-900.svg"
               alt="Transistor"
               width="158"
               height="48"
             />
             <img
-              class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+              class="object-contain col-span-2 w-full max-h-12 lg:col-span-1"
               src="https://tailwindui.com/img/logos/158x48/reform-logo-gray-900.svg"
               alt="Reform"
               width="158"
               height="48"
             />
             <img
-              class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+              class="object-contain col-span-2 w-full max-h-12 lg:col-span-1"
               src="https://tailwindui.com/img/logos/158x48/tuple-logo-gray-900.svg"
               alt="Tuple"
               width="158"
               height="48"
             />
             <img
-              class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
+              class="object-contain col-span-2 w-full max-h-12 sm:col-start-2 lg:col-span-1"
               src="https://tailwindui.com/img/logos/158x48/savvycal-logo-gray-900.svg"
               alt="SavvyCal"
               width="158"
               height="48"
             />
             <img
-              class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1"
+              class="object-contain col-span-2 col-start-2 w-full max-h-12 sm:col-start-auto lg:col-span-1"
               src="https://tailwindui.com/img/logos/158x48/statamic-logo-gray-900.svg"
               alt="Statamic"
               width="158"
@@ -731,16 +721,16 @@ pub fn Newsletter() -> impl IntoView {
     let add_email = create_server_action::<EmailAlert>();
     let value = add_email.value();
     view! {
-      <div class="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+      <div class="overflow-hidden relative py-16 bg-gray-900 sm:py-24 lg:py-32 isolate">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
+          <div class="grid grid-cols-1 gap-x-8 gap-y-16 mx-auto max-w-2xl lg:grid-cols-2 lg:max-w-none">
             <div class="max-w-xl lg:max-w-lg">
               <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Help us!</h2>
               <p class="mt-4 text-lg leading-8 text-gray-300">
                 We want to release PLAI to production, but we need enough mass to print them.
               </p>
               <ActionForm action=add_email>
-                <div class="mt-6 flex max-w-md gap-x-4">
+                <div class="flex gap-x-4 mt-6 max-w-md">
                   <label for="email-address" class="sr-only">
                     Email address
                   </label>
@@ -751,12 +741,12 @@ pub fn Newsletter() -> impl IntoView {
                     type="email"
                     autocomplete="email"
                     required
-                    class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6"
+                    class="flex-auto py-2 px-3.5 min-w-0 text-white rounded-md border-0 ring-1 ring-inset shadow-sm sm:text-sm sm:leading-6 focus:ring-2 focus:ring-inset focus:ring-green-500 bg-white/5 ring-white/10"
                     placeholder="Enter your best email"
                   />
                   <button
                     type="submit"
-                    class="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 plausible-event-name=Subscribe+Bottom"
+                    class="flex-none py-2.5 px-3.5 text-sm font-semibold text-white bg-green-700 rounded-md shadow-sm hover:bg-green-600 plausible-event-name=Subscribe+Bottom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
                   >
                     "I want them! "
                     {move || {
@@ -769,9 +759,9 @@ pub fn Newsletter() -> impl IntoView {
             </div>
             <dl class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2">
               <div class="flex flex-col items-start">
-                <div class="rounded-md bg-white/5 p-2 ring-1 ring-white/10">
+                <div class="p-2 rounded-md ring-1 bg-white/5 ring-white/10">
                   <svg
-                    class="h-6 w-6 text-white"
+                    class="w-6 h-6 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
@@ -791,9 +781,9 @@ pub fn Newsletter() -> impl IntoView {
                 </dd>
               </div>
               <div class="flex flex-col items-start">
-                <div class="rounded-md bg-white/5 p-2 ring-1 ring-white/10">
+                <div class="p-2 rounded-md ring-1 bg-white/5 ring-white/10">
                   <svg
-                    class="h-6 w-6 text-white"
+                    class="w-6 h-6 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
@@ -813,7 +803,7 @@ pub fn Newsletter() -> impl IntoView {
                   <a
                     href="https://www.instagram.com/plai_cards/"
                     target="_blank"
-                    class="underline decoration-green underline-offset-4 text-white font-bold hover:decoration-blue hover:underline-offset-8 decoration-2"
+                    class="font-bold text-white underline decoration-green underline-offset-4 decoration-2 hover:decoration-blue hover:underline-offset-8"
                   >
                     @plai_cards
                   </a>
@@ -823,11 +813,11 @@ pub fn Newsletter() -> impl IntoView {
           </div>
         </div>
         <div
-          class="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl xl:-top-6"
+          class="absolute top-0 left-1/2 -translate-x-1/2 xl:-top-6 -z-10 blur-3xl"
           aria-hidden="true"
         >
           <div
-            class="aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-green to-blue opacity-30"
+            class="bg-gradient-to-tr opacity-30 aspect-[1155/678] w-[72.1875rem] from-green to-blue"
             style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
           ></div>
         </div>

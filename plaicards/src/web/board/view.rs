@@ -168,7 +168,7 @@ pub fn Board() -> impl IntoView {
         <PlayersHands current_player=player_id()/>
 
         <MiddleBoard/>
-        <div class="mt-0.5 flex justify-around">
+        <div class="flex justify-around mt-0.5">
           <div class="py-20">
             <ul>
               <For
@@ -204,8 +204,8 @@ fn Nav() -> impl IntoView {
 
     view! {
       <nav class="flex justify-center">
-        <div class="fixed top-2 content-center w-11/12 bg-white/30 backdrop-blur-md py-2 z-50 rounded-2xl">
-          <div class="container mx-auto px-4 grid grid-cols-3 justify-items-center items-center text-white">
+        <div class="fixed top-2 z-50 content-center py-2 w-11/12 rounded-2xl bg-white/30 backdrop-blur-md">
+          <div class="container grid grid-cols-3 justify-items-center items-center px-4 mx-auto text-white">
             <div class="justify-self-start">
               <h1>Rounds: 12</h1>
             </div>
@@ -216,19 +216,20 @@ fn Nav() -> impl IntoView {
             </div>
 
             // <!-- Players' Icons -->
-            <div class="justify-self-end flex">
+            <div class="flex justify-self-end">
               <For each=move || updated_players().into_iter().enumerate() key=|(_, p)| p.id let:ip>
-                <div class="group flex relative">
+                <div class="flex relative group">
                   <span
-                    class="mx-1 h-6 w-6 rounded-full"
+                    class="mx-1 w-6 h-6 rounded-full"
                     class=("bg-blue", move || ip.0 == 0)
                     class=("bg-green", move || ip.0 == 1)
                     class=("bg-orange", move || ip.0 == 2)
                     class=("bg-yellow", move || ip.0 == 3)
                     class=("bg-gray-illustration", move || ip.0 == 4)
                   ></span>
-                  <span class="group-hover:opacity-100 transition-opacity bg-gray-800 px-1 text-sm text-gray-100 rounded-md absolute left-1/2
-                  -translate-x-1/2 translate-y-full opacity-0 m-4 p-1 mx-auto">{ip.1.name}</span>
+                  <span class="absolute left-1/2 p-1 px-1 m-4 mx-auto text-sm text-gray-100 bg-gray-800 rounded-md opacity-0 transition-opacity -translate-x-1/2 translate-y-full group-hover:opacity-100">
+                    {ip.1.name}
+                  </span>
                 </div>
               </For>
             </div>
@@ -269,7 +270,7 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
           when=move || { players().len() > 2 }
           fallback=move || {
               view! {
-                <div class="mt-0.5 flex justify-around">
+                <div class="flex justify-around mt-0.5">
                   <HandHorizontal player=players.get()[1].clone()/>
                 </div>
               }
@@ -277,7 +278,7 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
         >
 
           <HandVertical player=players.get()[1].clone() left=true/>
-          <div class="mt-0.5 flex justify-around">
+          <div class="flex justify-around mt-0.5">
             <HandHorizontal player=players.get()[2].clone()/>
             <Show when=move || players().len() == 5 fallback=|| view! {}>
               <HandHorizontal player=players.get()[3].clone()/>
@@ -298,9 +299,9 @@ fn PlayersHands(current_player: Uuid) -> impl IntoView {
 #[component]
 fn MiddleBoard() -> impl IntoView {
     view! {
-      <div class="my-8 flex justify-center space-x-4">
-        <div class="h-32 w-24 bg-gray-700"></div>
-        <div class="h-32 w-24 bg-gray-500"></div>
+      <div class="flex justify-center my-8 space-x-4">
+        <div class="w-24 h-32 bg-gray-700"></div>
+        <div class="w-24 h-32 bg-gray-500"></div>
       </div>
     }
 }
@@ -320,7 +321,7 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
 
     view! {
       <div class="absolute top-1/4" class=("left-5", move || left) class=("right-5", move || !left)>
-        <div class="rounded bg-white p-3">
+        <div class="p-3 bg-white rounded">
           <h2>{player.name}</h2>
           <div class="drawer-container">
             {move || {
@@ -328,7 +329,7 @@ fn HandVertical(player: msg::Player, left: bool) -> impl IntoView {
                     .into_iter()
                     .map(|_| {
                         view! {
-                          <div class="animate-slideIn card-vertical bg-card-back bg-cover will-change-transform"></div>
+                          <div class="bg-cover animate-slideIn card-vertical bg-card-back will-change-transform"></div>
                         }
                     })
                     .collect_view()
@@ -355,14 +356,14 @@ fn HandHorizontal(player: msg::Player) -> impl IntoView {
     };
 
     view! {
-      <div class="rounded bg-white p-2">
-        <div class="card-container p-2">
+      <div class="p-2 bg-white rounded">
+        <div class="p-2 card-container">
           {move || {
               vec![0; cards()]
                   .into_iter()
                   .map(|_| {
                       view! {
-                        <div class="animate-slideIn card bg-card-back bg-cover will-change-transform"></div>
+                        <div class="bg-cover animate-slideIn card bg-card-back will-change-transform"></div>
                       }
                   })
                   .collect_view()
@@ -412,7 +413,7 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
     view! {
       <div
         id="playersDrawer"
-        class="fixed bottom-0 left-0 right-0 rounded-t-lg p-4 text-white  bg-green-700/20 backdrop-blur-md hover:z-20"
+        class="fixed right-0 bottom-0 left-0 p-4 text-white rounded-t-lg hover:z-20 bg-green-700/20 backdrop-blur-md"
       >
 
         <div class="grid grid-cols-3 justify-items-center">
@@ -428,7 +429,7 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
         </div>
 
         <div class="grid justify-center">
-          <div class="card-container pt-4">
+          <div class="pt-4 card-container">
             <For
               each=move || updated_hand().into_iter().enumerate()
               key=|(_, c)| c.title.clone()
@@ -450,8 +451,8 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
                           "select-none uppercase text-gray-illustration font-extrabold mt-10 {}",
                           type_to_color.get(&c.ctype).unwrap_or(&"text-gray-illustration"),
                       )>{c.title}</p>
-                      <p class="select-none uppercase text-black font-bold mt-2">{c.effect}</p>
-                      <p class="select-none text-dove-gray italic mt-2">{c.description}</p>
+                      <p class="mt-2 font-bold text-black uppercase select-none">{c.effect}</p>
+                      <p class="mt-2 italic select-none text-dove-gray">{c.description}</p>
                     </div>
                   }
               }

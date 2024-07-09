@@ -1,3 +1,4 @@
 {
-      "rust-analyzer.rustfmt.overrideCommand": ["leptosfmt", "--stdin", "--rustfmt"]
+      // Requires installation via git directly cargo install --git https://github.com/bram209/leptosfmt.git
+      "rust-analyzer.rustfmt.overrideCommand": ["leptosfmt", "--stdin", "--rustfmt", "--experimental-tailwind"]
 }

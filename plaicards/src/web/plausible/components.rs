@@ -104,7 +104,7 @@ pub fn TrackElement(
 #[must_use]
 #[component]
 pub fn EndPage() -> impl IntoView {
-    view! {<TrackElement name="endpage" />}
+    view! { <TrackElement name="endpage"/> }
 }
 
 /// Substitute for `<a>` and `<A>` that tracks the links to plausible
@@ -163,11 +163,10 @@ pub fn A(
         href=href
         target=target
         class=class
-        //id=id
+        // id=id
         on:click=handle
       >
         {children()}
       </ARouter>
-
     }
 }

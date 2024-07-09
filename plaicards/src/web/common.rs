@@ -20,7 +20,7 @@ pub fn Button(
 pub fn ButtonDisablable(title: String, disabled: Signal<bool>) -> impl IntoView {
     view! {
       <button
-        class="focus:shadow-outline rounded bg-orange-500 px-4 ml-2 py-2 font-bold text-white enabled:hover:bg-orange-700 focus:outline-none disabled:bg-orange-900 disabled:opacity-50"
+        class="py-2 px-4 ml-2 font-bold text-white bg-orange-500 rounded focus:outline-none disabled:bg-orange-900 disabled:opacity-50 enabled:hover:bg-orange-700 focus:shadow-outline"
         class=("cursor-not-allowed", disabled)
         disabled=disabled
       >

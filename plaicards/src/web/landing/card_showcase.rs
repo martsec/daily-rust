@@ -21,17 +21,17 @@ pub fn Showcase() -> impl IntoView {
     view! {
       <Title text="PLAI - our cards"/>
 
-      <div class="overflow-hidden bg-white py-8 sm:py-8 lg:py-16 md:h-[60rem] content-center">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="overflow-hidden content-center py-8 bg-white sm:py-8 lg:py-16 md:h-[60rem]">
+        <div class="px-6 mx-auto max-w-7xl lg:px-8">
 
-          <div class="mx-auto place-items-center grid max-w-2xl grid-cols-1 gap-y-10 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div class="grid grid-cols-1 gap-y-10 place-items-center mx-auto max-w-2xl lg:grid-cols-2 lg:gap-y-20 lg:mx-0 lg:max-w-none">
             <Suspense fallback=|| ()>
               <Card card=card/>
             </Suspense>
           </div>
         </div>
-        <div class="m-8 px-4 mx-auto w-96">
-          <p class="m-4 text-center text-gray-400 text-lg">
+        <div class="px-4 m-8 mx-auto w-96">
+          <p class="m-4 text-lg text-center text-gray-400">
             {move_tr!(
                 "showcase-seen", { "cardsCount" => seen_cards().len(), "total" => total_cards }
             )}
@@ -47,9 +47,9 @@ pub fn Showcase() -> impl IntoView {
                 let num_card = num_card % total_cards + 1;
                 set_card(num_card);
                 expect_plausible_context()
-                  .event("LandingDrawCard")
-                  .prop("card", num_card.into())
-                  .send_local();
+                    .event("LandingDrawCard")
+                    .prop("card", num_card.into())
+                    .send_local();
             }
           />
 
@@ -65,12 +65,12 @@ pub fn Showcase() -> impl IntoView {
 fn Deck() -> impl IntoView {
     view! {
       <div class="deck">
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
-        <div class="sized-card card-border bg-card-back bg-cover"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
+        <div class="bg-cover sized-card card-border bg-card-back"></div>
       </div>
       <div class="lg:max-w-lg">
         <p class="mt-6 text-xl text-center text-gray-600">{move || tr!("showcase-intro")}</p>
@@ -102,7 +102,7 @@ fn FlipCard(
     view! {
       <div class=format!("sized-card flip-card {class}")>
         <div class=format!("sized-card card-border flip-card-front bg-cover bg-{image}")></div>
-        <div class="sized-card card-border flip-card-back bg-card-back bg-cover"></div>
+        <div class="bg-cover sized-card card-border flip-card-back bg-card-back"></div>
       </div>
     }
 }
@@ -120,7 +120,7 @@ fn Daily() -> impl IntoView {
       {move || update_seen_cards("daily")}
       <FlipCard image="card-daily" class="animate-fade-slide-in-right"/>
       <div class="lg:max-w-lg animate-fade-slide-in-left">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-daily")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -139,7 +139,7 @@ fn Antitrust() -> impl IntoView {
       {move || update_seen_cards("antitrust")}
       <FlipCard image="card-antitrust" class="animate-fade-slide-in-right"/>
       <div class="lg:max-w-lg animate-fade-slide-in-left">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-antitrust")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -171,7 +171,7 @@ fn ArtCompetitions() -> impl IntoView {
       {move || update_seen_cards("winart")}
       <FlipCard image="card-winart" class="animate-fade-slide-in-right"/>
       <div class="lg:max-w-lg animate-fade-slide-in-left">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-winart")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -202,7 +202,7 @@ fn Criminals() -> impl IntoView {
       {move || update_seen_cards("criminals")}
       <FlipCard image="card-criminals" class="animate-fade-slide-in-right"/>
       <div class="lg:max-w-lg animate-fade-slide-in-left">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-antitrust")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -247,7 +247,7 @@ fn Dotcom() -> impl IntoView {
       {move || update_seen_cards("dotcom")}
       <FlipCard image="card-dotcom" class="animate-fade-slide-in-right"/>
       <div class="lg:max-w-lg animate-fade-slide-in-left">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-dotcom")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -262,7 +262,7 @@ fn Data() -> impl IntoView {
     view! {
       {move || update_seen_cards("data")}
       <div class="lg:max-w-lg animate-fade-slide-in-right">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-more-data")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">
@@ -295,7 +295,7 @@ fn Hr() -> impl IntoView {
     view! {
       {move || update_seen_cards("hr")}
       <div class="lg:max-w-lg animate-fade-slide-in-right">
-        <p class="mt-2 text-3xl text-center uppercase text-black">
+        <p class="mt-2 text-3xl text-center text-black uppercase">
           {move || tr!("showcase-select-employees")}
         </p>
         <p class="mt-6 text-xl text-center text-gray-600">

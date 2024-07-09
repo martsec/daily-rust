@@ -170,18 +170,18 @@ where
     let b = store_value(children);
 
     view! {
-     <Provider value={ExperimentCtx(variant)} >
+      <Provider value=ExperimentCtx(variant)>
         // This provides the value ONLY to its children
         // see https://github.com/leptos-rs/book/issues/3
-      <Suspense fallback=|| ()>
-        <TrackElement name="ExperimentView" />
-        <Show
-          when=move || variant().map_or_else(|| false, |v| v.selected == 1)
-          fallback=move || a.with_value(|a| a())
-        >
-          {b.with_value(|b| b())}
-        </Show>
-      </Suspense>
+        <Suspense fallback=|| ()>
+          <TrackElement name="ExperimentView"/>
+          <Show
+            when=move || variant().map_or_else(|| false, |v| v.selected == 1)
+            fallback=move || a.with_value(|a| a())
+          >
+            {b.with_value(|b| b())}
+          </Show>
+        </Suspense>
       </Provider>
     }
 }

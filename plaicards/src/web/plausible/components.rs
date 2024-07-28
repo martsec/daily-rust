@@ -17,7 +17,7 @@ use super::experiments::{use_experiment_props, Experiment, ExperimentCtx};
 /// Sets the plausible context. It should usually be somewhere near the
 /// root of your application (Similar to the `<Router />` component).
 pub fn provide_plausible_context() {
-    let tracking = Plausible::new_private("test", "https://frumentarii.8vi.cat");
+    let tracking = Plausible::new_private("get.plai.cards", "https://frumentarii.8vi.cat");
     provide_context(tracking);
 }
 

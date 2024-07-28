@@ -47,7 +47,7 @@ pub struct Experiment {
     a: Variant,
     b: Variant,
     /// Selected variant
-    selected: usize,
+    pub selected: usize,
 }
 
 impl Experiment {
@@ -65,7 +65,7 @@ impl Experiment {
     ///
     /// It's separated from the init since this needs to happen in a leptos' [`local_resource`]
     /// to avoud hydration bugs
-    fn choose(&mut self) {
+    pub fn choose(&mut self) {
         // Using RNG in SSR will cause hydration bugs unless it's within a `local_resource`
         let weights: Vec<u16> = vec![self.a.weight, self.b.weight];
         let dist = WeightedIndex::new(weights).expect("ERR in experiment");
@@ -163,7 +163,6 @@ where
             e
         },
     );
-    //provide_context(ExperimentCtx(variant));
 
     // Store the views so we can "Copy" its references within other components
     let a = store_value(a);
@@ -199,7 +198,7 @@ pub fn use_experiment_props() -> Option<HashMap<String, PropValue>> {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct ExperimentCtx(Resource<(), Experiment>);
+pub struct ExperimentCtx(pub Resource<(), Experiment>);
 
 impl ExperimentCtx {
     pub fn to_plausible(&self) -> HashMap<String, PropValue> {

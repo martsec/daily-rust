@@ -19,7 +19,7 @@ use crate::web::plausible::components::{
 use leptos::html::{Div, Input};
 use leptos::logging::{debug_warn, log};
 
-use crate::web::plausible::experiments::{Experiment, ExperimentView, Variant};
+use crate::web::plausible::experiments::{use_experiment, Experiment, ExperimentView, Variant};
 
 #[component]
 fn ComponentA() -> impl IntoView {
@@ -42,7 +42,6 @@ fn ComponentB() -> impl IntoView {
 #[component]
 pub fn HomePage() -> impl IntoView {
     provide_meta_context();
-
     track_active_elements();
 
     view! {
@@ -54,8 +53,8 @@ pub fn HomePage() -> impl IntoView {
       <HeaderStats/>
       <Features/>
       // <LogoCloud />
+      // <WordCloud/>
       <Newsletter/>
-      <WordCloud/>
     }
 }
 
@@ -165,64 +164,66 @@ fn Hero() -> impl IntoView {
         }
     });
 
+    let variant = use_experiment().expect("Error seting up experiment");
     view! {
-      <div class="overflow-hidden content-center pt-4 bg-white sm:py-8 lg:py-16 lg:h-svh">
+      <div class="overflow-hidden content-center pt-4 bg-white sm:py-8 lg:py-60">
         <div class="px-6 mx-auto max-w-7xl lg:px-8">
 
           <div class="grid grid-cols-1 place-items-center mx-auto max-w-2xl md:gap-y-10 lg:grid-cols-2 lg:gap-y-20 lg:mx-0 lg:max-w-none">
             <div class="z-50 lg:pr-8">
               <div class="lg:max-w-lg">
-                <HeroText/>
+                <TrackElement name="ExperimentView"/>
+                <Show
+                  when=move || { variant.0().map_or_else(|| false, |v| v.selected == 1) }
+
+                  fallback=move || view! { <HeroText/> }
+                >
+                  <HeroTextB/>
+                </Show>
                 <div class="mt-2 text-lg">
-                  <ActionForm
-                    action=add_email
-                    class="plausible-DOESNOTWORK-event-name=Subscribe+Top"
-                  >
-                    <div class="grid grid-rows-2 gap-4 px-10 mt-6">
-                      <label for="email-address" class="sr-only">
-                        Email address
-                      </label>
-                      <input
-                        id="email-address"
-                        data-id="plausible-email-form-top"
-                        name="email"
-                        type="email"
-                        autocomplete="email"
-                        required
-                        class="flex-auto py-2 px-3.5 min-w-0 text-center bg-white rounded-md border-0 ring-1 ring-inset shadow-sm opacity-90 sm:text-lg sm:leading-6 focus:ring-2 focus:ring-inset focus:ring-green-700 ring-green/10"
-                        placeholder=move || {
-                            format!(
-                                "Enter your {} email",
-                                email_adjectives[(counter()) as usize % email_adjectives.len()],
-                            )
-                        }
-                      />
+                  // <ActionForm action=add_email>
+                  // <div class="grid grid-rows-2 gap-4 px-10 mt-6">
+                  // <label for="email-address" class="sr-only">
+                  // Email address
+                  // </label>
+                  // <input
+                  // id="email-address"
+                  // data-id="plausible-email-form-top"
+                  // name="email"
+                  // type="email"
+                  // autocomplete="email"
+                  // required
+                  // class="flex-auto py-2 px-3.5 min-w-0 text-center bg-white rounded-md border-0 ring-1 ring-inset shadow-sm opacity-90 sm:text-lg sm:leading-6 focus:ring-2 focus:ring-inset focus:ring-green-700 ring-green/10"
+                  // placeholder=move || {
+                  // format!(
+                  // "Enter your {} email",
+                  // email_adjectives[(counter()) as usize
+                  // % email_adjectives.len()],
+                  // )
+                  // }
+                  // />
 
-                      <button
-                        type="submit"
-                        class="flex-none py-2.5 px-3.5 text-lg font-semibold text-white bg-green-700 rounded-md shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
-                      >
-                        "Join "
-                        {animated_num_users}
-                        "+ plaiers "
-                        {move || {
-                            if value().is_some_and(|v| v == Ok("OK".into())) {
-                                "✔️"
-                            } else {
-                                ""
-                            }
-                        }}
+                  // <button
+                  // type="submit"
+                  // class="flex-none py-2.5 px-3.5 text-lg font-semibold text-white bg-green-700 rounded-md shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
+                  // >
+                  // "Join "
+                  // {animated_num_users}
+                  // "+ plaiers "
+                  // {move || {
+                  // if value().is_some_and(|v| v == Ok("OK".into())) {
+                  // "✔️"
+                  // } else {
+                  // ""
+                  // }
+                  // }}
 
-                      </button>
+                  // </button>
 
-                    </div>
-                  </ActionForm>
+                  // </div>
+                  // </ActionForm>
                   <div class="px-10 my-6">
-                    <ButtonLinkSecond
-                      title="See the cards"
-                      class="plausible-event-name=LandingSeeCards"
-                      href="/cards"
-                    />
+                    <ButtonLinkSecond title="Draw the cards" href="/cards"/>
                   </div>
                 </div>
               </div>
@@ -231,23 +232,23 @@ fn Hero() -> impl IntoView {
             <Hand/>
           </div>
         </div>
-        // Scroll down icon
-        <div class="flex absolute inset-x-0 bottom-0 z-50 justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-16 text-blue motion-safe:animate-bounce"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            ></path>
-          </svg>
-        </div>
+      // Scroll down icon
+      // <div class="flex absolute inset-x-0 bottom-0 z-50 justify-center">
+      // <svg
+      // xmlns="http://www.w3.org/2000/svg"
+      // fill="none"
+      // viewBox="0 0 24 24"
+      // stroke-width="1.5"
+      // stroke="currentColor"
+      // class="size-16 text-blue motion-safe:animate-bounce"
+      // >
+      // <path
+      // stroke-linecap="round"
+      // stroke-linejoin="round"
+      // d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      // ></path>
+      // </svg>
+      // </div>
       </div>
     }
 }
@@ -261,7 +262,7 @@ fn HeroText() -> impl IntoView {
       </p>
 
       <p class="mt-10 text-lg leading-8 text-gray-600">Guide your <mark>tech startup</mark>to</p>
-      <div class="bg-fixed bg-clip-text bg-repeat bg-texture-paper bg-parallax">
+      <div class="bg-clip-text bg-repeat bg-texture-paper bg-parallax">
         <p class="flex mt-2 text-5xl font-black tracking-tight text-center text-transparent bg-clip-text sm:text-6xl">
           MARKET DOMINANCE
         </p>
@@ -272,6 +273,21 @@ fn HeroText() -> impl IntoView {
         <p class="text-lg leading-8 text-gray-600">
           <mark>Next sprint</mark>
           on Kickstarter
+        </p>
+
+      </div>
+    }
+}
+
+#[component]
+fn HeroTextB() -> impl IntoView {
+    view! {
+      <div class="container flex flex-col items-center px-6 mx-auto">
+        <h1 class="mt-2 text-4xl font-bold tracking-tight text-center text-transparent text-gray-900 bg-clip-text bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 md:text-6xl bg-300% animate-gradient">
+          PLAI: The Ultimate Board Game for Tech Enthusiasts
+        </h1>
+        <p class="mb-6 text-xl text-center md:text-2xl">
+          Navigate the Tech Startup World and Dominate the Market
         </p>
 
       </div>

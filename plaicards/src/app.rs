@@ -4,8 +4,10 @@ use crate::web::common::BuiltWith;
 use crate::web::landing::{HomePage, Showcase};
 use crate::web::lobby::Lobby;
 use crate::web::plausible::components::{provide_plausible_context, EndPage, PageView};
+use crate::web::plausible::experiments::{Experiment, ExperimentCtx, Variant};
 
 use fluent_templates::static_loader;
+use leptos::Provider;
 use leptos::*;
 use leptos_fluent::{expect_i18n, leptos_fluent, move_tr, tr};
 use leptos_meta::*;
@@ -39,31 +41,52 @@ pub fn App() -> impl IntoView {
 
     }};
 
+    // Setup experiment
+    let experiment = Experiment::new(
+        "HeroText",
+        Variant::new("Human", 1),
+        Variant::new("ChatGpt", 1),
+    );
+    let exp = store_value(experiment);
+    let variant = create_resource(
+        || (),
+        move |()| async move {
+            let mut e = exp();
+            e.choose();
+            e
+        },
+    );
+
     view! {
-      <Stylesheet id="leptos" href="/pkg/plaicards.css"/>
-      <MetaInfo />
+        <Stylesheet id="leptos" href="/pkg/plaicards.css"/>
+        <MetaInfo/>
 
-      <Router
-        fallback=|| {
-            let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(AppError::NotFound);
-            view! { <ErrorTemplate outside_errors/> }.into_view()
-        }
+        <Router
+            fallback=|| {
+                let mut outside_errors = Errors::default();
+                outside_errors.insert_with_default_key(AppError::NotFound);
+                view! { <ErrorTemplate outside_errors/> }.into_view()
+            }
 
-        trailing_slash=TrailingSlash::Redirect
-      >
-        <main>
-      <PageView/>
-          <Routes>
-            <Route path="/" view=HomePage/>
-            <Route path="/cards" view=Showcase/>
-          // <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
-          // <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
-          </Routes>
-        </main>
-        <BuiltWith/>
-        <EndPage />
-      </Router>
+            trailing_slash=TrailingSlash::Redirect
+        >
+            <Provider value=ExperimentCtx(variant)>
+                <Suspense fallback=|| ()>
+                    <main>
+
+                        <PageView/>
+                        <Routes>
+                            <Route path="/" view=HomePage/>
+                            <Route path="/cards" view=Showcase/>
+                        // <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
+                        // <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
+                        </Routes>
+                    </main>
+                    <BuiltWith/>
+                    <EndPage/>
+                </Suspense>
+            </Provider>
+        </Router>
     }
 }
 
@@ -75,37 +98,25 @@ fn MetaInfo() -> impl IntoView {
     let url = "https://get.plai.cards/";
     let title = "PLAI - the Board game for tech workers";
     view! {
-
-      <Title text={title}/>
+        <Title text=title/>
 
         <Meta charset="utf-8"/>
-        <Meta
-          name="description"
-          content={description} />
-        <Meta
-          name="keywords"
-          content={keywords}
-        />
+        <Meta name="description" content=description/>
+        <Meta name="keywords" content=keywords/>
         <Meta name="HandheldFriendly" content="True"/>
         <Meta property="og:site_name" content="plAI card game"/>
 
         <Meta property="og:site_name" content="plAI card game"/>
         <Meta property="og:type" content="website"/>
-        <Meta property="og:title" content={title}/>
-        <Meta
-          property="og:description"
-          content={description}
-        />
-        <Meta property="og:url" content={url}/>
+        <Meta property="og:title" content=title/>
+        <Meta property="og:description" content=description/>
+        <Meta property="og:url" content=url/>
         <Meta name="twitter:card" content="summary_large_image"/>
-        <Meta name="twitter:title" content={title}/>
-        <Meta
-          name="twitter:description"
-          content={description}
-        />
-        <Meta name="twitter:url" content={url}/>
-        <Meta name="twitter:image" content={img}/>
-        <Meta property="og:image" content={img}/>
+        <Meta name="twitter:title" content=title/>
+        <Meta name="twitter:description" content=description/>
+        <Meta name="twitter:url" content=url/>
+        <Meta name="twitter:image" content=img/>
+        <Meta property="og:image" content=img/>
         <Meta name="twitter:label1" content="Written by"/>
         <Meta name="twitter:data1" content="Marti"/>
         <Meta name="twitter:site" content="@plai_cards"/>

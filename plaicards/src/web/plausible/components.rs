@@ -48,10 +48,12 @@ pub fn track_active_elements() {
     });
 
     create_effect(move |_| {
-        expect_plausible_context()
-            .event("active_element")
-            .prop("id", id_with_event().into())
-            .send_local();
+        if let Some(id) = id_with_event() {
+            expect_plausible_context()
+                .event("active_element")
+                .prop("id", id.into())
+                .send_local();
+        }
     });
 }
 /// Track a standard page view event.

@@ -1,7 +1,7 @@
 use crate::error_template::{AppError, ErrorTemplate};
 use crate::web::board::Board;
 use crate::web::common::BuiltWith;
-use crate::web::landing::{HomePage, Showcase};
+use crate::web::landing::{HomePage, RulePage, Showcase};
 use crate::web::lobby::Lobby;
 use crate::web::plausible::components::{provide_plausible_context, EndPage, PageView};
 use crate::web::plausible::experiments::{Experiment, ExperimentCtx, Variant};
@@ -78,6 +78,7 @@ pub fn App() -> impl IntoView {
                         <Routes>
                             <Route path="/" view=HomePage/>
                             <Route path="/cards" view=Showcase/>
+                            <Route path="/how-to-plai" view=RulePage/>
                         <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
                         <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
                         </Routes>

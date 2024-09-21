@@ -41,6 +41,20 @@ fn to_url_uuid(id: Uuid) -> String {
     BASE64URL_NOPAD.encode(id.as_bytes())
 }
 
+static TYPE_TO_COLOR: &[(&str, &str)] = &[
+    ("Adversary", "text-orange"),
+    ("UseCase", "text-green"),
+    ("Buzzword", "text-yellow"),
+    ("MarketEvent", "text-blue"),
+    ("Special", "text-gray"),
+];
+fn get_color(card_type: &str) -> &str {
+    TYPE_TO_COLOR
+        .binary_search_by(|(k, _)| k.cmp(&card_type))
+        .map(|x| TYPE_TO_COLOR[x].1)
+        .unwrap_or("text-gray")
+}
+
 #[derive(Clone)]
 struct WsContext {
     pub message: Signal<Option<String>>,
@@ -389,26 +403,18 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
     };
 
     let is_players_turn = create_rw_signal(false);
+    provide_context(is_players_turn);
     let check_player_turn = move || {
         if let Some(ServerMsg::NextPlayer(pid)) = ws_message() {
             is_players_turn.set(pid == player.id);
         }
         is_players_turn.get()
     };
-    provide_context(is_players_turn);
     create_effect(move |_| {
         if is_players_turn() {
             logging::log!("It's now your turn");
         }
     });
-
-    let type_to_color = HashMap::from([
-        ("Adversary".to_string(), "text-orange"),
-        ("UseCase".to_string(), "text-green"),
-        ("Buzzword".to_string(), "text-yellow"),
-        ("MarketEvent".to_string(), "text-blue"),
-        ("Special".to_string(), "text-gray"),
-    ]);
 
     view! {
       <div
@@ -428,39 +434,42 @@ fn PlayerDrawer(player: msg::Player) -> impl IntoView {
           </div>
         </div>
 
-        <div class="grid justify-center">
-          <div class="pt-4 card-container">
-            <For
-              each=move || updated_hand().into_iter().enumerate()
-              key=|(_, c)| c.title.clone()
-              children=move |(i, c)| {
-                  view! {
-                    <div
-                      class=&format!(
-                          "animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}",
-                          c.ctype.to_lowercase(),
-                      )
-
-                      class=("bg-card-adversary", || false)
-                      class=("bg-card-usecase", || false)
-                      class=("bg-card-buzzword", || false)
-                      class=("bg-card-special", || false)
-                      class=("bg-card-marketevent", || false)
-                    >
-                      <p class=format!(
-                          "select-none uppercase text-gray-illustration font-extrabold mt-10 {}",
-                          type_to_color.get(&c.ctype).unwrap_or(&"text-gray-illustration"),
-                      )>{c.title}</p>
-                      <p class="mt-2 font-bold text-black uppercase select-none">{c.effect}</p>
-                      <p class="mt-2 italic select-none text-dove-gray">{c.description}</p>
-                    </div>
-                  }
-              }
-            />
-
-          </div>
-        </div>
+      <div class="grid justify-center">
+      <div class="card-container pt-4">
+      <For
+            each=move || updated_hand().into_iter().enumerate()
+            key=|(_, c)| c.title.clone()
+            children=move |(_, c)| view! { <FaceUpCard c=c/>}
+    />
       </div>
+    </div>
+    </div>
+    }
+}
+
+#[component]
+fn FaceUpCard(c: msg::Card) -> impl IntoView {
+    let ws = expect_context::<Ws>();
+    let is_players_turn =
+        use_context::<RwSignal<bool>>().expect("to have found the players turn signal");
+    let can_be_played = c.ctype == "Special";
+    let c = StoredValue::new(c);
+
+    view! {
+        <button
+            class={&format!("animate-slideIn card card-faceup will-change-transform text-center py-6 bg-cover bg-card-{}", c().ctype.to_lowercase())}
+            class=("bg-card-adversary", || false)
+            class=("bg-card-usecase",  || false)
+            class=("bg-card-buzzword", || false)
+            class=("bg-card-special", || false)
+            class=("bg-card-marketevent", ||false)
+            disabled=move || !(is_players_turn() && can_be_played)
+            on:click=move |_| ws.send(ClientMsg::PlayCard(c()))
+        >
+            <p class={format!("select-none uppercase text-gray-illustration font-extrabold mt-10 {}", get_color(&c().ctype))}>{c().title}</p>
+            <p class="select-none uppercase text-black font-bold mt-2">{c().effect}</p>
+            <p class="select-none text-dove-gray italic mt-2">{c().description}</p>
+        </button>
     }
 }
 

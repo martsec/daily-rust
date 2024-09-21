@@ -11,6 +11,8 @@ pub enum Error {
     GameEnded,
     NotYourTurn,
     RuleBreak,
+
+    NotImplemented,
 }
 
 impl Display for Error {

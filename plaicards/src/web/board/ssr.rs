@@ -75,6 +75,7 @@ impl GameController {
             ],
         );
 
+        debug!("DUMMY game room with players was created. Can be found at \n\thttp://127.0.0.1:3000/plai/nLFHZbv9RHqynrsgOAGstg/VB9O7AfDRrOULE7RXgf45A \n\thttp://127.0.0.1:3000/plai/nLFHZbv9RHqynrsgOAGstg/WfmZY_3fSbKaTIOBt2aOww");
         gc.put(gr).await.unwrap();
 
         gc

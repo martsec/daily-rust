@@ -7,7 +7,7 @@ mod errors;
 mod player;
 mod round;
 use crate::game::cards::{get_cards_available, Deck, DeckEmptyError};
-pub use crate::game::cards::{Card, Hand};
+pub use crate::game::cards::{Card, CardEffect, Hand};
 pub use crate::game::player::Player;
 use crate::game::player::PlayerState;
 use crate::game::round::Round;
@@ -214,13 +214,13 @@ impl Game {
                     //let other_player_hand = self.get_player(rival_id).hand.clone();
                     //self.active_player_mut().hand = other_player_hand;
                     //self.get_player_mut(rival_id).hand = hand;
-                    todo!();
+                    return Err(Error::NotImplemented);
                 }
-                FourCardVc => todo!(),
-                ReviveCard => todo!(),
-                SpyPlayer => todo!(),
-                StealCat => todo!(),
-                Steal2Cards => todo!(),
+                FourCardVc => return Err(Error::NotImplemented),
+                ReviveCard => return Err(Error::NotImplemented),
+                SpyPlayer => return Err(Error::NotImplemented),
+                StealCat => return Err(Error::NotImplemented),
+                Steal2Cards => return Err(Error::NotImplemented),
                 DiscardAttack => {
                     self.active_player_mut()
                         .hand

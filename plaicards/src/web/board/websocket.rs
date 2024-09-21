@@ -210,6 +210,24 @@ async fn handle_socket(socket: WebSocket, gc: GameController) {
                         .await
                         .expect("WSERR");
                 }
+                ClientMsg::PlayCard(c) => {
+                    let mut game = r.game.write().await;
+                    match game.turn_action(player_id, TurnAction::SpecialCard(&c.into())) {
+                        Ok(()) => {}
+                        Err(e) => {
+                            tracing::error!("Played card gave error");
+                            s.to_client(e.into()).await.expect("WSERR");
+                            continue;
+                        }
+                    }
+                    update_player_state(&s, &game, &player_id)
+                        .await
+                        .expect("WSERR");
+                    // Forward next player to room
+                    s.to_room(ServerMsg::NextPlayer(game.active_player().id))
+                        .await
+                        .expect("WSERR");
+                }
             }
         }
     });
@@ -228,6 +246,8 @@ async fn handle_socket(socket: WebSocket, gc: GameController) {
 /// Sends an update for the current player to all players
 async fn update_player_state(s: &WsSender, game: &Game, player_id: &Uuid) -> Res<()> {
     // Updating user hand
+    // FIXME does not work well for removal nor adding more than one card
+    // Send all cards anew?
     let p = game.get_player(*player_id);
     if let Some(card) = p.hand.card_iter().last() {
         let c = msg::Card::from(card);

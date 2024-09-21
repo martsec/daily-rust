@@ -19,7 +19,7 @@ cfg_if! {
 pub mod msg {
 
     #[cfg(feature = "ssr")]
-    use crate::game::{Card as GCard, Player as GPlayer};
+    use crate::game::{Card as GCard, CardEffect, Player as GPlayer};
     use crate::game::{Error as GError, Funding, TurnAction};
 
     use serde::{Deserialize, Serialize};
@@ -68,6 +68,8 @@ pub mod msg {
         Players(Vec<Player>),
         RivalHand { id: Uuid, num_cards: usize },
         AddCard(Card),
+
+        NotImplemented,
     }
     impl<'a> WsSerDe<'a> for ServerMsg {}
 
@@ -77,6 +79,7 @@ pub mod msg {
                 GError::NotYourTurn => Self::NotYourTurn,
                 GError::RuleBreak => Self::BadMove,
                 GError::GameEnded | GError::EmptyDeck => Self::GameEnded,
+                GError::NotImplemented => Self::NotImplemented,
             }
         }
     }
@@ -112,6 +115,21 @@ pub mod msg {
         }
     }
 
+    #[cfg(feature = "ssr")]
+    impl Into<GCard> for Card {
+        fn into(self) -> GCard {
+            if self.ctype == "Special" {
+                GCard::Special {
+                    title: self.title,
+                    effect: self.effect.parse::<CardEffect>().unwrap(),
+                    description: self.description,
+                }
+            } else {
+                todo!()
+            }
+        }
+    }
+
     /// Encapsulates all messages the client will send
     #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
     #[serde(tag = "t", content = "c")]
@@ -120,6 +138,7 @@ pub mod msg {
 
         // Actions
         DoFunding(Funding),
+        PlayCard(Card),
     }
 
     impl<'a> WsSerDe<'a> for ClientMsg {}

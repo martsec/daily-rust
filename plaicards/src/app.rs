@@ -78,8 +78,8 @@ pub fn App() -> impl IntoView {
                         <Routes>
                             <Route path="/" view=HomePage/>
                             <Route path="/cards" view=Showcase/>
-                        // <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
-                        // <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
+                        <Route path="/lobby/:id/:player_id" view=move || view!{ <Lobby/>} />
+                        <Route path="/plai/:id/:player_id" view=move || view!{ <Board/>} />
                         </Routes>
                     </main>
                     <BuiltWith/>

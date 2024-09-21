@@ -1,3 +1,5 @@
+use std::{error::Error, str::FromStr};
+
 use serde::{Deserialize, Serialize};
 
 mod containers;
@@ -162,6 +164,52 @@ impl ToString for CardEffect {
             Self::PlusTwoBuzzwords => "+2 to all buzzwords",
             Self::PlusThreeCEOs => "+3 against CEOs and Companies",
         }.to_string()
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct ParseCardEffectError;
+
+impl FromStr for CardEffect {
+    type Err = ParseCardEffectError;
+    fn from_str(item: &str) -> Result<Self, Self::Err> {
+        Ok(match item {
+            "" => Self::NoEffect,
+              "+2 against data cards"=>Self::PlusTwoVsData,
+              "Discard all buzzword cards plaied"=>Self::DiscardBuzzwords,
+              "+2 against a deceptive Use-case"=>Self::PlusTwoVsDeceptive,
+              "+4 against data cards"=>Self::PlusFourVsData,
+              "Removes all card effects "=>Self::RemovesEffect,
+              "Discard 1 of your rival's plaied cards"=>Self::DiscardOne,
+              "Your rival discards all buzzword cards they plaied"=>Self::DiscardBuzzwordsRival,
+              "Discard 2 of your rival's plaied cards"=>Self::DiscardTwo,
+              "+1 with other data cards"=>Self::PlusOneData,
+              "+1 with python"=>Self::PlusOnePython,
+              "Randomly discard 1 plaied card each"=>Self::DiscardOneEach,
+              "Your plaied cards cannot be discarded"=>Self::CannotDiscard,
+              "Discard 3 cards, draw 2"=>Self::DiscardThreeDrawTwo,
+              "Discard 3 cards"=>Self::DiscardThree,
+              "Discard all your attack cards"=>Self::DiscardAttack,
+              "Everybody draws 4 cards"=>Self::AllDrawFour,
+              "Everybody discards 4 cards"=>Self::AllDiscardFour,
+              "Everybody discards 1 card"=>Self::AllDiscardOne,
+              "All plaiers give their cards to the next plaier. Cannot be blocked."=>Self::CardsToNextPlayer,
+              "All plaiers with more than 9 cards discard 10 cards "=>Self::Antitrust,
+              "Change hands with another plaier"=>Self::ChangeHands,
+              "Do a 4 card VC funding"=>Self::FourCardVc,
+              "Draw 2 cards from the deck"=>Self::DrawTwo,
+              "Draw 3 cards from the deck"=>Self::DrawThree,
+              "Revive any card from the discard pile"=>Self::ReviveCard,
+              "Spy any plAIer's hand and steal one card"=>Self::SpyPlayer,
+              "Steal 1 card from a plAIer. 4 if used as counter for the 'CEO has requested this'. Use it any time."=>Self::StealCat,
+              "Steal 2 cards from a plAIer"=>Self::Steal2Cards,
+              "plAI anytime to stop any effect"=>Self::StopEffect,
+              "plAI anytime to stop an attack"=>Self::StopAttack,
+              "+2 against  CEOs and Managers"=>Self::PlusTwoVsManagers,
+              "+2 to all buzzwords"=>Self::PlusTwoBuzzwords,
+              "+3 against CEOs and Companies"=>Self::PlusThreeCEOs,
+              &_ => todo!(),
+        })
     }
 }
 

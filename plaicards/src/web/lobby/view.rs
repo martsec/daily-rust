@@ -1,12 +1,13 @@
 use crate::web::common::Button;
 use crate::web::common::ButtonLink;
+use codee::string::FromToStringCodec;
 use data_encoding::BASE64URL_NOPAD;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::use_params_map;
 use leptos_router::*;
 use leptos_use::{
-    use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebsocketReturn,
+    use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebSocketReturn,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -53,10 +54,10 @@ pub fn Lobby() -> impl IntoView {
     let (to_game, set_to_game) = create_signal(false);
     let game_url = move || format!("/plai/{}/{}", id().0, player_id().0);
 
-    // Websocket
+    // WebSocket
     let ws_url = format!("/lobby/{}/ws", id().1);
     // Update signals when new data arrives from the webhook
-    let update_signals = move |m: String| {
+    let update_signals = move |m: &String| {
         if let Some(slice) = m.strip_prefix("PLAYERS") {
             let ps: Vec<Player> = serde_json::from_str(slice).unwrap_or_default();
             set_players.set(ps);
@@ -64,10 +65,11 @@ pub fn Lobby() -> impl IntoView {
             set_to_game.set(true);
         }
     };
-    let UseWebsocketReturn { message, send, .. } = use_websocket_with_options(
-        &ws_url,
-        UseWebSocketOptions::default().on_message(update_signals),
-    );
+    let UseWebSocketReturn { message, send, .. } =
+        use_websocket_with_options::<String, String, FromToStringCodec>(
+            &ws_url,
+            UseWebSocketOptions::default().on_message(update_signals),
+        );
 
     let (name, set_name) = create_signal("MetaTrust".to_string());
 
@@ -83,7 +85,7 @@ pub fn Lobby() -> impl IntoView {
     };
 
     let send1 = send.clone();
-    let start_game = move |_| send.clone()("START_GAME");
+    let start_game = move |_| send.clone()(&String::from("START_GAME"));
 
     view! {
       <Show when=to_game fallback=|| view! {}>

@@ -4,6 +4,7 @@ use std::rc::Rc;
 use crate::game::Funding;
 use crate::web::common::Button;
 use crate::web::common::ButtonDisablable;
+use codee::string::FromToStringCodec;
 use data_encoding::BASE64URL_NOPAD;
 use leptos::ev::Event;
 use leptos::logging::log;
@@ -12,7 +13,7 @@ use leptos_meta::*;
 use leptos_router::use_params_map;
 use leptos_router::*;
 use leptos_use::{
-    use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebsocketReturn,
+    use_websocket, use_websocket_with_options, UseWebSocketOptions, UseWebSocketReturn,
 };
 use uuid::Uuid;
 
@@ -58,23 +59,23 @@ fn get_color(card_type: &str) -> &str {
 #[derive(Clone)]
 struct WsContext {
     pub message: Signal<Option<String>>,
-    send: Rc<dyn Fn(&str)>,
+    send: Rc<dyn Fn(&String)>,
 }
 
 impl WsContext {
-    pub fn new(message: Signal<Option<String>>, send: Rc<dyn Fn(&str)>) -> Self {
+    pub fn new(message: Signal<Option<String>>, send: Rc<dyn Fn(&String)>) -> Self {
         Self { message, send }
     }
 
     // create a method to avoid having to use parantheses around the field
-    pub fn send(&self, message: &str) {
+    pub fn send(&self, message: &String) {
         (self.send)(message);
     }
 }
 
 type History = RwSignal<Vec<String>>;
 
-/// Websocket encapsulation with the following features:
+/// WebSocket encapsulation with the following features:
 ///
 /// * History of messages
 /// * Contract enforcement
@@ -104,12 +105,13 @@ impl Ws {
     pub fn new(url: &str) -> Self {
         let history: History = create_rw_signal(vec![format!("[init] Starting Ws to {}", &url)]);
 
-        let UseWebsocketReturn { message, send, .. } = use_websocket_with_options(
-            "/game/ws",
-            UseWebSocketOptions::default()
-                .on_open(Self::callback_open(history))
-                .on_message(Self::callback_message(history)),
-        );
+        let UseWebSocketReturn { message, send, .. } =
+            use_websocket_with_options::<String, String, FromToStringCodec>(
+                "/game/ws",
+                UseWebSocketOptions::default()
+                    .on_open(Self::callback_open(history))
+                    .on_message(Self::callback_message(history)),
+            );
         let ctx = WsContext::new(message, Rc::new(send.clone()));
         Self { history, ctx }
     }
@@ -119,8 +121,8 @@ impl Ws {
             history.update(|h| h.push(format!("[onopen]: event {:?}", e.type_())));
         }
     }
-    fn callback_message(history: RwSignal<Vec<String>>) -> impl Fn(String) {
-        move |m: String| {
+    fn callback_message(history: RwSignal<Vec<String>>) -> impl Fn(&String) {
+        move |m: &String| {
             history.update(|h| h.push(format!("[onmessage]: event {m}")));
         }
     }
